@@ -19,32 +19,26 @@ export default function WelcomeScreen() {
   const dog_position = useRef(new Animated.Value(height)).current;
 
   useEffect(() => {
-    // animación del perro
     Animated.timing(dog_position, {
       toValue: 0,
       duration: 1000,
       useNativeDriver: true,
     }).start();
 
-    // redirección al login después de 3 segundos
     const timeout = setTimeout(() => {
-      navigation.replace('Login'); // usamos replace para que no se pueda volver con "Back"
-    }, 3000);
+      navigation.replace('AuthIntro');
+    }, 2000);
 
-    return () => clearTimeout(timeout); // cleanup
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
     <LinearGradient colors={['#63B3ED', '#E0F2FE']} style={styles.background_gradient}>
       <Text style={styles.welcome_title}>PTW</Text>
-
       <Animated.Image
         source={require('../../assets/menu_dog.png')}
-        style={[
-          styles.dog_image,
-          { transform: [{ translateY: dog_position }] },
-        ]}
-        resizeMode="contain"
+        style={[styles.dog_image, { transform: [{ translateY: dog_position }] }]}
+        resizeMode="cover"
       />
     </LinearGradient>
   );
