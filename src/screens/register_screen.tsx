@@ -35,7 +35,7 @@ import {
     
       const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!email_regex.test(email)) {
-        Alert.alert('Error al crear cuenta', 'Correo electrónico inválido');
+        Alert.alert('Error al crear cuenta', 'Por favor ingrese un correo electrónico válido.');
         return;
       }
     

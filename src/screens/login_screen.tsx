@@ -32,12 +32,11 @@ export default function LoginScreen() {
   
     const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email_regex.test(email)) {
-      Alert.alert('Error al iniciar sesión', 'Correo electrónico inválido');
+      Alert.alert('Error al iniciar sesión', 'Por favor ingrese un correo electrónico válido.');
       return;
     }
   
-    //TODO
-    //Autenticación del usuario
+    //TODO: Implementar la lógica de autenticación del usuario
     console.log('Login válido: ', { email, password });
   };
   
@@ -97,9 +96,9 @@ export default function LoginScreen() {
         />
 
         <View style={{ width: '100%' }}>
-          <TouchableOpacity>
-            <Text style={styles.forgot_password}>¿Olvidó su contraseña?</Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgot_password}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
         </View>
 
 
