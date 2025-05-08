@@ -10,17 +10,20 @@ import {
     Easing,
   } from 'react-native';
   import { useRef, useState, useEffect } from 'react';
-  import { useNavigation } from '@react-navigation/native';
-  import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+  import { NativeStackScreenProps } from '@react-navigation/native-stack';
   import { RootStackParamList } from '../navigation/stack_navigator';
   import { LinearGradient } from 'expo-linear-gradient';
   import { Ionicons } from '@expo/vector-icons';
   
-  export default function ForgotPasswordScreen() {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  type Props = NativeStackScreenProps<RootStackParamList, 'ResetPassword'>;
+  
+  export default function ResetPasswordScreen({ route, navigation }: Props) {
+    const { email } = route.params;
     const fade_anim = useRef(new Animated.Value(0)).current;
     const translate_anim = useRef(new Animated.Value(30)).current;
-    const [email, set_email] = useState('');
+  
+    const [password, setPassword] = useState('');
+    const [confirm, setConfirm] = useState('');
   
     useEffect(() => {
       Animated.parallel([
@@ -39,33 +42,35 @@ import {
       ]).start();
     }, []);
   
-    const validate_email = (email: string) => {
-      return /\S+@\S+\.\S+/.test(email);
-    };
+    const handleReset = () => {
+      if (password.length === 0 || confirm.length === 0) {
+        Alert.alert('Campo vacío', 'Por favor ingresa tu contraseña.');
+        return;
+      }
   
-    const handle_reset = () => {
-
-      if (email.length === 0) {
-        Alert.alert('Campo vacío', 'Por favor ingrese su correo electrónico.');
+      if (password.length < 6) {
+        Alert.alert('Contraseña débil', 'Debe tener al menos 6 caracteres.');
         return;
       }
-      if (!validate_email(email)) {
-        Alert.alert('Correo inválido', 'Por favor ingrese un correo electrónico válido.');
+  
+      if (password !== confirm) {
+        Alert.alert('Error', 'Las contraseñas no coinciden.');
         return;
       }
-    
-      // Simular envío de código al correo
-      Alert.alert('Correo enviado', 'Revisa tu bandeja de entrada para el código.');
-      navigation.navigate('VerifyCode', { email });
+  
+      //TODO: Logica de backend para restablecer la contraseña
+      Alert.alert('Contraseña actualizada', 'Ahora puedes iniciar sesión.');
+      navigation.navigate('Login');
     };
   
     return (
       <LinearGradient colors={['#0096FF', '#E6F4FF']} style={styles.container}>
         <Image
-            source={require('../../assets/menu_dog.png')}
-            style={styles.dog_image}
-            resizeMode="cover"
+          source={require('../../assets/menu_dog.png')}
+          style={styles.dog_image}
+          resizeMode="cover"
         />
+  
         <Animated.View
           style={[styles.card, { opacity: fade_anim, transform: [{ translateY: translate_anim }] }]}
         >
@@ -73,19 +78,29 @@ import {
             <Ionicons name="arrow-back" size={24} color="#333" />
           </TouchableOpacity>
   
-          <Text style={styles.title}>Recuperar contraseña</Text>
-          <Text style={styles.subtitle}>Ingrese su correo y le enviaremos instrucciones.</Text>
+          <Text style={styles.title}>Nueva contraseña</Text>
+          <Text style={styles.subtitle}>
+            Para el correo: {'\n'}
+            <Text style={{ fontWeight: '600' }}>{email}</Text>
+          </Text>
   
           <TextInput
             style={styles.input_field}
-            placeholder="Correo electrónico"
-            value={email}
-            onChangeText={set_email}
-            keyboardType="email-address"
+            placeholder="Contraseña"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TextInput
+            style={styles.input_field}
+            placeholder="Confirmar contraseña"
+            secureTextEntry
+            value={confirm}
+            onChangeText={setConfirm}
           />
   
-          <TouchableOpacity style={styles.send_button} onPress={handle_reset}>
-            <Text style={styles.send_text}>Enviar correo</Text>
+          <TouchableOpacity style={styles.send_button} onPress={handleReset}>
+            <Text style={styles.send_text}>Guardar</Text>
           </TouchableOpacity>
         </Animated.View>
       </LinearGradient>
@@ -98,13 +113,13 @@ import {
       justifyContent: 'flex-start',
     },
     dog_image: {
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        top: 80,
-        left: 40,
-        right: 0,
-        bottom: 0,
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      top: 80,
+      left: 40,
+      right: 0,
+      bottom: 0,
     },
     card: {
       position: 'absolute',
@@ -122,27 +137,6 @@ import {
       position: 'absolute',
       left: 20,
       top: 20,
-    },
-    icon_container: {
-      backgroundColor: '#fff',
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'absolute',
-      top: -36,
-      borderWidth: 4,
-      borderColor: '#E6F4FF',
-      shadowColor: '#000',
-      shadowOpacity: 0.08,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    icon: {
-      width: 50,
-      height: 50,
-      resizeMode: 'contain',
     },
     title: {
       fontSize: 26,

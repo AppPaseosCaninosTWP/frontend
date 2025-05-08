@@ -10,17 +10,20 @@ import {
     Easing,
   } from 'react-native';
   import { useRef, useState, useEffect } from 'react';
-  import { useNavigation } from '@react-navigation/native';
+  import { useNavigation, useRoute } from '@react-navigation/native';
   import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
   import { RootStackParamList } from '../navigation/stack_navigator';
   import { LinearGradient } from 'expo-linear-gradient';
   import { Ionicons } from '@expo/vector-icons';
   
-  export default function ForgotPasswordScreen() {
+  export default function VerifyCodeScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute();
+    const { email } = route.params || {};
     const fade_anim = useRef(new Animated.Value(0)).current;
     const translate_anim = useRef(new Animated.Value(30)).current;
-    const [email, set_email] = useState('');
+  
+    const [code, set_code] = useState('');
   
     useEffect(() => {
       Animated.parallel([
@@ -39,32 +42,38 @@ import {
       ]).start();
     }, []);
   
-    const validate_email = (email: string) => {
-      return /\S+@\S+\.\S+/.test(email);
-    };
-  
-    const handle_reset = () => {
+    const handle_verify = () => {
+    //Prueba de screens sin backend
+    //if (code === '123456') {
+    //    Alert.alert('Código verificado', 'Puedes restablecer tu contraseña.');
+    //    navigation.navigate('ResetPassword', { email });
+    //}
+    //else {
+    //    Alert.alert('Código inválido', 'Por favor verifica el código.');
+    //}
+    // Fin de prueba
 
-      if (email.length === 0) {
-        Alert.alert('Campo vacío', 'Por favor ingrese su correo electrónico.');
+    if (code.length === 0) {
+      Alert.alert('Campo vacío', 'Por favor ingrese el código.');
+      return;
+    }
+        
+      if (code.length !== 6) {
+        Alert.alert('Código inválido', 'Debe tener 6 dígitos.');
         return;
       }
-      if (!validate_email(email)) {
-        Alert.alert('Correo inválido', 'Por favor ingrese un correo electrónico válido.');
-        return;
-      }
-    
-      // Simular envío de código al correo
-      Alert.alert('Correo enviado', 'Revisa tu bandeja de entrada para el código.');
-      navigation.navigate('VerifyCode', { email });
+
+      //TODO: Lógica para verificar el código
+      Alert.alert('Código verificado', 'Ahora puedes cambiar tu contraseña.');
+      navigation.navigate('ResetPassword', { email });
     };
   
     return (
       <LinearGradient colors={['#0096FF', '#E6F4FF']} style={styles.container}>
         <Image
-            source={require('../../assets/menu_dog.png')}
-            style={styles.dog_image}
-            resizeMode="cover"
+          source={require('../../assets/menu_dog.png')}
+          style={styles.dog_image}
+          resizeMode="cover"
         />
         <Animated.View
           style={[styles.card, { opacity: fade_anim, transform: [{ translateY: translate_anim }] }]}
@@ -73,19 +82,23 @@ import {
             <Ionicons name="arrow-back" size={24} color="#333" />
           </TouchableOpacity>
   
-          <Text style={styles.title}>Recuperar contraseña</Text>
-          <Text style={styles.subtitle}>Ingrese su correo y le enviaremos instrucciones.</Text>
+          <Text style={styles.title}>Verificar código</Text>
+          <Text style={styles.subtitle}>
+            Ingrese el código que enviamos a{'\n'}
+            <Text style={{ fontWeight: '600' }}>{email}</Text>
+          </Text>
   
           <TextInput
             style={styles.input_field}
-            placeholder="Correo electrónico"
-            value={email}
-            onChangeText={set_email}
-            keyboardType="email-address"
+            placeholder="Código de verificación"
+            value={code}
+            onChangeText={set_code}
+            keyboardType="numeric"
+            maxLength={6}
           />
   
-          <TouchableOpacity style={styles.send_button} onPress={handle_reset}>
-            <Text style={styles.send_text}>Enviar correo</Text>
+          <TouchableOpacity style={styles.send_button} onPress={handle_verify}>
+            <Text style={styles.send_text}>Verificar</Text>
           </TouchableOpacity>
         </Animated.View>
       </LinearGradient>
@@ -98,13 +111,13 @@ import {
       justifyContent: 'flex-start',
     },
     dog_image: {
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        top: 80,
-        left: 40,
-        right: 0,
-        bottom: 0,
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      top: 80,
+      left: 40,
+      right: 0,
+      bottom: 0,
     },
     card: {
       position: 'absolute',
@@ -122,27 +135,6 @@ import {
       position: 'absolute',
       left: 20,
       top: 20,
-    },
-    icon_container: {
-      backgroundColor: '#fff',
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'absolute',
-      top: -36,
-      borderWidth: 4,
-      borderColor: '#E6F4FF',
-      shadowColor: '#000',
-      shadowOpacity: 0.08,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    icon: {
-      width: 50,
-      height: 50,
-      resizeMode: 'contain',
     },
     title: {
       fontSize: 26,
@@ -166,6 +158,8 @@ import {
       fontSize: 16,
       borderWidth: 1,
       borderColor: '#E0E0E0',
+      textAlign: 'center',
+      letterSpacing: 4,
     },
     send_button: {
       backgroundColor: '#007BFF',
