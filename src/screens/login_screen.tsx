@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
+  Alert,
 } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +23,23 @@ export default function LoginScreen() {
 
   const [email, set_email] = useState('');
   const [password, set_password] = useState('');
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert('Error al iniciar sesión', 'Debe completar todos los campos');
+      return;
+    }
+  
+    const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email_regex.test(email)) {
+      Alert.alert('Error al iniciar sesión', 'Por favor ingrese un correo electrónico válido.');
+      return;
+    }
+  
+    //TODO: Implementar la lógica de autenticación del usuario
+    console.log('Login válido: ', { email, password });
+  };
+  
 
   useEffect(() => {
     Animated.parallel([
@@ -78,13 +96,13 @@ export default function LoginScreen() {
         />
 
         <View style={{ width: '100%' }}>
-          <TouchableOpacity>
-            <Text style={styles.forgot_password}>¿Olvidó su contraseña?</Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgot_password}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
         </View>
 
 
-        <TouchableOpacity style={styles.login_button}>
+        <TouchableOpacity style={styles.login_button} onPress={handleLogin}>
           <Text style={styles.login_text}>Iniciar sesión</Text>
         </TouchableOpacity>
 

@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Animated,
     Easing,
+    Alert,
   } from 'react-native';
   import { useEffect, useRef, useState } from 'react';
   import { useNavigation } from '@react-navigation/native';
@@ -25,6 +26,55 @@ import {
     const [phone, set_phone] = useState('');
     const [password, set_password] = useState('');
     const [confirm_password, set_confirm_password] = useState('');
+
+    const handleRegister = () => {
+      if (!email || !phone || !password || !confirm_password) {
+        Alert.alert('Error al crear cuenta', 'Todos los campos son obligatorios');
+        return;
+      }
+    
+      const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email_regex.test(email)) {
+        Alert.alert('Error al crear cuenta', 'Por favor ingrese un correo electrónico válido.');
+        return;
+      }
+    
+      const phone_regex = /^\d{9}$/;
+      if (!phone_regex.test(phone)) {
+        Alert.alert('Error al crear cuenta', 'El número de teléfono debe tener exactamente 9 dígitos');
+        return;
+      }
+    
+      if (password.length < 8 || password.length > 15) {
+        Alert.alert('Error al crear cuenta', 'La contraseña debe tener entre 8 y 15 caracteres');
+        return;
+      }
+    
+      if (password !== confirm_password) {
+        Alert.alert('Error al crear cuenta', 'Las contraseñas no coinciden');
+        return;
+      }
+    
+      Alert.alert(
+        'Registro exitoso',
+        '¡Tu cuenta ha sido creada!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              set_email('');
+              set_phone('');
+              set_password('');
+              set_confirm_password('');
+    
+              navigation.navigate('Login');
+            },
+          },
+        ]
+      );
+    };
+    
+    
   
     useEffect(() => {
       Animated.parallel([
@@ -101,7 +151,7 @@ import {
             onChangeText={set_confirm_password}
           />
   
-          <TouchableOpacity style={styles.register_button}>
+          <TouchableOpacity style={styles.register_button} onPress={handleRegister}>
             <Text style={styles.register_text}>Crear cuenta</Text>
           </TouchableOpacity>
   
@@ -115,6 +165,8 @@ import {
       </LinearGradient>
     );
   }
+
+  
   
   const styles = StyleSheet.create({
     container: {
