@@ -15,6 +15,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { login_user } from '../service/auth_service';
+import { save_session } from '../utils/token_service';
+
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -24,7 +27,7 @@ export default function LoginScreen() {
   const [email, set_email] = useState('');
   const [password, set_password] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error al iniciar sesión', 'Debe completar todos los campos');
       return;
@@ -36,9 +39,18 @@ export default function LoginScreen() {
       return;
     }
   
-    //TODO: Implementar la lógica de autenticación del usuario
-    console.log('Login válido: ', { email, password });
+    try {
+      const { token, user } = await login_user(email, password);
+      await save_session(token, user); // <-- ¡ahora sí funcionará!      
+      Alert.alert('Sesión iniciada', `Bienvenido, ${user.email}`);
+      navigation.replace('Welcome'); // o redirige a tu pantalla principal
+    } catch (err: any) {
+      console.error('Error desde login_user:', err);
+      Alert.alert('Error', err.message);
+    }
   };
+  
+  
   
 
   useEffect(() => {
