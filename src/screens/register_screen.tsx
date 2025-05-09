@@ -39,9 +39,9 @@ import {
         return;
       }
     
-      const phone_regex = /^\d{9}$/;
+      const phone_regex = /^\d{8}$/;
       if (!phone_regex.test(phone)) {
-        Alert.alert('Error al crear cuenta', 'El número de teléfono debe tener exactamente 9 dígitos');
+        Alert.alert('Error al crear cuenta', 'El número de teléfono debe tener exactamente 8 dígitos');
         return;
       }
     
@@ -117,7 +117,7 @@ import {
   
           <TextInput
             style={styles.input_field}
-            placeholder="Email"
+            placeholder="Correo electrónico"
             value={email}
             onChangeText={set_email}
           />
@@ -125,10 +125,11 @@ import {
           <View style={styles.phone_input_container}>
             <View style={styles.flag_wrapper}>
               <Image source={require('../../assets/flag_cl.png')} style={styles.flag_icon} />
+              <Text style={styles.prefix_text}>+56 | 9</Text>
             </View>
             <TextInput
               style={styles.phone_input}
-              placeholder="Mobile phone"
+              placeholder="Teléfono"
               value={phone}
               keyboardType="phone-pad"
               onChangeText={set_phone}
@@ -137,7 +138,7 @@ import {
   
           <TextInput
             style={styles.input_field}
-            placeholder="Password"
+            placeholder="Contraseña"
             secureTextEntry
             value={password}
             onChangeText={set_password}
@@ -145,7 +146,7 @@ import {
   
           <TextInput
             style={styles.input_field}
-            placeholder="Confirm password"
+            placeholder="Confirmar contraseña"
             secureTextEntry
             value={confirm_password}
             onChangeText={set_confirm_password}
@@ -295,5 +296,18 @@ import {
       color: '#007BFF',
       fontWeight: '600',
     },
+    prefix_wrapper: {
+  paddingHorizontal: 12,
+  paddingVertical: 12,
+  borderRightWidth: 1,
+  borderRightColor: '#E0E0E0',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+prefix_text: {
+  fontSize: 16,
+  color: '#1B1B1B',
+},
+
   });
   
