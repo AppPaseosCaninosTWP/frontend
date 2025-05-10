@@ -81,13 +81,13 @@ export async function verify_reset_code(email: string, code: string): Promise<vo
 }
 
 export async function send_code(email: string): Promise<void> {
-  const token = await get_token(); // <-- obtener el token almacenado
+  const token = await get_token();
 
   const response = await fetch(`${API_BASE_URL}/user/request_reset_code`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`, // <-- aquí se incluye el token
+      Authorization: `Bearer ${token}`, 
     },
     body: JSON.stringify({ email }),
   });
