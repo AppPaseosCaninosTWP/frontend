@@ -12,11 +12,11 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/stack_navigator';
+import { RootStackParamList } from '../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { login_user } from '../service/auth_service';
-import { save_session } from '../utils/token_service';
+import { login_user } from '../../service/auth_service';
+import { save_session } from '../../utils/token_service';
 
 
 export default function LoginScreen() {

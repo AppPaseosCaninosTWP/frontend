@@ -11,7 +11,7 @@ import {
   import { LinearGradient } from 'expo-linear-gradient';
   import { useNavigation } from '@react-navigation/native';
   import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-  import { RootStackParamList } from '../navigation/stack_navigator';
+  import { RootStackParamList } from '../../navigation/stack_navigator';
   
   export default function AuthIntroScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();

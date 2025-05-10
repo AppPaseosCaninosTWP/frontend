@@ -12,11 +12,11 @@ import {
   import { useEffect, useRef, useState } from 'react';
   import { useNavigation } from '@react-navigation/native';
   import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-  import { RootStackParamList } from '../navigation/stack_navigator';
+  import { RootStackParamList } from '../../navigation/stack_navigator';
   import { LinearGradient } from 'expo-linear-gradient';
   import { Ionicons } from '@expo/vector-icons';
-  import { register_user } from '../service/auth_service';
-  import { save_session } from '../utils/token_service';
+  import { register_user } from '../../service/auth_service';
+  import { send_code } from '../../service/auth_service';
 
   
   export default function RegisterScreen() {
@@ -61,20 +61,20 @@ import {
     
       try {
         const user = await register_user(email, phone, password, confirm_password);
-        Alert.alert(
-          'Cuenta creada',
-          `Usuario ${user.email} registrado exitosamente`,
-          [
-            {
-              text: 'Iniciar sesión',
-              onPress: () => navigation.replace('Login'),
-            },
-          ]
-        );
+      
+        // Enviar código de validación por correo
+        await send_code(user.email);
+      
+        // Redirigir a pantalla de verificación
+        navigation.navigate('VerifyCode', {
+          email: user.email,
+          context: 'register',
+        });
       } catch (err: any) {
         console.error('Error al registrarse:', err);
         Alert.alert('Error', err.message);
-      }      
+      }
+       
     };
     
     

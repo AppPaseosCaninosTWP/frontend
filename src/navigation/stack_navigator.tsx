@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from '../screens/welcome_screen';
-import AuthIntroScreen from '../screens/auth_intro_screen';
-import LoginScreen from '../screens/login_screen';
-import RegisterScreen from '../screens/register_screen';
-import ForgotPasswordScreen from '../screens/forgot_password_screen';
-import VerifyCodeScreen from '../screens/verify_code_screen';
-import ResetPasswordScreen from '../screens/reset_password_screen';
+import AuthIntroScreen from '../screens/auth/auth_intro_screen';
+import LoginScreen from '../screens/auth/login_screen';
+import RegisterScreen from '../screens/auth/register_screen';
+import ForgotPasswordScreen from '../screens/auth/forgot_password_screen';
+import VerifyCodeScreen from '../screens/auth/verify_code_screen';
+import ResetPasswordScreen from '../screens/auth/reset_password_screen';
 //import CreatePetProfileScreen from '../screens/create_pet_profile_screen';
 
 
@@ -15,7 +15,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  VerifyCode: { email: string };
+  VerifyCode: { email: string; context: 'register' | 'reset' };
   ResetPassword: { email: string };
   //CreatePetProfile: { petToEdit?: PetProfile } | undefined;
 }
