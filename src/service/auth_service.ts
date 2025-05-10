@@ -1,5 +1,6 @@
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 import { user_model } from '../models/user_model';
+import { get_token } from '../utils/token_service';
 
 export interface login_response {
   token: string;
@@ -58,5 +59,41 @@ export async function register_user(
     throw new Error(json.msg || 'Error al registrarse');
   }
 
-  return json.data; // ya no hay token
+  return json.data;
+}
+
+export async function verify_reset_code(email: string, code: string): Promise<void> {
+  const token = await get_token();
+
+  const response = await fetch(`${API_BASE_URL}/user/verify_reset_code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ email, code }),
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Código inválido');
+  }
+}
+
+export async function send_code(email: string): Promise<void> {
+  const token = await get_token(); // <-- obtener el token almacenado
+
+  const response = await fetch(`${API_BASE_URL}/user/request_reset_code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`, // <-- aquí se incluye el token
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al enviar el código');
+  }
 }
