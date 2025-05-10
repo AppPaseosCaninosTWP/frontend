@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/stack_navigator';
+import { RootStackParamList } from '../../navigation/stack_navigator';
 
 const { height } = Dimensions.get('window');
 
