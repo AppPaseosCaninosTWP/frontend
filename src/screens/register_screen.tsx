@@ -15,6 +15,9 @@ import {
   import { RootStackParamList } from '../navigation/stack_navigator';
   import { LinearGradient } from 'expo-linear-gradient';
   import { Ionicons } from '@expo/vector-icons';
+  import { register_user } from '../service/auth_service';
+  import { save_session } from '../utils/token_service';
+
   
   export default function RegisterScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -27,52 +30,53 @@ import {
     const [password, set_password] = useState('');
     const [confirm_password, set_confirm_password] = useState('');
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
       if (!email || !phone || !password || !confirm_password) {
         Alert.alert('Error al crear cuenta', 'Todos los campos son obligatorios');
         return;
       }
     
       const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phone_regex = /^\d{9}$/;
+    
       if (!email_regex.test(email)) {
-        Alert.alert('Error al crear cuenta', 'Por favor ingrese un correo electrónico válido.');
+        Alert.alert('Correo inválido', 'Ingrese un correo electrónico válido.');
         return;
       }
     
-      const phone_regex = /^\d{8}$/;
       if (!phone_regex.test(phone)) {
-        Alert.alert('Error al crear cuenta', 'El número de teléfono debe tener exactamente 8 dígitos');
+        Alert.alert('Teléfono inválido', 'El número debe tener exactamente 8 dígitos.');
         return;
       }
     
       if (password.length < 8 || password.length > 15) {
-        Alert.alert('Error al crear cuenta', 'La contraseña debe tener entre 8 y 15 caracteres');
+        Alert.alert('Contraseña inválida', 'Debe tener entre 8 y 15 caracteres.');
         return;
       }
     
       if (password !== confirm_password) {
-        Alert.alert('Error al crear cuenta', 'Las contraseñas no coinciden');
+        Alert.alert('Error', 'Las contraseñas no coinciden');
         return;
       }
     
-      Alert.alert(
-        'Registro exitoso',
-        '¡Tu cuenta ha sido creada!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              set_email('');
-              set_phone('');
-              set_password('');
-              set_confirm_password('');
-    
-              navigation.navigate('Login');
+      try {
+        const user = await register_user(email, phone, password, confirm_password);
+        Alert.alert(
+          'Cuenta creada',
+          `Usuario ${user.email} registrado exitosamente`,
+          [
+            {
+              text: 'Iniciar sesión',
+              onPress: () => navigation.replace('Login'),
             },
-          },
-        ]
-      );
+          ]
+        );
+      } catch (err: any) {
+        console.error('Error al registrarse:', err);
+        Alert.alert('Error', err.message);
+      }      
     };
+    
     
     
   
