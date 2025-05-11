@@ -45,7 +45,7 @@ import {
       }
     
       if (!phone_regex.test(phone)) {
-        Alert.alert('Teléfono inválido', 'El número debe tener exactamente 8 dígitos.');
+        Alert.alert('Teléfono inválido', 'El número debe tener exactamente 9 dígitos.');
         return;
       }
     

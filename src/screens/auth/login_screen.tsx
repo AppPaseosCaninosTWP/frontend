@@ -41,7 +41,7 @@ export default function LoginScreen() {
   
     try {
       const { token, user } = await login_user(email, password);
-      await save_session(token, user); // <-- ¡ahora sí funcionará!      
+      await save_session(token, user);     
       Alert.alert('Sesión iniciada', `Bienvenido, ${user.email}`);
       navigation.replace('DashboardScreen');
     } catch (err: any) {
