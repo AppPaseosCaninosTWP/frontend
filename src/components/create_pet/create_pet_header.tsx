@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
 interface CreatePetHeaderProps {
   title: string;
   subtitle: string;
   step: number;
   total_steps?: number;
+  on_back_press?: () => void;
 }
 
 export default function CreatePetHeader({
@@ -13,19 +15,28 @@ export default function CreatePetHeader({
   subtitle,
   step,
   total_steps = 9,
+  on_back_press,
 }: CreatePetHeaderProps) {
   const progress = (step / total_steps) * 100;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header_row}>
-        <Text style={styles.title}>{title}</Text>
+      <View style={styles.top_row}>
+        {on_back_press && (
+          <TouchableOpacity onPress={on_back_press} style={styles.back_button}>
+            <Feather name="arrow-left" size={24} color="#333" />
+          </TouchableOpacity>
+        )}
+
+        <View style={styles.centered_text}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+        </View>
+
         <Text style={styles.step_text}>
-          Step <Text style={styles.step_number}>{`${step}/${total_steps}`}</Text>
+          Paso <Text style={styles.step_count}>{step}/{total_steps}</Text>
         </Text>
       </View>
-
-      <Text style={styles.subtitle}>{subtitle}</Text>
 
       <View style={styles.progress_bar}>
         <View style={[styles.progress_fill, { width: `${progress}%` }]} />
@@ -37,41 +48,51 @@ export default function CreatePetHeader({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 16,
     backgroundColor: '#fff',
   },
-  header_row: {
+  top_row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  back_button: {
+    paddingRight: 12,
+  },
+  centered_text: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 20,
   },
   title: {
-    fontWeight: '600',
     fontSize: 16,
+    fontWeight: '600',
     color: '#111',
-  },
-  step_text: {
-    fontSize: 14,
-    color: '#999',
-  },
-  step_number: {
-    color: '#111',
-    fontWeight: '500',
   },
   subtitle: {
     fontSize: 13,
-    color: '#555',
+    color: '#888',
     marginTop: 4,
-    marginBottom: 12,
+  },
+  step_text: {
+    fontSize: 13,
+    color: '#999',
+  },
+  step_count: {
+    fontWeight: '500',
   },
   progress_bar: {
     height: 6,
-    backgroundColor: '#EEE',
-    borderRadius: 4,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 3,
     overflow: 'hidden',
+    marginTop: 12,
   },
   progress_fill: {
     height: '100%',
-    backgroundColor: '#FFB200', // amarillo como en Figma
+    backgroundColor: '#FFB200',
   },
 });
+
+
