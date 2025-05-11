@@ -9,7 +9,9 @@ import ResetPasswordScreen from '../screens/auth/reset_password_screen';
 import DashboardPaseadorScreen from '../screens/main/dashboard/dashboard_paseador_screen';
 import DashboardAdminScreen from '../screens/main/dashboard/dashboard_admin_screen';
 import DashboardClienteScreen from '../screens/main/dashboard/dashboard_cliente_screen';
-import DashboardScreen from '../screens/main/dashboard/dashboard_screen'; // Updated path to match the correct location
+import DashboardScreen from '../screens/main/dashboard/dashboard_screen'; 
+import StepBreedScreen from '../screens/main/create_pet/step_breed_screen';
+import StepZonaScreen from '../screens/main/create_pet/step_zona_screen';
 //import CreatePetProfileScreen from '../screens/create_pet_profile_screen';
 
 
@@ -25,6 +27,8 @@ export type RootStackParamList = {
   DashboardCliente: undefined;
   DashboardPaseador: undefined;
   DashboardScreen: undefined;
+  StepBreedScreen: undefined;
+  StepZonaScreen: undefined;
   //CreatePetProfile: { petToEdit?: PetProfile } | undefined;
 }
 
@@ -60,6 +64,8 @@ export default function StackNavigator() {
       <Stack.Screen name="DashboardPaseador" component={DashboardPaseadorScreen} />
       <Stack.Screen name="DashboardAdmin" component={DashboardAdminScreen} />
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
+      <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
+      <Stack.Screen name="StepBreedScreen" component={StepBreedScreen} />
       {/*<Stack.Screen name="CreatePetProfile" component={CreatePetProfileScreen} />*/}
     </Stack.Navigator>
   );
