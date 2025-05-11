@@ -175,52 +175,52 @@ const validateConfirmPassword = (value: string) => {
           <Text style={styles.subtitle}>¡Bienvenido! Introduce tus datos a continuación y empieza.</Text>
   
           <TextInput 
-  style={styles.input_field}
-  placeholder="Correo electrónico"
-  value={email}
-  onChangeText={validateEmail}
-/>
-{emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+          style={styles.input_field}
+          placeholder="Correo electrónico"
+          value={email}
+          onChangeText={validateEmail}
+        />
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-<View style={styles.phone_input_container}>
-  <View style={styles.flag_wrapper}>
-    <Image source={require('../../assets/flag_cl.png')} style={styles.flag_icon} />
-    <Text style={styles.prefix_text}>+56</Text>
-  </View>
-  <TextInput
-    style={styles.phone_input}
-    placeholder="Teléfono"
-    value={phone}
-    keyboardType="phone-pad"
-    maxLength={8}
-    onChangeText={validatePhone}
-  />
-</View>
-{phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+        <View style={styles.phone_input_container}>
+          <View style={styles.flag_wrapper}>
+          <Image source={require('../../assets/flag_cl.png')} style={styles.flag_icon} />
+          <Text style={styles.prefix_text}>+56</Text>
+        </View>
+        <TextInput
+          style={styles.phone_input}
+          placeholder="Teléfono"
+          value={phone}
+          keyboardType="phone-pad"
+          maxLength={8}
+          onChangeText={validatePhone}
+        />
+        </View>
+      {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
 
-<TextInput
-  style={styles.input_field}
-  placeholder="Contraseña"
-  secureTextEntry
-  value={password}
-  onChangeText={validatePassword}
-  onBlur={() => setPasswordTouched(true)}
-/>
-{passwordTouched && passwordError ? (
-  <Text style={styles.errorText}>{passwordError}</Text>
-) : null}
+        <TextInput
+          style={styles.input_field}
+          placeholder="Contraseña"
+          secureTextEntry
+          value={password}
+          onChangeText={validatePassword}
+          onBlur={() => setPasswordTouched(true)}
+        />
+        {passwordTouched && passwordError ? (
+      <Text style={styles.errorText}>{passwordError}</Text>
+      ) : null}
 
-<TextInput
-  style={styles.input_field}
-  placeholder="Confirmar contraseña"
-  secureTextEntry
-  value={confirm_password}
-  onChangeText={validateConfirmPassword}
-  onBlur={() => setConfirmPasswordTouched(true)}
-/>
-{confirmPasswordTouched && confirmPasswordError ? (
-  <Text style={styles.errorText}>{confirmPasswordError}</Text>
-) : null}
+      <TextInput
+        style={styles.input_field}
+        placeholder="Confirmar contraseña"
+        secureTextEntry
+        value={confirm_password}
+        onChangeText={validateConfirmPassword}
+        onBlur={() => setConfirmPasswordTouched(true)}
+      />
+      {confirmPasswordTouched && confirmPasswordError ? (
+      <Text style={styles.errorText}>{confirmPasswordError}</Text>) : null
+      }
 
   
           <TouchableOpacity style={styles.register_button} onPress={handleRegister}>
