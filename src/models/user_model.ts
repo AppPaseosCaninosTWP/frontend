@@ -5,6 +5,6 @@ export interface user_model {
   email: string;
   phone: string;
   role_id: number;
-  role_name: string;
-  is_active: boolean;
+  role_name?: string;
+  is_enable: boolean; 
 }
