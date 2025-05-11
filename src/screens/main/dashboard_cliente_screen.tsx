@@ -17,10 +17,11 @@ import { get_user } from '../../utils/token_service';
 import { get_user_pets } from '../../service/pet_service';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 import type { pet_model } from '../../models/pet_model';
+import SwipeButtonTWP from '../../components/swipe_button';
 
 export default function DashboardClienteScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [loading, set_loading] = useState(true);
+  const [is_loading, set_is_loading] = useState(true);
   const [user_pets, set_user_pets] = useState<pet_model[]>([]);
 
   useEffect(() => {
@@ -38,14 +39,14 @@ export default function DashboardClienteScreen() {
       } catch (error) {
         Alert.alert('Error', 'No se pudieron cargar las mascotas');
       } finally {
-        set_loading(false);
+        set_is_loading(false);
       }
     };
 
     fetch_pets();
   }, []);
 
-  if (loading) {
+  if (is_loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#007BFF" />
@@ -66,12 +67,17 @@ export default function DashboardClienteScreen() {
           <Text style={styles.subtitle}>
             Parece que no tienes perfiles configurados en este momento, agrega tu mascota ahora
           </Text>
-          <TouchableOpacity
-            style={styles.slide_button}
-            onPress={() => navigation.navigate('CreatePet')}
-          >
-            <Text style={styles.slide_text}>Agregar mascota</Text>
-          </TouchableOpacity>
+          <SwipeButtonTWP
+            on_toggle={(value) => {
+              if (value) {
+                navigation.navigate('CreatePet');
+              }
+            }}
+            text="Desliza para continuar"
+            colors={['#0096FF', '#1B9AAA']}
+            width={300}
+            height={80}
+          />
         </View>
       </View>
     );
@@ -96,7 +102,10 @@ export default function DashboardClienteScreen() {
       </View>
 
       <View style={styles.grid}>
-        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('AgendarPaseo')}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate('AgendarPaseo')}
+        >
           <Text style={styles.card_title}>¿Un Paseo?</Text>
           <Text style={styles.card_subtitle}>Agenda un paseo y deja que tu mascota lo disfrute.</Text>
         </TouchableOpacity>
@@ -120,8 +129,34 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     backgroundColor: '#fff',
-    position: 'absolute',
-    justifyContent: 'flex-start',
+  },
+  empty_container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+  },
+  centered: {
+    alignItems: 'center',
+  },
+  empty_image: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 6,
+    color: '#111',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
   section_title: {
     fontSize: 18,
@@ -181,48 +216,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
   },
-  centered: {
-    alignItems: 'center',
-  },
-  
-  empty_image: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
-  },
-  empty_container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  
-  slide_button: {
-    backgroundColor: '#E0F2FF',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 24,
-  },
-  
-  slide_text: {
-    color: '#007BFF',
-    fontWeight: '600',
-    fontSize: 14,
-  },
 });
+
 
 
   
