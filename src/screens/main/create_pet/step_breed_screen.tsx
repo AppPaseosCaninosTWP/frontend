@@ -9,10 +9,12 @@ import {
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { use_pet_creation } from '../../../context/pet_creation_context';
-import { breeds } from '../../../data/breeds'; // archivo que te paso abajo
+import { breeds } from '../../../data/breeds';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
+
 import CreatePetHeader from '../../../components/create_pet/create_pet_header';
+import ContinueButton from '../../../components/shared/continue_button';
 
 export default function StepBreedScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -27,7 +29,6 @@ export default function StepBreedScreen() {
   return (
     <View style={styles.container}>
       <CreatePetHeader title="Agregar perfil de mascota" subtitle="Raza" step={1} />
-
 
       <FlatList
         data={breeds}
@@ -50,13 +51,7 @@ export default function StepBreedScreen() {
       />
 
       <View style={styles.actions}>
-        <TouchableOpacity onPress={on_continue} disabled={!selected_breed} style={[styles.button, !selected_breed && styles.button_disabled]}>
-          <Text style={styles.button_text}>Continuar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('StepZonaScreen')}>
-          <Text style={styles.skip_text}>Saltar por ahora</Text>
-        </TouchableOpacity>
+        <ContinueButton on_press={on_continue} disabled={!selected_breed} />
       </View>
     </View>
   );
@@ -67,33 +62,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 40,
-    paddingHorizontal: 20,
-  },
-  header_title: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 4,
-    textAlign: 'center',    
-  },
-  step_info: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 12,
-    textAlign: 'right'
-  },
-  progress_bar: {
-    height: 6,
-    backgroundColor: '#E5E5E5',
-    borderRadius: 4,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  progress_fill: {
-    width: '11.1%',
-    height: '100%',
-    backgroundColor: '#007BFF',
   },
   list_container: {
+    paddingHorizontal: 20,
     paddingBottom: 20,
   },
   row: {
@@ -123,26 +94,8 @@ const styles = StyleSheet.create({
   actions: {
     alignItems: 'center',
     paddingTop: 10,
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 24,
-    marginBottom: 10,
-  },
-  button_disabled: {
-    backgroundColor: '#A0CFFF',
-  },
-  button_text: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  skip_text: {
-    color: '#007BFF',
-    fontSize: 14,
-    fontWeight: '500',
+    paddingBottom: 30,
   },
 });
+
 
