@@ -43,7 +43,7 @@ export default function LoginScreen() {
       const { token, user } = await login_user(email, password);
       await save_session(token, user); // <-- ¡ahora sí funcionará!      
       Alert.alert('Sesión iniciada', `Bienvenido, ${user.email}`);
-      navigation.replace('Welcome'); // o redirige a tu pantalla principal
+      navigation.replace('DashboardScreen');
     } catch (err: any) {
       console.error('Error desde login_user:', err);
       Alert.alert('Error', err.message);
