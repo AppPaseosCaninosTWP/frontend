@@ -6,6 +6,10 @@ import RegisterScreen from '../screens/auth/register_screen';
 import ForgotPasswordScreen from '../screens/auth/forgot_password_screen';
 import VerifyCodeScreen from '../screens/auth/verify_code_screen';
 import ResetPasswordScreen from '../screens/auth/reset_password_screen';
+import DashboardPaseadorScreen from '../screens/main/dashboard_paseador_screen';
+import DashboardAdminScreen from '../screens/main/dashboard_admin_screen';
+import DashboardClienteScreen from '../screens/main/dashboard_cliente_screen';
+import DashboardScreen from '../screens/main/dashboard_screen'; // Ensure this file exists at the specified path
 //import CreatePetProfileScreen from '../screens/create_pet_profile_screen';
 
 
@@ -17,6 +21,10 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   VerifyCode: { email: string; context: 'register' | 'reset' };
   ResetPassword: { email: string };
+  DashboardAdmin: undefined;
+  DashboardCliente: undefined;
+  DashboardPaseador: undefined;
+  DashboardScreen: undefined;
   //CreatePetProfile: { petToEdit?: PetProfile } | undefined;
 }
 
@@ -48,6 +56,10 @@ export default function StackNavigator() {
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+      <Stack.Screen name="DashboardCliente" component={DashboardClienteScreen} />
+      <Stack.Screen name="DashboardPaseador" component={DashboardPaseadorScreen} />
+      <Stack.Screen name="DashboardAdmin" component={DashboardAdminScreen} />
+      <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
       {/*<Stack.Screen name="CreatePetProfile" component={CreatePetProfileScreen} />*/}
     </Stack.Navigator>
   );
