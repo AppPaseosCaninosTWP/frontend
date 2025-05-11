@@ -8,6 +8,6 @@ export interface pet_model {
     comments: string;
     medical_condition: string;
     photo: string;
-    user_id: number;
+    user_id?: number; // esta variable se agrega ya que se asume que la mascota pertenece a un usuario
   }
   
