@@ -21,6 +21,21 @@ import {
     const fade_anim = useRef(new Animated.Value(0)).current;
     const translate_anim = useRef(new Animated.Value(30)).current;
     const [email, set_email] = useState('');
+    const [emailError, setEmailError] = useState('');
+
+    const validateEmail = (value: string) => {
+      set_email(value);
+      const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!value) {
+        setEmailError('El correo electrónico es obligatorio');
+      }else if (!email_regex.test(value)) {
+        setEmailError('Ingrese un correo electrónico válido');
+      }
+      else {
+        setEmailError('');
+      }
+    };
+
   
     useEffect(() => {
       Animated.parallel([
@@ -80,9 +95,10 @@ import {
             style={styles.input_field}
             placeholder="Correo electrónico"
             value={email}
-            onChangeText={set_email}
+            onChangeText={validateEmail}
             keyboardType="email-address"
           />
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
   
           <TouchableOpacity style={styles.send_button} onPress={handle_reset}>
             <Text style={styles.send_text}>Enviar correo</Text>
@@ -105,6 +121,13 @@ import {
         left: 40,
         right: 0,
         bottom: 0,
+    },
+    errorText: {
+      color: 'red',
+      fontSize: 13,
+      marginBottom: 8,
+      marginLeft: 4,
+      alignSelf: 'flex-start',
     },
     card: {
       position: 'absolute',
