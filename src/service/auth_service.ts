@@ -29,14 +29,18 @@ export async function login_user(email: string, password: string): Promise<login
     throw new Error(json.msg || 'Error al iniciar sesión');
   }
 
-  const { token, user } = json.data;
+  const token = json.data.token;
+  const raw_user = json.data.user?.user ?? json.data.user;
 
-  if (!token || typeof token !== 'string') {
-    throw new Error('El token no es válido o no es string');
-  }
+  const user = {
+    ...raw_user,
+    role_name: raw_user.role || raw_user.role_name,
+  };
 
   return { token, user };
 }
+
+
 
 export async function register_user(
   email: string,
