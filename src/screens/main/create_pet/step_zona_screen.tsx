@@ -5,6 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
+import CreatePetHeader from '../../../components/create_pet/create_pet_header';
+import ContinueButton from '../../../components/shared/continue_button';
+
 const ZONES = ['Norte', 'Centro', 'Sur'];
 
 export default function StepZonaScreen() {
@@ -14,17 +17,18 @@ export default function StepZonaScreen() {
 
   const handle_continue = () => {
     set_pet_data({ zone: selected_zone });
-    console.log('Zona seleccionada:', selected_zone); // luego reemplazar con siguiente paso
+    console.log('Zona seleccionada:', selected_zone);
+    // navigation.navigate('StepNombreEdad');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header_title}>Agregar perfil de mascota</Text>
-      <Text style={styles.step_info}>Zona (2/9)</Text>
-
-      <View style={styles.progress_bar}>
-        <View style={styles.progress_fill} />
-      </View>
+      <CreatePetHeader
+        title="Agregar perfil de mascota"
+        subtitle="Zona"
+        step={2}
+        on_back_press={() => navigation.goBack()}
+      />
 
       <Text style={styles.question}>¿En qué sector vives?</Text>
 
@@ -51,17 +55,10 @@ export default function StepZonaScreen() {
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity
-          onPress={handle_continue}
+        <ContinueButton
+          on_press={handle_continue}
           disabled={!selected_zone}
-          style={[styles.button, !selected_zone && styles.button_disabled]}
-        >
-          <Text style={styles.button_text}>Continuar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={handle_continue}>
-          <Text style={styles.skip_text}>Saltar por ahora</Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
@@ -71,30 +68,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 60,
     paddingHorizontal: 20,
-  },
-  header_title: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  step_info: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 12,
-  },
-  progress_bar: {
-    height: 6,
-    backgroundColor: '#E5E5E5',
-    borderRadius: 4,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  progress_fill: {
-    width: '22.2%', // paso 2 de 9
-    height: '100%',
-    backgroundColor: '#007BFF',
+    paddingTop: 40,
   },
   question: {
     fontSize: 16,
@@ -125,25 +100,7 @@ const styles = StyleSheet.create({
   actions: {
     alignItems: 'center',
     paddingTop: 10,
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 24,
-    marginBottom: 10,
-  },
-  button_disabled: {
-    backgroundColor: '#A0CFFF',
-  },
-  button_text: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  skip_text: {
-    color: '#007BFF',
-    fontSize: 14,
-    fontWeight: '500',
+    paddingBottom: 30,
   },
 });
+
