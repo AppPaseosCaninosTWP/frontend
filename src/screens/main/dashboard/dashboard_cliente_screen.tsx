@@ -11,14 +11,14 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../navigation/stack_navigator';
+import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
-import { get_user } from '../../utils/token_service';
-import { get_user_pets } from '../../service/pet_service';
+import { get_user } from '../../../utils/token_service';
+import { get_user_pets } from '../../../service/pet_service';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-import type { pet_model } from '../../models/pet_model';
-import SwipeButtonTWP from '../../components/swipe_button';
-import Header from '../../components/shared/header';
+import type { pet_model } from '../../../models/pet_model';
+import SwipeButtonTWP from '../../../components/swipe_button';
+import Header from '../../../components/shared/header';
 
 export default function DashboardClienteScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -62,7 +62,7 @@ export default function DashboardClienteScreen() {
     
         <View style={styles.center_content}>
           <Image
-            source={require('../../assets/empty_state.png')}
+            source={require('../../../assets/empty_state.png')}
             style={styles.empty_image}
             resizeMode="contain"
           />

@@ -6,10 +6,10 @@ import RegisterScreen from '../screens/auth/register_screen';
 import ForgotPasswordScreen from '../screens/auth/forgot_password_screen';
 import VerifyCodeScreen from '../screens/auth/verify_code_screen';
 import ResetPasswordScreen from '../screens/auth/reset_password_screen';
-import DashboardPaseadorScreen from '../screens/main/dashboard_paseador_screen';
-import DashboardAdminScreen from '../screens/main/dashboard_admin_screen';
-import DashboardClienteScreen from '../screens/main/dashboard_cliente_screen';
-import DashboardScreen from '../screens/main/dashboard_screen'; // Ensure this file exists at the specified path
+import DashboardPaseadorScreen from '../screens/main/dashboard/dashboard_paseador_screen';
+import DashboardAdminScreen from '../screens/main/dashboard/dashboard_admin_screen';
+import DashboardClienteScreen from '../screens/main/dashboard/dashboard_cliente_screen';
+import DashboardScreen from '../screens/main/dashboard/dashboard_screen'; // Updated path to match the correct location
 //import CreatePetProfileScreen from '../screens/create_pet_profile_screen';
 
 

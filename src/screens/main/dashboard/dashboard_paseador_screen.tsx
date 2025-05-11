@@ -7,7 +7,7 @@ export default function DashboardPaseadorScreen() {
       pet_name: 'Maxi',
       owner: 'Juan Pérez',
       time: '10:30 AM',
-      image: require('../../assets/menu_dog.png'),
+      image: require('../../../assets/menu_dog.png'),
     },
   ]);
 

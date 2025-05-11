@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { get_user } from '../../utils/token_service';
-import type { user_model } from '../../models/user_model';
+import { get_user } from '../../../utils/token_service';
+import type { user_model } from '../../../models/user_model';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../navigation/stack_navigator';
+import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
 export default function DashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
