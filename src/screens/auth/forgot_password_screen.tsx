@@ -54,18 +54,12 @@ import {
       ]).start();
     }, []);
   
-    const validate_email = (email: string) => {
-      return /\S+@\S+\.\S+/.test(email);
-    };
-  
-    const handle_reset = () => {
+    const handle_reset = async () => {
 
-      if (email.length === 0) {
-        Alert.alert('Campo vacío', 'Por favor ingrese su correo electrónico.');
-        return;
-      }
-      if (!validate_email(email)) {
-        Alert.alert('Correo inválido', 'Por favor ingrese un correo electrónico válido.');
+      validateEmail(email);
+      
+      if (emailError) {
+        Alert.alert('Por favor, corrija el error antes de continuar', emailError);
         return;
       }
     
