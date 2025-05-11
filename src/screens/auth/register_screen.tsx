@@ -88,33 +88,20 @@ import {
 
 
     const handleRegister = async () => {
-      if (!email || !phone || !password || !confirm_password) {
-        Alert.alert('Error al crear cuenta', 'Todos los campos son obligatorios');
+      validateEmail(email);
+      validatePhone(phone);
+      validatePassword(password);
+      validateConfirmPassword(confirm_password);
+
+      setPasswordTouched(true);
+      setConfirmPasswordTouched(true);
+
+      if (emailError || phoneError || passwordError || confirmPasswordError) {
+        Alert.alert('Error', 'Por favor corrige los errores antes de continuar.');
         return;
       }
     
-      const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const phone_regex = /^\d{9}$/;
     
-      if (!email_regex.test(email)) {
-        Alert.alert('Correo inválido', 'Ingrese un correo electrónico válido.');
-        return;
-      }
-    
-      if (!phone_regex.test(phone)) {
-        Alert.alert('Teléfono inválido', 'El número debe tener exactamente 9 dígitos.');
-        return;
-      }
-    
-      if (password.length < 8 || password.length > 15) {
-        Alert.alert('Contraseña inválida', 'Debe tener entre 8 y 15 caracteres.');
-        return;
-      }
-    
-      if (password !== confirm_password) {
-        Alert.alert('Error', 'Las contraseñas no coinciden');
-        return;
-      }
     
       try {
         const user = await register_user(email, phone, password, confirm_password);
