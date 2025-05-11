@@ -129,11 +129,11 @@ import {
           <View style={styles.phone_input_container}>
             <View style={styles.flag_wrapper}>
               <Image source={require('../../assets/flag_cl.png')} style={styles.flag_icon} />
-              <Text style={styles.prefix_text}>+56 | 9</Text>
+              <Text style={styles.prefix_text}>+56</Text>
             </View>
             <TextInput
               style={styles.phone_input}
-              placeholder="Teléfono"
+              placeholder="912345678"
               value={phone}
               keyboardType="phone-pad"
               onChangeText={set_phone}
