@@ -12,7 +12,6 @@ import DashboardClienteScreen from '../screens/main/dashboard/dashboard_cliente_
 import DashboardScreen from '../screens/main/dashboard/dashboard_screen'; 
 import StepBreedScreen from '../screens/main/create_pet/step_breed_screen';
 import StepZonaScreen from '../screens/main/create_pet/step_zona_screen';
-//import CreatePetProfileScreen from '../screens/create_pet_profile_screen';
 
 
 export type RootStackParamList = {
@@ -29,24 +28,7 @@ export type RootStackParamList = {
   DashboardScreen: undefined;
   StepBreedScreen: undefined;
   StepZonaScreen: undefined;
-  //CreatePetProfile: { petToEdit?: PetProfile } | undefined;
 }
-
-
-
-//type PetProfile = {
-//  id: string;
-//  image: string;
-//  name: string;
-// breed?: string;
-//  age: number;
-//  sector: string;
-//  description?: string;
-//  comments?: string;
-//  medical?: string;
-//  sharedProfile: boolean;
-//}
-
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -66,7 +48,6 @@ export default function StackNavigator() {
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
       <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
       <Stack.Screen name="StepBreedScreen" component={StepBreedScreen} />
-      {/*<Stack.Screen name="CreatePetProfile" component={CreatePetProfileScreen} />*/}
     </Stack.Navigator>
   );
 }
