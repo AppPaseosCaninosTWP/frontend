@@ -30,6 +30,61 @@ import {
     const [password, set_password] = useState('');
     const [confirm_password, set_confirm_password] = useState('');
 
+    const [emailError, setEmailError] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    const [passwordTouched, setPasswordTouched] = useState(false);
+    const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
+
+
+    const validateEmail = (value: string) => {
+  set_email(value);
+    const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) {
+     setEmailError('El correo electrónico es obligatorio');
+    } else if (!email_regex.test(value)) {
+      setEmailError('Ingrese un correo electrónico válido');
+    } else {
+      setEmailError('');
+    }
+};
+
+const validatePhone = (value: string) => {
+  set_phone(value);
+  const phone_regex = /^\d{9}$/;
+  if (!value) {
+    setPhoneError('El teléfono es obligatorio');
+  } else if (!phone_regex.test(value)) {
+    setPhoneError('El número debe tener exactamente 9 dígitos');
+  } else {
+    setPhoneError('');
+  }
+};
+
+const validatePassword = (value: string) => {
+  set_password(value);
+  if (!value) {
+    setPasswordError('La contraseña es obligatoria');
+  } else if (value.length < 8 || value.length > 15) {
+    setPasswordError('La contraseña debe tener entre 8 y 15 caracteres');
+  } else {
+    setPasswordError('');
+  }
+};
+
+const validateConfirmPassword = (value: string) => {
+  set_confirm_password(value);
+  if (!value) {
+    setConfirmPasswordError('La confirmación de contraseña es obligatoria');
+  } else if (value !== password) {
+    setConfirmPasswordError('Las contraseñas no coinciden');
+  } else {
+    setConfirmPasswordError('');
+  }
+};
+
     const handleRegister = async () => {
       if (!email || !phone || !password || !confirm_password) {
         Alert.alert('Error al crear cuenta', 'Todos los campos son obligatorios');
@@ -45,7 +100,7 @@ import {
       }
     
       if (!phone_regex.test(phone)) {
-        Alert.alert('Teléfono inválido', 'El número debe tener exactamente 8 dígitos.');
+        Alert.alert('Teléfono inválido', 'El número debe tener exactamente 9 dígitos.');
         return;
       }
     
@@ -119,42 +174,54 @@ import {
           <Text style={styles.title}>Crear una cuenta</Text>
           <Text style={styles.subtitle}>¡Bienvenido! Introduce tus datos a continuación y empieza.</Text>
   
-          <TextInput
-            style={styles.input_field}
-            placeholder="Correo electrónico"
-            value={email}
-            onChangeText={set_email}
-          />
-  
-          <View style={styles.phone_input_container}>
-            <View style={styles.flag_wrapper}>
-              <Image source={require('../../assets/flag_cl.png')} style={styles.flag_icon} />
-              <Text style={styles.prefix_text}>+56 | 9</Text>
-            </View>
-            <TextInput
-              style={styles.phone_input}
-              placeholder="Teléfono"
-              value={phone}
-              keyboardType="phone-pad"
-              onChangeText={set_phone}
-            />
-          </View>
-  
-          <TextInput
-            style={styles.input_field}
-            placeholder="Contraseña"
-            secureTextEntry
-            value={password}
-            onChangeText={set_password}
-          />
-  
-          <TextInput
-            style={styles.input_field}
-            placeholder="Confirmar contraseña"
-            secureTextEntry
-            value={confirm_password}
-            onChangeText={set_confirm_password}
-          />
+          <TextInput 
+  style={styles.input_field}
+  placeholder="Correo electrónico"
+  value={email}
+  onChangeText={validateEmail}
+/>
+{emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+
+<View style={styles.phone_input_container}>
+  <View style={styles.flag_wrapper}>
+    <Image source={require('../../assets/flag_cl.png')} style={styles.flag_icon} />
+    <Text style={styles.prefix_text}>+56</Text>
+  </View>
+  <TextInput
+    style={styles.phone_input}
+    placeholder="Teléfono"
+    value={phone}
+    keyboardType="phone-pad"
+    maxLength={8}
+    onChangeText={validatePhone}
+  />
+</View>
+{phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+
+<TextInput
+  style={styles.input_field}
+  placeholder="Contraseña"
+  secureTextEntry
+  value={password}
+  onChangeText={validatePassword}
+  onBlur={() => setPasswordTouched(true)}
+/>
+{passwordTouched && passwordError ? (
+  <Text style={styles.errorText}>{passwordError}</Text>
+) : null}
+
+<TextInput
+  style={styles.input_field}
+  placeholder="Confirmar contraseña"
+  secureTextEntry
+  value={confirm_password}
+  onChangeText={validateConfirmPassword}
+  onBlur={() => setConfirmPasswordTouched(true)}
+/>
+{confirmPasswordTouched && confirmPasswordError ? (
+  <Text style={styles.errorText}>{confirmPasswordError}</Text>
+) : null}
+
   
           <TouchableOpacity style={styles.register_button} onPress={handleRegister}>
             <Text style={styles.register_text}>Crear cuenta</Text>
@@ -186,6 +253,13 @@ import {
         left: 40,
         right: 0,
         bottom: 0,
+    },
+    errorText:{
+      color: 'red',
+      fontSize:13, 
+      marginBottom: 8,
+      marginLeft: 4,
+      alignSelf: 'flex-start',
     },
     card: {
       position: 'absolute',
