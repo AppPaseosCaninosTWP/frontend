@@ -97,7 +97,7 @@ import {
       setConfirmPasswordTouched(true);
 
       if (emailError || phoneError || passwordError || confirmPasswordError) {
-        Alert.alert('Error', 'Por favor corrige los errores antes de continuar.');
+        Alert.alert('Error', 'Por favor corrija los errores antes de continuar.');
         return;
       }
     

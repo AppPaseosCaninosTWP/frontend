@@ -53,14 +53,12 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error al iniciar sesión', 'Debe completar todos los campos');
-      return;
-    }
-  
-    const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email_regex.test(email)) {
-      Alert.alert('Error al iniciar sesión', 'Por favor ingrese un correo electrónico válido.');
+
+    validateEmail(email);
+    validatePassword(password);
+
+    if (emailError || passwordError) {
+      Alert.alert('Error al iniciar sesión', 'Por favor complete todos los campos correctamente');
       return;
     }
   
