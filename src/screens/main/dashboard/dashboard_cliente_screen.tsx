@@ -74,7 +74,7 @@ export default function DashboardClienteScreen() {
     
         <View style={styles.bottom_button}>
           <SwipeButtonTWP
-            on_toggle={() => navigation.navigate('CreatePet')}
+            on_toggle={() => navigation.navigate('StepBreedScreen')}
             text="Desliza para continuar"
             width={300}
             height={80}
