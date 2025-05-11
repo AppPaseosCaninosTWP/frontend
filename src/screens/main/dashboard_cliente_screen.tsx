@@ -18,6 +18,7 @@ import { get_user_pets } from '../../service/pet_service';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 import type { pet_model } from '../../models/pet_model';
 import SwipeButtonTWP from '../../components/swipe_button';
+import Header from '../../components/shared/header';
 
 export default function DashboardClienteScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -57,38 +58,41 @@ export default function DashboardClienteScreen() {
   if (user_pets.length === 0) {
     return (
       <View style={styles.empty_container}>
-      <View style={styles.header_placeholder} />
-      
-      <View style={styles.center_content}>
-        <Image
-          source={require('../../assets/empty_state.png')}
-          style={styles.empty_image}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Uh Oh!</Text>
-        <Text style={styles.subtitle}>
-          Parece que no tienes perfiles configurados en este momento, agrega tu mascota ahora
-        </Text>
+        <Header role="cliente" />
+    
+        <View style={styles.center_content}>
+          <Image
+            source={require('../../assets/empty_state.png')}
+            style={styles.empty_image}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Uh Oh!</Text>
+          <Text style={styles.subtitle}>
+            Parece que no tienes perfiles configurados en este momento, agrega tu mascota ahora
+          </Text>
+        </View>
+    
+        <View style={styles.bottom_button}>
+          <SwipeButtonTWP
+            on_toggle={() => navigation.navigate('CreatePet')}
+            text="Desliza para continuar"
+            width={300}
+            height={80}
+          />
+        </View>
       </View>
-
-      <View style={styles.bottom_button}>
-        <SwipeButtonTWP
-          on_toggle={() => navigation.navigate('CreatePet')}
-          text="Desliza para continuar"
-          width={300}
-          height={80}
-        />
-      </View>
-    </View>
-    );    
+    );
+        
   }
   
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.section_title}>
-        Perfiles de mascotas activos <Text style={styles.badge}>{user_pets.length}</Text>
-      </Text>
+    <Header role="cliente" />
+
+    <Text style={styles.section_title}>
+      Perfiles de mascotas activos <Text style={styles.badge}>{user_pets.length}</Text>
+    </Text>
 
       <View style={styles.pet_card}>
         <Text style={styles.pet_name}>{user_pets[0].name}</Text>
@@ -150,7 +154,6 @@ const styles = StyleSheet.create({
   },
   bottom_button: {
     alignItems: 'center',
-    marginBottom: 20,  
   },
   centered: {
     alignItems: 'center',
