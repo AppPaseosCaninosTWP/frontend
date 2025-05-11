@@ -57,30 +57,30 @@ export default function DashboardClienteScreen() {
   if (user_pets.length === 0) {
     return (
       <View style={styles.empty_container}>
-        <View style={styles.centered}>
-          <Image
-            source={require('../../assets/empty_state.png')}
-            style={styles.empty_image}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Uh Oh!</Text>
-          <Text style={styles.subtitle}>
-            Parece que no tienes perfiles configurados en este momento, agrega tu mascota ahora
-          </Text>
-          <SwipeButtonTWP
-            on_toggle={(value) => {
-              if (value) {
-                navigation.navigate('CreatePet');
-              }
-            }}
-            text="Desliza para continuar"
-            colors={['#0096FF', '#1B9AAA']}
-            width={300}
-            height={80}
-          />
-        </View>
+      <View style={styles.header_placeholder} />
+      
+      <View style={styles.center_content}>
+        <Image
+          source={require('../../assets/empty_state.png')}
+          style={styles.empty_image}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Uh Oh!</Text>
+        <Text style={styles.subtitle}>
+          Parece que no tienes perfiles configurados en este momento, agrega tu mascota ahora
+        </Text>
       </View>
-    );
+
+      <View style={styles.bottom_button}>
+        <SwipeButtonTWP
+          on_toggle={() => navigation.navigate('CreatePet')}
+          text="Desliza para continuar"
+          width={300}
+          height={80}
+        />
+      </View>
+    </View>
+    );    
   }
   
 
@@ -132,10 +132,25 @@ const styles = StyleSheet.create({
   },
   empty_container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  header_placeholder: {
+    height: 60, // simula el espacio del header (puedes ajustar)
+  },
+  center_content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  empty_content: {
+    alignItems: 'center',
+  },
+  bottom_button: {
+    alignItems: 'center',
+    marginBottom: 20,  
   },
   centered: {
     alignItems: 'center',
@@ -144,19 +159,21 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     marginBottom: 20,
+    
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     marginBottom: 6,
     color: '#111',
   },
+  
   subtitle: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 20,
     paddingHorizontal: 10,
+    marginBottom: 10,
   },
   section_title: {
     fontSize: 18,
