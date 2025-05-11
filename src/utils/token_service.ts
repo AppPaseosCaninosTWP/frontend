@@ -9,7 +9,25 @@ export const save_session = async (token: string, user: user_model): Promise<voi
     throw new Error('El token no es válido o no es string');
   }
 
-  const user_string = JSON.stringify(user);
+  const role_map: Record<string, number> = {
+    admin: 1,
+    walker: 2,
+    client: 3,
+  };
+
+  const role_clean = (user.role_name as string)?.trim().toLowerCase();
+  const mapped_role = role_map[role_clean];
+
+  const adapted_user = {
+    ...user,
+    role_id: mapped_role ?? -1,
+  };
+
+  console.log('Usuario con role_id adaptado:', adapted_user);
+  console.log('user.role_name:', user.role_name);
+
+
+  const user_string = JSON.stringify(adapted_user);
 
   await SecureStore.setItemAsync(TOKEN_KEY, token);
   await SecureStore.setItemAsync(USER_KEY, user_string);
@@ -28,4 +46,5 @@ export const clear_session = async (): Promise<void> => {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
   await SecureStore.deleteItemAsync(USER_KEY);
 };
+
 
