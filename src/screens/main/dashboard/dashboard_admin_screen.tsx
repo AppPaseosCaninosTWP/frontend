@@ -60,7 +60,7 @@ export default function DashboardAdminScreen() {
           source={require('../../../assets/user_icon.png')} 
           style={styles.profile_image}
         />
-        <Text style={styles.header_text}>Hola, Administrador {user?.name}</Text>
+        <Text style={styles.header_text}>Hola, Administrador</Text>
         <View style={styles.icon_group}>
           <TouchableOpacity onPress={() => {/* busqueda */}}>
             <Image source={require('../../../assets/search_icon.png')} style={styles.icon} />
