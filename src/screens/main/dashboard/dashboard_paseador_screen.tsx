@@ -1,46 +1,62 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useState } from 'react';
+import Header from '../../../components/shared/header';
 
 export default function DashboardPaseadorScreen() {
-  const [assigned_walks, set_assigned_walks] = useState([
+  const [assigned_walks] = useState([
     {
       pet_name: 'Maxi',
-      owner: 'Juan Pérez',
-      time: '10:30 AM',
-      image: require('../../../assets/menu_dog.png'),
+      zone: 'Antofagasta',
+      time: '11:00',
+      image: require('../../../assets/breeds/golden.png'),
     },
   ]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Hola, Caminante</Text>
+      <Header role="paseador" />
+      
+      <Text style={styles.section_title}>
+        Tu próximo paseo <Text style={styles.badge}>{assigned_walks.length}</Text>
+      </Text>
 
-      <Text style={styles.section_title}>Paseos asignados</Text>
-
-      {assigned_walks.length === 0 ? (
-        <View style={styles.empty_box}>
-          <Text style={styles.empty_text}>No tienes paseos asignados por ahora</Text>
-        </View>
-      ) : (
-        assigned_walks.map((walk, index) => (
-          <View key={index} style={styles.walk_card}>
-            <Image source={walk.image} style={styles.pet_image} />
-            <View style={styles.walk_info}>
-              <Text style={styles.pet_name}>{walk.pet_name}</Text>
-              <Text style={styles.detail}>Propietario: {walk.owner}</Text>
-              <Text style={styles.detail}>Hora: {walk.time}</Text>
-            </View>
+      {assigned_walks.map((walk, index) => (
+        <View key={index} style={styles.walk_card}>
+          <View style={styles.walk_text}>
+            <Text style={styles.pet_name}>{walk.pet_name}</Text>
+            <Text style={styles.detail}>{walk.zone} | {walk.time}</Text>
           </View>
-        ))
-      )}
+          <Image source={walk.image} style={styles.pet_image} />
+        </View>
+      ))}
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.button_text}>Ver historial de paseos</Text>
-      </TouchableOpacity>
+
+      <View style={styles.grid}>
+        <TouchableOpacity style={styles.card}>
+          <Image source={require('../../../assets/plate_icon.png')} style={styles.icon} />
+          <Text style={styles.card_title}>Mi Agenda</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.card}>
+          <Image source={require('../../../assets/admin/admin_photo1.png')} style={styles.icon} />
+          <Text style={styles.card_title}>Calificaciones</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.card}>
+          <Image source={require('../../../assets/admin/admin_photo2.png')} style={styles.icon} />
+          <Text style={styles.card_title}>Historial</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -48,62 +64,69 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#fff',
   },
-  header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   section_title: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
   },
-  empty_box: {
-    padding: 30,
-    backgroundColor: '#F3F4F6',
+  badge: {
+    backgroundColor: '#E6F4FF',
+    color: '#007BFF',
+    paddingHorizontal: 8,
     borderRadius: 12,
-    alignItems: 'center',
-  },
-  empty_text: {
-    color: '#6B7280',
     fontSize: 14,
   },
   walk_card: {
+    backgroundColor: '#007BFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E6F4FF',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
+    justifyContent: 'space-between',
   },
-  pet_image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 16,
-  },
-  walk_info: {
+  walk_text: {
     flex: 1,
   },
   pet_name: {
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: '700',
-    marginBottom: 4,
   },
   detail: {
+    color: '#D0E7FF',
     fontSize: 14,
-    color: '#4B5563',
+    marginTop: 4,
   },
-  button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 14,
-    borderRadius: 12,
+  pet_image: {
+    width: 90,
+    height: 90,
+    borderRadius: 30,
+    marginLeft: 10,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  card: {
+    width: '48%',
+    backgroundColor: '#F9F9F9',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 10,
     alignItems: 'center',
-    marginTop: 24,
   },
-  button_text: {
-    color: '#fff',
+  card_title: {
+    fontSize: 15,
     fontWeight: '600',
-    fontSize: 16,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  icon: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
 });
