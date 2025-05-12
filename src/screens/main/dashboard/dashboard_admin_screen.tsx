@@ -1,29 +1,31 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+} from 'react-native';
 
 export default function DashboardAdminScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Bienvenido, Administrador 👨‍💼</Text>
+      <Text style={styles.header}>Hola, CJ</Text>
 
       <View style={styles.card_container}>
         <TouchableOpacity style={styles.card}>
-          <Text style={styles.card_title}>Usuarios Registrados</Text>
-          <Text style={styles.card_subtitle}>Ver y gestionar usuarios activos</Text>
+          <Image source={require('../../../assets/admin/admin_photo1.png')} style={styles.card_image} />
+          <Text style={styles.card_title}>Usuarios</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card}>
-          <Text style={styles.card_title}>Paseadores Verificados</Text>
-          <Text style={styles.card_subtitle}>Lista de paseadores con validación</Text>
+          <Image source={require('../../../assets/admin/admin_photo2.png')} style={styles.card_image} />
+          <Text style={styles.card_title}>Paseos</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card}>
-          <Text style={styles.card_title}>Reportes</Text>
-          <Text style={styles.card_subtitle}>Visualizar actividad y estadísticas</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card}>
-          <Text style={styles.card_title}>Solicitudes pendientes</Text>
-          <Text style={styles.card_subtitle}>Validación y revisión manual</Text>
+          <Image source={require('../../../assets/admin/admin_photo3.png')} style={styles.card_image} />
+          <Text style={styles.card_title}>Pagos</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -33,32 +35,41 @@ export default function DashboardAdminScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    paddingTop: 60,
+    paddingTop: 50,
     paddingHorizontal: 20,
     backgroundColor: '#fff',
   },
   header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 24,
+    fontSize: 20,
+    fontWeight: '500',
+    marginBottom: 20,
+    marginLeft: 4,
   },
   card_container: {
     flexDirection: 'column',
-    gap: 12,
+    gap: 16,
   },
   card: {
-    backgroundColor: '#F0F4FF',
-    padding: 20,
+    backgroundColor: '#fff',
     borderRadius: 16,
-    marginBottom: 10,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  card_image: {
+    width: 100,
+    height: 100,
+    marginBottom: 12,
+    resizeMode: 'contain',
   },
   card_title: {
     fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  card_subtitle: {
-    fontSize: 13,
-    color: '#6B7280',
+    fontWeight: '600',
+    color: '#111827',
   },
 });
