@@ -15,13 +15,14 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 import { user_model } from '../../../models/user_model';
-
-
 import { get_user, clear_session } from '../../../utils/token_service';
 
+import Header from '../../../components/shared/header';
+
 export default function DashboardAdminScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const  [user, setUser] = useState<user_model | null>(null);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [user, setUser] = useState<user_model | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +31,10 @@ export default function DashboardAdminScreen() {
       // Si no hay usuario o no es admin (role_id !== 1), cerrar sesión
       if (!storedUser || storedUser.role_id !== 1) {
         await clear_session();
-        Alert.alert('Acceso denegado', 'Debes iniciar sesión como administrador.');
+        Alert.alert(
+          'Acceso denegado',
+          'Debes iniciar sesión como administrador.'
+        );
         navigation.reset({
           index: 0,
           routes: [{ name: 'Login' }],
@@ -54,28 +58,14 @@ export default function DashboardAdminScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header_container}>
-        <Image
-          source={require('../../../assets/user_icon.png')} 
-          style={styles.profile_image}
-        />
-        <Text style={styles.header_text}>Hola, Administrador</Text>
-        <View style={styles.icon_group}>
-          <TouchableOpacity onPress={() => {/* busqueda */}}>
-            <Image source={require('../../../assets/search_icon.png')} style={styles.icon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {/* menú */}}>
-            <Image source={require('../../../assets/menu_icon.png')} style={styles.icon} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* Header reutilizable: ahora solo necesita el roleId */}
+      <Header roleId={user!.role_id} />
 
       {/* Dashboard Tiles */}
       <View style={styles.card_container}>
         <TouchableOpacity
           style={styles.card}
-          //onPress={() => navigation.navigate()}
+          // onPress={() => navigation.navigate('UsersList')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo1.png')}
@@ -86,7 +76,7 @@ export default function DashboardAdminScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          //onPress={() => navigation.navigate('')}
+          // onPress={() => navigation.navigate('WalkersList')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
@@ -97,7 +87,7 @@ export default function DashboardAdminScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          //onPress={() => navigation.navigate('')}
+          // onPress={() => navigation.navigate('Payments')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo3.png')}
@@ -121,30 +111,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: 60,
     paddingHorizontal: 20,
-  },
-  header_container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  profile_image: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  header_text: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  icon_group: {
-    flexDirection: 'row',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginLeft: 12,
   },
   card_container: {
     flexDirection: 'column',
