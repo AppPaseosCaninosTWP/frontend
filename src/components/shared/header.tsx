@@ -1,70 +1,109 @@
+// src/components/shared/header.tsx
+
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Feather, Ionicons, FontAwesome } from '@expo/vector-icons';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ImageSourcePropType } from 'react-native';
 
 interface HeaderProps {
-  role: 'cliente' | 'paseador' | 'admin';
-  name?: string; // opcional por si algún rol tiene nombre en el futuro
-  on_menu_press?: () => void;
-  on_search_press?: () => void;
+  /** roleId: 1=Administrador, 2=Paseador, 3=Cliente */
+  roleId: number;
+  /** Nombre personalizado (si se quiere mostrar en lugar del rol) */
+  name?: string;
+  /** Imagen de perfil opcional */
+  profileImage?: ImageSourcePropType;
+  onSearchPress?: () => void;
+  onMenuPress?: () => void;
 }
 
-export default function Header({
-  role,
+// Mapea roleId a texto legible
+const getRoleLabel = (roleId: number): string => {
+  switch (roleId) {
+    case 1:
+      return 'Administrador';
+    case 2:
+      return 'Paseador';
+    case 3:
+      return 'Cliente';
+    default:
+      return 'Usuario';
+  }
+};
+
+const Header: React.FC<HeaderProps> = ({
+  roleId,
   name,
-  on_menu_press,
-  on_search_press,
-}: HeaderProps) {
-  const display_name = name ? `Hola, ${name}` : 'Hola';
+  profileImage,
+  onSearchPress,
+  onMenuPress,
+}) => {
+  // Si name está presente, lo usamos; si no, usamos label de rol
+  const displayName = name ? `Hola, ${name}` : `Hola, ${getRoleLabel(roleId)}`;
 
   return (
     <View style={styles.container}>
-      <View style={styles.user_info}>
-        <FontAwesome name="user-circle" size={32} color="#333" style={styles.avatar_icon} />
-        <Text style={styles.greeting}>{display_name}</Text>
+      <View style={styles.userInfo}>
+        <Image
+          source={profileImage ?? require('../../assets/user_icon.png')}
+          style={styles.profileImage}
+        />
+        <Text style={styles.greeting}>{displayName}</Text>
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity onPress={on_search_press}>
-          <Feather name="search" size={24} color="#333" />
+        <TouchableOpacity onPress={onSearchPress}>
+          <Image
+            source={require('../../assets/search_icon.png')}
+            style={styles.icon}
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={on_menu_press} style={styles.menu_icon}>
-          <Ionicons name="menu" size={28} color="#333" />
+        <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
+          <Image
+            source={require('../../assets/menu_icon.png')}
+            style={styles.icon}
+          />
         </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    height: 132,
     width: '100%',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 12,
+    paddingHorizontal: 1,
+    paddingTop: 5,
+    paddingBottom: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
   },
-  user_info: {
+  userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  avatar_icon: {
-    marginRight: 8,
+  profileImage: {
+    width: 45,
+    height: 45,
+    borderRadius: 20,
   },
   greeting: {
-    color: '#111',
-    fontSize: 16,
+    marginLeft: 12,
+    fontSize: 18,
     fontWeight: '600',
+    color: '#111',
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  menu_icon: {
+  icon: {
+    width: 24,
+    height: 24,
     marginLeft: 16,
   },
+  menuButton: {
+    marginLeft: 8,
+  },
 });
+
+export default Header;
