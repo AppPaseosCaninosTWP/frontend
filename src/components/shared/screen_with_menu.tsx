@@ -11,10 +11,18 @@ interface ScreenWithMenuProps {
   children: ReactNode;
 }
 
+interface ScreenWithMenuProps{
+    roleId: number;
+    menuOptions: MenuOption[];
+    children: ReactNode;
+    onSearchPress?: () => void;
+}
+
 export default function ScreenWithMenu({
   roleId,
   menuOptions,
   children,
+    onSearchPress,
 }: ScreenWithMenuProps) {
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -23,6 +31,7 @@ export default function ScreenWithMenu({
       <Header
         roleId={roleId}
         onMenuPress={() => setMenuVisible(true)}
+        onSearchPress={onSearchPress}
       />
 
       <ScrollView

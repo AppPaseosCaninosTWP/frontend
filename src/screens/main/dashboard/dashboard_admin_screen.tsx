@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
@@ -17,7 +16,9 @@ import type { RootStackParamList } from '../../../navigation/stack_navigator';
 import { user_model } from '../../../models/user_model';
 import { get_user, clear_session } from '../../../utils/token_service';
 
-import Header from '../../../components/shared/header';
+import ScreenWithMenu from '../../../components/shared/screen_with_menu';
+import type { MenuOption } from '../../../components/shared/side_menu';
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 export default function DashboardAdminScreen() {
   const navigation =
@@ -28,7 +29,6 @@ export default function DashboardAdminScreen() {
   useEffect(() => {
     const init = async () => {
       const storedUser = await get_user();
-      // Si no hay usuario o no es admin (role_id !== 1), cerrar sesión
       if (!storedUser || storedUser.role_id !== 1) {
         await clear_session();
         Alert.alert(
@@ -56,12 +56,59 @@ export default function DashboardAdminScreen() {
     );
   }
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header reutilizable: ahora solo necesita el roleId */}
-      <Header roleId={user!.role_id} />
+  // Opciones del menú lateral
+  const menuOptions: MenuOption[] = [
+    {
+      label: 'Dashboard',
+      icon: <Feather name="layout" size={20} color="#fff" />,
+      onPress: () => navigation.navigate('DashboardAdmin'),
+    },
+    {
+      label: 'Usuarios',
+      icon: <Ionicons name="people" size={20} color="#fff" />,
+      onPress: () => navigation.navigate('UserScreen'),
+    },
+    {
+      label: 'Calendario Global',
+      icon: <MaterialIcons name="calendar-today" size={20} color="#fff" />,
+      onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Pagos',
+      icon: <MaterialIcons name="payment" size={20} color="#fff" />,
+      onPress: () => Alert.alert('Pagos'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Cuenta',
+      icon: <Ionicons name="person-circle" size={20} color="#fff" />,
+      onPress: () => Alert.alert('Cuenta'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Calificaciones',
+      icon: <Ionicons name="star" size={20} color="#fff" />,
+      onPress: () => Alert.alert('Calificaciones'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Ajustes',
+      icon: <Feather name="settings" size={20} color="#fff" />,
+      onPress: () => Alert.alert('Ajustes'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Cerrar sesión',
+      icon: <MaterialIcons name="logout" size={20} color="#fff" />,
+      onPress: async () => {
+        await clear_session();
+        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+      },
+    },
+  ];
 
-      {/* Dashboard Tiles */}
+  return (
+    <ScreenWithMenu
+      roleId={1}
+      menuOptions={menuOptions}
+      onSearchPress={() => navigation.navigate('UserScreen')}
+    >
       <View style={styles.card_container}>
         <TouchableOpacity
           style={styles.card}
@@ -96,7 +143,7 @@ export default function DashboardAdminScreen() {
           <Text style={styles.card_title}>Pagos</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </ScreenWithMenu>
   );
 }
 
@@ -106,15 +153,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  container: {
-    flexGrow: 1,
-    backgroundColor: '#fff',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-  },
   card_container: {
     flexDirection: 'column',
     gap: 16,
+    marginTop: 20, // separa un poco del Header
   },
   card: {
     backgroundColor: '#fff',
