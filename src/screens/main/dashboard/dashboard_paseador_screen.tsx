@@ -1,3 +1,5 @@
+// src/screens/paseador/DashboardPaseadorScreen.tsx
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +8,6 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { useState } from 'react';
 import Header from '../../../components/shared/header';
 
 export default function DashboardPaseadorScreen() {
@@ -21,42 +22,55 @@ export default function DashboardPaseadorScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Header role="paseador" />
-      
+      {/* Header reutilizable: roleId 2 = Paseador */}
+      <Header roleId={2} />
+
       <Text style={styles.section_title}>
-        Tu próximo paseo <Text style={styles.badge}>{assigned_walks.length}</Text>
+        Tu próximo paseo{' '}
+        <Text style={styles.badge}>{assigned_walks.length}</Text>
       </Text>
 
       {assigned_walks.map((walk, index) => (
         <View key={index} style={styles.walk_card}>
           <View style={styles.walk_text}>
             <Text style={styles.pet_name}>{walk.pet_name}</Text>
-            <Text style={styles.detail}>{walk.zone} | {walk.time}</Text>
+            <Text style={styles.detail}>
+              {walk.zone} | {walk.time}
+            </Text>
           </View>
           <Image source={walk.image} style={styles.pet_image} />
         </View>
       ))}
 
-
       <View style={styles.grid}>
         <TouchableOpacity style={styles.card}>
-          <Image source={require('../../../assets/plate_icon.png')} style={styles.icon} />
+          <Image
+            source={require('../../../assets/plate_icon.png')}
+            style={styles.icon}
+          />
           <Text style={styles.card_title}>Mi Agenda</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card}>
-          <Image source={require('../../../assets/admin/admin_photo1.png')} style={styles.icon} />
+          <Image
+            source={require('../../../assets/admin/admin_photo1.png')}
+            style={styles.icon}
+          />
           <Text style={styles.card_title}>Calificaciones</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card}>
-          <Image source={require('../../../assets/admin/admin_photo2.png')} style={styles.icon} />
+          <Image
+            source={require('../../../assets/admin/admin_photo2.png')}
+            style={styles.icon}
+          />
           <Text style={styles.card_title}>Historial</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
