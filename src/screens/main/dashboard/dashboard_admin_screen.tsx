@@ -65,7 +65,7 @@ export default function DashboardAdminScreen() {
       <View style={styles.card_container}>
         <TouchableOpacity
           style={styles.card}
-          // onPress={() => navigation.navigate('UsersList')}
+          onPress={() => navigation.navigate('UserScreen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo1.png')}

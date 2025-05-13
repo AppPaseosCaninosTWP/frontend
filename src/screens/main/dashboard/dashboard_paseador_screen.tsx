@@ -1,16 +1,24 @@
 // src/screens/paseador/DashboardPaseadorScreen.tsx
+
 import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
-  ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-import Header from '../../../components/shared/header';
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import type { RootStackParamList } from '../../../navigation/stack_navigator';
+
+import ScreenWithMenu from '../../../components/shared/screen_with_menu';
+import type { MenuOption } from '../../../components/shared/side_menu';
 
 export default function DashboardPaseadorScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [assigned_walks] = useState([
     {
       pet_name: 'Maxi',
@@ -20,11 +28,41 @@ export default function DashboardPaseadorScreen() {
     },
   ]);
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header reutilizable: roleId 2 = Paseador */}
-      <Header roleId={2} />
+  const menuOptions: MenuOption[] = [
+    {
+      label: 'Dashboard',
+      icon: <Feather name="layout" size={20} color="#333" />, 
+      onPress: () => navigation.navigate('DashboardPaseador'),
+    },
+    {
+      label: 'Buscar Paseos',
+      icon: <Ionicons name="search" size={20} color="#333" />,
+      onPress: () => Alert.alert('Buscar Paseos'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Calendario',
+      icon: <MaterialIcons name="calendar-today" size={20} color="#333" />,
+      onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Cuenta',
+      icon: <Ionicons name="person-circle" size={20} color="#333" />,
+      onPress: () => Alert.alert('Cuenta'),//momentaneo hasta que se implemente
+    },
+    {
+      label: 'Calificaciones',
+      icon: <Ionicons name="star" size={20} color="#333" />,
+      onPress: () => Alert.alert('Calificaciones'), //momentaneo hasta que se implemente
+    },
+    {
+      label: 'Ajustes',
+      icon: <Feather name="settings" size={20} color="#333" />,
+      onPress: () => Alert.alert('Ajustes'), //momentaneo hasta que se implemente
+    },
+  ];
 
+  return (
+    <ScreenWithMenu roleId={2} menuOptions={menuOptions}>
       <Text style={styles.section_title}>
         Tu próximo paseo{' '}
         <Text style={styles.badge}>{assigned_walks.length}</Text>
@@ -34,9 +72,7 @@ export default function DashboardPaseadorScreen() {
         <View key={index} style={styles.walk_card}>
           <View style={styles.walk_text}>
             <Text style={styles.pet_name}>{walk.pet_name}</Text>
-            <Text style={styles.detail}>
-              {walk.zone} | {walk.time}
-            </Text>
+            <Text style={styles.detail}>{walk.zone} | {walk.time}</Text>
           </View>
           <Image source={walk.image} style={styles.pet_image} />
         </View>
@@ -67,18 +103,13 @@ export default function DashboardPaseadorScreen() {
           <Text style={styles.card_title}>Historial</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </ScreenWithMenu>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-  },
   section_title: {
+    marginTop: 20,
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
