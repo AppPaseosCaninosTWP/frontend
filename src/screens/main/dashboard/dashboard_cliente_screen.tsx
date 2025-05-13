@@ -1,3 +1,6 @@
+// src/screens/cliente/DashboardClienteScreen.tsx
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,20 +11,21 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
 import { get_user } from '../../../utils/token_service';
 import { get_user_pets } from '../../../service/pet_service';
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 import type { pet_model } from '../../../models/pet_model';
 import SwipeButtonTWP from '../../../components/swipe_button';
 import Header from '../../../components/shared/header';
 
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+
 export default function DashboardClienteScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [is_loading, set_is_loading] = useState(true);
   const [user_pets, set_user_pets] = useState<pet_model[]>([]);
 
@@ -55,11 +59,13 @@ export default function DashboardClienteScreen() {
     );
   }
 
+  // Si no hay mascotas registradas
   if (user_pets.length === 0) {
     return (
       <View style={styles.empty_container}>
-        <Header role="cliente" />
-    
+        {/* Header reutilizable: roleId 3 = Cliente */}
+        <Header roleId={3} />
+
         <View style={styles.center_content}>
           <Image
             source={require('../../../assets/empty_state.png')}
@@ -71,7 +77,7 @@ export default function DashboardClienteScreen() {
             Parece que no tienes perfiles configurados en este momento, agrega tu mascota ahora
           </Text>
         </View>
-    
+
         <View style={styles.bottom_button}>
           <SwipeButtonTWP
             on_toggle={() => navigation.navigate('StepBreedScreen')}
@@ -82,25 +88,27 @@ export default function DashboardClienteScreen() {
         </View>
       </View>
     );
-        
   }
-  
+
+  const pet = user_pets[0];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-    <Header role="cliente" />
+      {/* Header reutilizable: roleId 3 = Cliente */}
+      <Header roleId={3} />
 
-    <Text style={styles.section_title}>
-      Perfiles de mascotas activos <Text style={styles.badge}>{user_pets.length}</Text>
-    </Text>
+      <Text style={styles.section_title}>
+        Perfiles de mascotas activos{' '}
+        <Text style={styles.badge}>{user_pets.length}</Text>
+      </Text>
 
       <View style={styles.pet_card}>
-        <Text style={styles.pet_name}>{user_pets[0].name}</Text>
+        <Text style={styles.pet_name}>{pet.name}</Text>
         <Text style={styles.pet_info}>
-          {user_pets[0].breed} | {user_pets[0].zone}
+          {pet.breed} | {pet.zone}
         </Text>
         <Image
-          source={{ uri: `${API_BASE_URL}/uploads/${user_pets[0].photo}` }}
+          source={{ uri: `${API_BASE_URL}/uploads/${pet.photo}` }}
           style={styles.pet_avatar}
         />
       </View>
@@ -108,10 +116,12 @@ export default function DashboardClienteScreen() {
       <View style={styles.grid}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('AgendarPaseo')}
+          //onPress={() => navigation.navigate('AgendarPaseo')}
         >
           <Text style={styles.card_title}>¿Un Paseo?</Text>
-          <Text style={styles.card_subtitle}>Agenda un paseo y deja que tu mascota lo disfrute.</Text>
+          <Text style={styles.card_subtitle}>
+            Agenda un paseo y deja que tu mascota lo disfrute.
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.card}>
           <Text style={styles.card_title}>Nutrición</Text>
@@ -141,28 +151,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
-  header_placeholder: {
-    height: 60, // simula el espacio del header (puedes ajustar)
-  },
   center_content: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
   },
-  empty_content: {
-    alignItems: 'center',
-  },
   bottom_button: {
-    alignItems: 'center',
-  },
-  centered: {
     alignItems: 'center',
   },
   empty_image: {
     width: 200,
     height: 200,
     marginBottom: 20,
-    
   },
   title: {
     fontSize: 28,
@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     color: '#111',
   },
-  
   subtitle: {
     fontSize: 18,
     color: '#666',
@@ -237,7 +236,3 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
 });
-
-
-
-  
