@@ -13,6 +13,7 @@ import DashboardScreen from '../screens/main/dashboard/dashboard_screen';
 import StepBreedScreen from '../screens/main/create_pet/step_breed_screen';
 import StepZonaScreen from '../screens/main/create_pet/step_zona_screen';
 import UserScreen from '../screens/main/Admin/user_screen';
+import WalksScreen from '../screens/main/Admin/walks_screen';
 
 
 export type RootStackParamList = {
@@ -30,6 +31,7 @@ export type RootStackParamList = {
   StepBreedScreen: undefined;
   StepZonaScreen: undefined;
   UserScreen: undefined;
+  WalksScreen: undefined;
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -51,6 +53,7 @@ export default function StackNavigator() {
       <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
       <Stack.Screen name="StepBreedScreen" component={StepBreedScreen} />
       <Stack.Screen name="UserScreen" component={UserScreen} />
+      <Stack.Screen name="WalksScreen" component={WalksScreen} />
     </Stack.Navigator>
   );
 }
