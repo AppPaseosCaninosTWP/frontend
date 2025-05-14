@@ -1,4 +1,3 @@
-// src/screens/main/Admin/walks_screen.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -33,7 +32,7 @@ interface Walk {
   notes: string;
 }
 
-// Ejemplo de datos; reemplaza con tu fetch real
+// Ejemplo de datos, luego se deben cambiar por datos reales de la API desde el backend
 const mockWalks: Walk[] = [
   {
     id: '1',
@@ -207,7 +206,7 @@ export default function WalksScreen() {
           showsVerticalScrollIndicator={false}
         />
 
-        {/* Bottom sheet de detalles */}
+        {/* Bottom de detalles */}
         <Modal
           visible={!!selected}
           transparent
