@@ -123,13 +123,13 @@ export default function DashboardAdminScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          // onPress={() => navigation.navigate('WalkersList')}
+          onPress={() => navigation.navigate('WalksScreen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
             style={styles.card_image}
           />
-          <Text style={styles.card_title}>Paseadores</Text>
+          <Text style={styles.card_title}>Paseos</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
