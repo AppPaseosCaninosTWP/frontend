@@ -1,4 +1,3 @@
-// src/screens/main/Admin/user_screen.tsx
 import React, { useState } from 'react';
 import {
   View,
