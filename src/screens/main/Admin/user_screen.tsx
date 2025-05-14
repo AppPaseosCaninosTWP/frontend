@@ -26,14 +26,14 @@ interface User {
 }
 
 // DATOS DE EJEMPLO, LUEGO SE DEBE HACER UNA PETICIÓN A LA API, ESTO ES SOLO PARA DEMOSTRAR QUE FUNCIONA 
-// LA SCREEN COMO CORRESPONDE 
+// LA SCREEN COMO CORRESPONDE
 const mockUsers: User[] = [
   { id: '1', name: 'Walter White',  rol_id: 2, rating: 0,   type: '—',           time: '--:--', zone: 'Antofagasta - Sur',    avatar: require('../../../assets/user_icon.png'), enabled: true },
   { id: '2', name: 'Shaggy Rogers', rol_id: 3, rating: 4.7, type: 'Paseo Prueba', time: '11:20', zone: 'Antofagasta - Norte', avatar: require('../../../assets/user_icon.png'), enabled: true },
   { id: '3', name: 'Jesse Pinkman', rol_id: 2, rating: 0,   type: '—',           time: '--:--', zone: 'Antofagasta - Centro',  avatar: require('../../../assets/user_icon.png'), enabled: false },
 ];
 
-const UserScreen: React.FC = () => {
+export default function UserScreen() {
   const [tab, setTab] = useState<'Clientes' | 'Paseadores'>('Clientes');
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'enabled' | 'disabled'>('all');
@@ -178,9 +178,7 @@ const UserScreen: React.FC = () => {
       </View>
     </View>
   );
-};
-
-export default UserScreen;
+}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
@@ -188,14 +186,14 @@ const styles = StyleSheet.create({
 
   tabBar: {
     flexDirection: 'row',
-    paddingHorizontal: 75,
+    paddingHorizontal: 16,
     paddingTop: 8,
   },
   tab: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginRight: 75,
-    borderRadius: 11,
+    marginRight: 16,
+    borderRadius: 16,
     backgroundColor: '#E0E0E0',
     alignItems: 'center',
   },
