@@ -134,7 +134,7 @@ export default function DashboardAdminScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          // onPress={() => navigation.navigate('Payments')}
+          onPress={() => navigation.navigate('PaymentsScreen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo3.png')}
