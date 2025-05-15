@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#000c14',
     paddingTop: 60,
     paddingHorizontal: 20,
     elevation: 8,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   headerName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111',
+    color: '#fff',
   },
   closeBtn: {
     position: 'absolute',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   closeTxt: {
     fontSize: 28,
-    color: '#333',
+    color: '#fff',
   },
   option: {
     flexDirection: 'row',
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   optionTxt: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
   },
   separator: {
   height: 1,

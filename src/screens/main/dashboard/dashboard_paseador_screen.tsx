@@ -38,32 +38,32 @@ export default function DashboardPaseadorScreen() {
 const menuOptions: MenuOption[] = [
     {
       label: 'Dashboard',
-      icon: <Feather name="layout" size={20} color="#333" />, 
+      icon: <Feather name="layout" size={20} color="#fff" />, 
       onPress: () => navigation.navigate('DashboardPaseador'),
     },
     {
       label: 'Buscar Paseos',
-      icon: <Ionicons name="search" size={20} color="#333" />,
+      icon: <Ionicons name="search" size={20} color="#fff" />,
       onPress: () => Alert.alert('Buscar Paseos'), //momentaneo hasta que se implemente
     },
     {
       label: 'Calendario',
-      icon: <MaterialIcons name="calendar-today" size={20} color="#333" />,
+      icon: <MaterialIcons name="calendar-today" size={20} color="#fff" />,
       onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
     },
     {
       label: 'Cuenta',
-      icon: <Ionicons name="person-circle" size={20} color="#333" />,
+      icon: <Ionicons name="person-circle" size={20} color="#fff" />,
       onPress: () => Alert.alert('Cuenta'),//momentaneo hasta que se implemente
     },
     {
       label: 'Calificaciones',
-      icon: <Ionicons name="star" size={20} color="#333" />,
+      icon: <Ionicons name="star" size={20} color="#fff" />,
       onPress: () => Alert.alert('Calificaciones'), //momentaneo hasta que se implemente
     },
     {
       label: 'Ajustes',
-      icon: <Feather name="settings" size={20} color="#333" />,
+      icon: <Feather name="settings" size={20} color="#fff" />,
       onPress: () => Alert.alert('Ajustes'), //momentaneo hasta que se implemente
     },
   ];
