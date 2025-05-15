@@ -166,7 +166,7 @@ const menuOptions: MenuOption[] = [
 
         <TouchableOpacity
           style={styles.card}
-          //onPress={() => navigation.navigate('Historial')}
+          onPress={() => navigation.navigate('WalkHistoryScreen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
