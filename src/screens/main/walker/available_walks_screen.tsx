@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
-interface Walk {
+export interface Walk {
   id: string;
   name: string;
   rating: number;
@@ -30,7 +30,7 @@ const mockWalks: Walk[] = [
     id: '1',
     name: 'Walter White',
     rating: 5.0,
-    type: 'Fixed Walk',
+    type: 'Paseo fijo',
     time: '11:00',
     zone: 'Antofagasta',
     region: 'Sur',
@@ -40,7 +40,7 @@ const mockWalks: Walk[] = [
     id: '2',
     name: 'Shaggy Rogers',
     rating: 4.7,
-    type: 'Test Walk',
+    type: 'Paseo fijo',
     time: '11:20',
     zone: 'Antofagasta',
     region: 'Norte',
@@ -50,10 +50,10 @@ const mockWalks: Walk[] = [
     id: '3',
     name: 'Finn Mertens',
     rating: 4.0,
-    type: 'Test Walk',
+    type: 'Paseo de prueba',
     time: '11:22',
-    zone: 'Land of Ooo',
-    region: 'Candy Kingdom',
+    zone: 'Antofagasta',
+    region: 'Centro',
     avatar: require('../../../assets/user_icon.png'),
   },
 ];
@@ -66,9 +66,7 @@ export default function AvailableWalksScreen() {
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => {
-          //detalles del paseo
-        }}
+        onPress={() => navigation.navigate('PetProfileScreen', { walk: item })}
       >
         <View style={styles.cardHeader}>
           <View style={styles.avatarContainer}>
@@ -103,7 +101,7 @@ export default function AvailableWalksScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Available Walks</Text>
+        <Text style={styles.headerTitle}>Paseos disponibles</Text>
       </View>
 
       <FlatList
@@ -116,6 +114,18 @@ export default function AvailableWalksScreen() {
     </View>
   );
 }
+
+export interface Walk {
+  id: string;
+  name: string;
+  rating: number;
+  type: string;
+  time: string;
+  zone: string;
+  region: string;
+  avatar: any;
+}
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
