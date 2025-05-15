@@ -186,14 +186,14 @@ const styles = StyleSheet.create({
 
   tabBar: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 75,
     paddingTop: 8,
   },
   tab: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginRight: 16,
-    borderRadius: 16,
+    marginRight: 75,
+    borderRadius: 11,
     backgroundColor: '#E0E0E0',
     alignItems: 'center',
   },
