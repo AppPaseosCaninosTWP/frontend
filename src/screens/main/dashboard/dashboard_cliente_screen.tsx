@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Alert,
 } from 'react-native';
@@ -20,6 +19,10 @@ import { get_user_pets } from '../../../service/pet_service';
 import type { pet_model } from '../../../models/pet_model';
 import SwipeButtonTWP from '../../../components/swipe_button';
 import Header from '../../../components/shared/header';
+
+import ScreenWithMenu from '../../../components/shared/screen_with_menu';
+import type { MenuOption } from '../../../components/shared/side_menu';
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -50,6 +53,47 @@ export default function DashboardClienteScreen() {
 
     fetch_pets();
   }, []);
+
+  const menuOptions: MenuOption[] = [
+    {
+      label: 'Dashboard',
+      icon: <Feather name="layout" size={20} color="#333" />,
+      onPress: () => navigation.navigate('DashboardCliente'),
+    },
+    { label: '__separator__', icon: null, onPress: () => {} },
+    {
+      label: 'Mascotas: ',
+      icon: <Ionicons name="paw" size={20} color="#333" />,
+      onPress: () => Alert.alert('Mascotas'),
+    },
+    
+    ...user_pets.map((pet) => ({
+      label: pet.name,
+      icon: <Image source={{ uri: `${API_BASE_URL}/uploads/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />,
+      onPress: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
+    })),
+    { label: '__separator__', icon: null, onPress: () => {} },
+    {
+      label: 'Contactos',
+      icon: <Ionicons name="search" size={20} color="#333" />,
+      onPress: () => Alert.alert('Contactos'),
+    },
+    {
+      label: 'Calendario',
+      icon: <MaterialIcons name="calendar-today" size={20} color="#333" />,
+      onPress: () => Alert.alert('Calendario'),
+    },
+    {
+      label: 'Cuenta',
+      icon: <Ionicons name="person-circle" size={20} color="#333" />,
+      onPress: () => Alert.alert('Cuenta'),
+    },
+    {
+      label: 'Ajustes',
+      icon: <Feather name="settings" size={20} color="#333" />,
+      onPress: () => Alert.alert('Ajustes'),
+    },
+  ];
 
   if (is_loading) {
     return (
@@ -93,10 +137,7 @@ export default function DashboardClienteScreen() {
   const pet = user_pets[0];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header reutilizable: roleId 3 = Cliente */}
-      <Header roleId={3} />
-
+    <ScreenWithMenu roleId={3} menuOptions={menuOptions}>
       <Text style={styles.section_title}>
         Perfiles de mascotas activos{' '}
         <Text style={styles.badge}>{user_pets.length}</Text>
@@ -114,10 +155,7 @@ export default function DashboardClienteScreen() {
       </View>
 
       <View style={styles.grid}>
-        <TouchableOpacity
-          style={styles.card}
-          //onPress={() => navigation.navigate('AgendarPaseo')}
-        >
+        <TouchableOpacity style={styles.card}>
           <Text style={styles.card_title}>¿Un Paseo?</Text>
           <Text style={styles.card_subtitle}>
             Agenda un paseo y deja que tu mascota lo disfrute.
@@ -133,7 +171,7 @@ export default function DashboardClienteScreen() {
           <Text style={styles.card_title}>Historial</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </ScreenWithMenu>
   );
 }
 

@@ -87,19 +87,26 @@ const SideMenu: React.FC<SideMenuProps> = ({
           <Text style={styles.closeTxt}>×</Text>
         </TouchableOpacity>
 
-        {options.map(opt => (
-          <TouchableOpacity
-            key={opt.label}
+        {options.map((opt, index) => {
+          if (opt.label === '__separator__') {
+             return <View key={`sep-${index}`} style={styles.separator} />;
+          }
+
+         return (
+           <TouchableOpacity
+             key={opt.label}
             style={styles.option}
             onPress={() => {
-              opt.onPress();
-              onClose();
-            }}
-          >
-            <View style={styles.iconWrapper}>{opt.icon}</View>
-            <Text style={styles.optionTxt}>{opt.label}</Text>
-          </TouchableOpacity>
-        ))}
+            opt.onPress();
+          onClose();
+        }}
+    >
+      <View style={styles.iconWrapper}>{opt.icon}</View>
+      <Text style={styles.optionTxt}>{opt.label}</Text>
+    </TouchableOpacity>
+  );
+})}
+
       </Animated.View>
     </>
   );
@@ -159,6 +166,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  separator: {
+  height: 1,
+  backgroundColor: '#D1D5DB', // Gris suave
+  marginVertical: 8,
+  opacity: 0.6,
+},
+
 });
 
 export default SideMenu;
