@@ -51,6 +51,7 @@ const menuOptions: MenuOption[] = [
       icon: <MaterialIcons name="calendar-today" size={20} color="#fff" />,
       onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
     },
+    { label: '__separator__', icon: null, onPress: () => {} },
     {
       label: 'Cuenta',
       icon: <Ionicons name="person-circle" size={20} color="#fff" />,
