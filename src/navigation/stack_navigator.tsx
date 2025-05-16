@@ -17,6 +17,7 @@ import AvailableWalksScreen from '../screens/main/walker/available_walks_screen'
 import WalkHistoryScreen from '../screens/main/walker/walk_history_screen';
 import PetProfileScreen from '../screens/main/walker/pet_profile_screen';
 import type { Walk } from '../screens/main/walker/available_walks_screen';
+import RatingsScreen from '../screens/main/walker/ratings_screen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -36,6 +37,7 @@ export type RootStackParamList = {
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
   PetProfileScreen: { walk: Walk };
+  RatingsScreen: undefined
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -60,6 +62,7 @@ export default function StackNavigator() {
       <Stack.Screen name="AvailableWalksScreen" component={AvailableWalksScreen} />
       <Stack.Screen name="WalkHistoryScreen" component={WalkHistoryScreen} />
       <Stack.Screen name="PetProfileScreen" component={PetProfileScreen} />
+      <Stack.Screen name="RatingsScreen" component={RatingsScreen} />
     </Stack.Navigator>
   );
 }
