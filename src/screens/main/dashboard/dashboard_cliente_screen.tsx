@@ -57,13 +57,13 @@ export default function DashboardClienteScreen() {
   const menuOptions: MenuOption[] = [
     {
       label: 'Dashboard',
-      icon: <Feather name="layout" size={20} color="#333" />,
+      icon: <Feather name="layout" size={20} color="#000c14" />,
       onPress: () => navigation.navigate('DashboardCliente'),
     },
     { label: '__separator__', icon: null, onPress: () => {} },
     {
       label: 'Mascotas: ',
-      icon: <Ionicons name="paw" size={20} color="#333" />,
+      icon: <Ionicons name="paw" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Mascotas'),
     },
     
@@ -75,22 +75,22 @@ export default function DashboardClienteScreen() {
     { label: '__separator__', icon: null, onPress: () => {} },
     {
       label: 'Contactos',
-      icon: <Ionicons name="search" size={20} color="#333" />,
+      icon: <Ionicons name="search" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Contactos'),
     },
     {
       label: 'Calendario',
-      icon: <MaterialIcons name="calendar-today" size={20} color="#333" />,
+      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Calendario'),
     },
     {
       label: 'Cuenta',
-      icon: <Ionicons name="person-circle" size={20} color="#333" />,
+      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Cuenta'),
     },
     {
       label: 'Ajustes',
-      icon: <Feather name="settings" size={20} color="#333" />,
+      icon: <Feather name="settings" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Ajustes'),
     },
   ];

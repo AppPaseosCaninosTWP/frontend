@@ -38,33 +38,33 @@ export default function DashboardPaseadorScreen() {
 const menuOptions: MenuOption[] = [
     {
       label: 'Dashboard',
-      icon: <Feather name="layout" size={20} color="#fff" />, 
+      icon: <Feather name="layout" size={20} color="#000c14" />, 
       onPress: () => navigation.navigate('DashboardPaseador'),
     },
     {
       label: 'Buscar Paseos',
-      icon: <Ionicons name="search" size={20} color="#fff" />,
+      icon: <Ionicons name="search" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Buscar Paseos'), //momentaneo hasta que se implemente
     },
     {
       label: 'Calendario',
-      icon: <MaterialIcons name="calendar-today" size={20} color="#fff" />,
+      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
     },
     { label: '__separator__', icon: null, onPress: () => {} },
     {
       label: 'Cuenta',
-      icon: <Ionicons name="person-circle" size={20} color="#fff" />,
+      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Cuenta'),//momentaneo hasta que se implemente
     },
     {
       label: 'Calificaciones',
-      icon: <Ionicons name="star" size={20} color="#fff" />,
+      icon: <Ionicons name="star" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Calificaciones'), //momentaneo hasta que se implemente
     },
     {
       label: 'Ajustes',
-      icon: <Feather name="settings" size={20} color="#fff" />,
+      icon: <Feather name="settings" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Ajustes'), //momentaneo hasta que se implemente
     },
   ];
@@ -82,9 +82,9 @@ const menuOptions: MenuOption[] = [
       menuOptions={menuOptions}
       //onSearchPress={() => navigation.navigate('BuscarPaseos')}
     >
-      <Text style={styles.section_title}>
-        Tu próximo paseo: {' '}
+      <Text style={styles.section_title}>Tu próximo paseo: {' '}
         <Text style={styles.badge}>{assigned_walks.length}</Text>
+        <Text  style={styles.badge}> paseos asignados</Text>
       </Text>
 
       {/* --- Carrusel de paseos --- */}
@@ -183,7 +183,7 @@ const menuOptions: MenuOption[] = [
 const styles = StyleSheet.create({
   section_title: {
     marginTop: 16,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: '#111',
     marginBottom: 12,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     color: '#007BFF',
     paddingHorizontal: 8,
     borderRadius: 12,
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: '600',
   },
 
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48%',
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#e3f2fd',
     borderRadius: 16,
     paddingVertical: 24,
     paddingHorizontal: 12,
@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   icon: {
-    width: 60,
-    height: 60,
+    width: 90,
+    height: 90,
     marginBottom: 12,
     resizeMode: 'contain',
   },
