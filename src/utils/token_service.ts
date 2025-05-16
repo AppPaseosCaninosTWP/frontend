@@ -20,6 +20,7 @@ export const save_session = async (token: string, user: user_model): Promise<voi
 
   const adapted_user = {
     ...user,
+    id: user.user_id,
     role_id: mapped_role ?? -1,
   };
 
