@@ -72,9 +72,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    marginLeft: 100,
+    //poner texto en el medio
+    flex: 0.9,
+    textAlign: 'center',
     color: '#111',
   },
   scrollContent: {
