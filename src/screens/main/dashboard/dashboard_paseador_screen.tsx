@@ -55,12 +55,12 @@ const menuOptions: MenuOption[] = [
     {
       label: 'Cuenta',
       icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Cuenta'),//momentaneo hasta que se implemente
+      onPress: () => navigation.navigate('WalkerProfileScreen'),
     },
     {
       label: 'Calificaciones',
       icon: <Ionicons name="star" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Calificaciones'), //momentaneo hasta que se implemente
+      onPress: () => navigation.navigate('RatingsScreen'),
     },
     {
       label: 'Ajustes',
