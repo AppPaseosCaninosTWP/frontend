@@ -1,4 +1,3 @@
-// src/screens/main/Admin/payments_screen.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -16,8 +15,8 @@ import HeaderAdmin from '../../../components/shared/header_admin';
 
 interface Walker {
   name: string;
-  avatar?: any;       // avatar opcional
-  rating?: number;    // calificación promedio del paseador
+  avatar?: any;
+  rating?: number;
 }
 
 interface Payment {
@@ -32,11 +31,10 @@ interface Payment {
   endTime: string;
   type: string;
   walker: Walker;
-  walkRating?: number;    // calificación del paseo
+  walkRating?: number;
   notes: string;
 }
-
-// Datos de ejemplo: reemplaza por tu fetch real
+//Datos de ejemplo
 const mockPayments: Payment[] = [
   {
     id: '1',
@@ -110,9 +108,7 @@ export default function PaymentsScreen() {
     .map(sec => ({
       title: sec.title,
       data: sec.data.filter(p => {
-        const matchQuery = p.ownerName
-          .toLowerCase()
-          .includes(query.toLowerCase());
+        const matchQuery = p.ownerName.toLowerCase().includes(query.toLowerCase());
         const matchFilter =
           filter === 'all' ||
           (filter === 'paid' && p.paymentStatus === 'Pagado') ||
@@ -124,14 +120,11 @@ export default function PaymentsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={styles.container.backgroundColor}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={styles.container.backgroundColor} />
       <HeaderAdmin title="Pagos" />
 
       <View style={styles.body}>
-        {/* --- Filtros arriba de búsqueda --- */}
+        {/* Filtros */}
         <View style={styles.segmented}>
           {(['all', 'paid', 'pending'] as Filter[]).map(key => (
             <TouchableOpacity
@@ -145,17 +138,13 @@ export default function PaymentsScreen() {
                   filter === key && styles.segmentTextActive,
                 ]}
               >
-                {key === 'all'
-                  ? 'Todos'
-                  : key === 'paid'
-                  ? 'Pagados'
-                  : 'Pendientes'}
+                {key === 'all' ? 'Todos' : key === 'paid' ? 'Pagados' : 'Pendientes'}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* --- Barra de búsqueda --- */}
+        {/* Search bar */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBox}>
             <Feather name="search" size={18} color="#888" />
@@ -174,7 +163,7 @@ export default function PaymentsScreen() {
           </View>
         </View>
 
-        {/* --- Lista de pagos --- */}
+        {/* Lista */}
         <SectionList
           sections={filteredSections}
           keyExtractor={item => item.id}
@@ -182,39 +171,35 @@ export default function PaymentsScreen() {
             <Text style={styles.sectionHeader}>{title}</Text>
           )}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => setSelected(item)}
-            >
-              <View style={styles.cardLeft} />
+            <TouchableOpacity style={styles.card} onPress={() => setSelected(item)}>
               <View style={styles.cardContent}>
                 <Text style={styles.cardTitle}>{item.ownerName}</Text>
                 <Text style={styles.cardSub}>Mascota – {item.petName}</Text>
+                <Text style={styles.zoneText}>{item.zone}</Text>
                 <View style={styles.row}>
                   <Feather name="calendar" size={14} color="#666" />
                   <Text style={styles.cardMeta}>{item.date}</Text>
-                  <Feather name="dollar-sign" size={14} color="#666" />
-                  <Text style={styles.cardMeta}>{item.fee}</Text>
+                  <Feather name="clock" size={14} color="#666" />
+                  <Text style={styles.cardMeta}>
+                    {item.startTime}–{item.endTime}
+                  </Text>
                 </View>
               </View>
               <Text
                 style={[
-                  styles.status,
-                  item.paymentStatus === 'Pagado'
-                    ? styles.statusPaid
-                    : styles.statusPending,
+                  styles.pill,
+                  item.paymentStatus === 'Pagado' ? styles.pillPaid : styles.pillPending,
                 ]}
               >
                 {item.paymentStatus}
               </Text>
-              <Feather name="chevron-right" size={20} color="#AAA" />
             </TouchableOpacity>
           )}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
 
-        {/* --- Modal detalle de pago --- */}
+        {/* Detalle */}
         <Modal
           visible={!!selected}
           transparent
@@ -222,44 +207,30 @@ export default function PaymentsScreen() {
           onRequestClose={() => setSelected(null)}
         >
           <View style={styles.modalOverlay}>
-            <TouchableOpacity
-              style={{ flex: 1 }}
-              onPress={() => setSelected(null)}
-            />
+            <TouchableOpacity style={{ flex: 1 }} onPress={() => setSelected(null)} />
             {selected && (
               <View style={styles.modal}>
                 <View style={styles.handle} />
 
                 <Text style={styles.modalTitle}>{selected.ownerName}</Text>
-                <Text style={styles.modalSub}>
-                  Mascota – {selected.petName}
-                </Text>
+                <Text style={styles.modalSub}>Mascota – {selected.petName}</Text>
 
-                {/* Zona y Calificación del paseo */}
                 <View style={styles.modalRow}>
                   <View style={styles.modalCol}>
                     <Text style={styles.label}>Zona</Text>
                     <Text style={styles.value}>{selected.zone}</Text>
                   </View>
                   <View style={styles.modalCol}>
-                    <Text style={styles.label}>Calificación</Text>
+                    <Text style={styles.label}>Calif. Paseo</Text>
                     <View style={styles.row}>
                       <Text style={styles.value}>
-                        {typeof selected.walkRating === 'number'
-                          ? selected.walkRating.toFixed(1)
-                          : '-'}
+                        {selected.walkRating?.toFixed(1) ?? '-'}
                       </Text>
-                      <Feather
-                        name="star"
-                        size={16}
-                        color="#FFB300"
-                        style={{ marginLeft: 6 }}
-                      />
+                      <Feather name="star" size={16} color="#FFB300" style={{ marginLeft: 6 }} />
                     </View>
                   </View>
                 </View>
 
-                {/* Horario */}
                 <View style={styles.modalRow}>
                   <View style={styles.modalCol}>
                     <Text style={styles.label}>Inicio</Text>
@@ -271,13 +242,10 @@ export default function PaymentsScreen() {
                   </View>
                 </View>
 
-                {/* Estado / Tipo paseo */}
                 <View style={styles.modalRow}>
                   <View style={styles.modalCol}>
-                    <Text style={styles.label}>Pago</Text>
-                    <Text style={styles.value}>
-                      {selected.paymentStatus}
-                    </Text>
+                    <Text style={styles.label}>Estado Pago</Text>
+                    <Text style={styles.value}>{selected.paymentStatus}</Text>
                   </View>
                   <View style={styles.modalCol}>
                     <Text style={styles.label}>Tipo paseo</Text>
@@ -285,53 +253,33 @@ export default function PaymentsScreen() {
                   </View>
                 </View>
 
-                {/* Fecha */}
                 <View style={{ marginTop: 12 }}>
                   <Text style={styles.label}>Fecha</Text>
                   <Text style={styles.value}>{selected.date}</Text>
                 </View>
 
-                {/* Paseador */}
-                <Text style={[styles.label, { marginTop: 16 }]}>
-                  Paseador
-                </Text>
+                <Text style={[styles.label, { marginTop: 16 }]}>Paseador</Text>
                 <View style={styles.walkerCard}>
                   {selected.walker.avatar ? (
-                    <Image
-                      source={selected.walker.avatar}
-                      style={styles.walkerAvatar}
-                    />
+                    <Image source={selected.walker.avatar} style={styles.walkerAvatar} />
                   ) : (
                     <Feather name="user" size={40} color="#888" />
                   )}
                   <View style={{ marginLeft: 12, flex: 1 }}>
-                    <Text style={styles.walkerName}>
-                      {selected.walker.name}
-                    </Text>
+                    <Text style={styles.walkerName}>{selected.walker.name}</Text>
                     <View style={[styles.row, { marginTop: 4 }]}>
                       <Text style={styles.walkerRating}>
-                        {typeof selected.walker.rating === 'number'
-                          ? selected.walker.rating.toFixed(1)
-                          : '-'}
+                        {selected.walker.rating?.toFixed(1) ?? '-'}
                       </Text>
-                      <Feather
-                        name="star"
-                        size={16}
-                        color="#FFB300"
-                        style={{ marginLeft: 6 }}
-                      />
+                      <Feather name="star" size={16} color="#FFB300" style={{ marginLeft: 6 }} />
                     </View>
                   </View>
                 </View>
 
-                {/* Notas */}
                 <Text style={[styles.label, { marginTop: 16 }]}>Notas</Text>
                 <Text style={styles.value}>{selected.notes}</Text>
 
-                <TouchableOpacity
-                  style={styles.closeBtn}
-                  onPress={() => setSelected(null)}
-                >
+                <TouchableOpacity style={styles.closeBtn} onPress={() => setSelected(null)}>
                   <Text style={styles.closeTxt}>Cerrar</Text>
                 </TouchableOpacity>
               </View>
@@ -385,9 +333,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     color: '#444',
-    borderBottomWidth: 1,
-    borderBottomColor: '#DDD',
-    paddingBottom: 4,
   },
 
   card: {
@@ -397,28 +342,29 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    overflow: 'hidden',
   },
-  cardLeft: { width: 6, backgroundColor: ACCENT, height: '100%' },
-  cardContent: { flex: 1, padding: 12 },
+  cardContent: { flex: 1, padding: 16 },
   cardTitle: { fontSize: 15, fontWeight: '600', color: '#222' },
   cardSub: { fontSize: 13, color: '#666', marginTop: 4 },
+  zoneText: { fontSize: 12, color: '#666', marginTop: 4 },
   row: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
   cardMeta: { fontSize: 12, color: '#666', marginLeft: 4, marginRight: 12 },
 
-  status: {
+  pill: {
     fontSize: 12,
     fontWeight: '600',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
+    color: '#FFF',
     marginRight: 12,
   },
-  statusPaid:    { backgroundColor: '#E6F4EA', color: '#28A745' },
-  statusPending: { backgroundColor: '#F5F5F5', color: '#888' },
+  pillPaid:    { backgroundColor: '#28A745' },
+  pillPending: { backgroundColor: '#9CA3AF' },
 
   modalOverlay: {
     flex: 1,
