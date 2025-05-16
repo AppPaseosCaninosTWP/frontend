@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#000c14',
+    backgroundColor: '#e3f2fd',
     paddingTop: 60,
     paddingHorizontal: 20,
     elevation: 8,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   headerName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
+    color: '#000c14',
   },
   closeBtn: {
     position: 'absolute',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   closeTxt: {
     fontSize: 28,
-    color: '#fff',
+    color: '#000c14',
   },
   option: {
     flexDirection: 'row',
@@ -164,11 +164,11 @@ const styles = StyleSheet.create({
   },
   optionTxt: {
     fontSize: 16,
-    color: '#fff',
+    color: '#000c14',
   },
   separator: {
   height: 1,
-  backgroundColor: '#D1D5DB', // Gris suave
+  backgroundColor: '#000c14', // Gris suave
   marginVertical: 8,
   opacity: 0.6,
 },
