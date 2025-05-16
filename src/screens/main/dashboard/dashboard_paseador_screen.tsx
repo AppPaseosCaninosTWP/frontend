@@ -156,7 +156,7 @@ const menuOptions: MenuOption[] = [
 
         <TouchableOpacity
           style={styles.card}
-          //onPress={() => navigation.navigate('Calificaciones')}
+          onPress={() => navigation.navigate('RatingsScreen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo1.png')}
