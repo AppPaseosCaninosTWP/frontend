@@ -1,5 +1,3 @@
-// src/screens/paseador/EditWalkerProfileScreen.tsx
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -131,7 +129,7 @@ export default function EditWalkerProfileScreen() {
       const token = await get_token();
       if (!token || !userId) throw new Error('Sesión no válida');
 
-      const res = await fetch(`${API_BASE_URL}/walkers/${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/walker_profile/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
