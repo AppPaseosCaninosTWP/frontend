@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,83 +7,95 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { get_token } from '../../../utils/token_service';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
-export interface Walk {
-  id: string;
-  name: string;
-  rating: number;
-  type: string;
-  time: string;
-  zone: string;
-  region: string;
-  avatar: any;
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+
+interface BackendWalk {
+  walk_id: number;
+  walk_type: string;
+  status: string;
+  comments: string | null;
+  days: { start_date: string; start_time: string; duration: number }[];
+  pet: {
+    id: number;
+    name: string;
+    avatarUrl: string;
+    description: string;
+    age: number;
+    zone: string;
+  } | null;
 }
 
-// Datos de ejemplo; luego vendrán de la API
-const mockWalks: Walk[] = [
-  {
-    id: '1',
-    name: 'Walter White',
-    rating: 5.0,
-    type: 'Paseo fijo',
-    time: '11:00',
-    zone: 'Antofagasta',
-    region: 'Sur',
-    avatar: require('../../../assets/user_icon.png'),
-  },
-  {
-    id: '2',
-    name: 'Shaggy Rogers',
-    rating: 4.7,
-    type: 'Paseo fijo',
-    time: '11:20',
-    zone: 'Antofagasta',
-    region: 'Norte',
-    avatar: require('../../../assets/user_icon.png'),
-  },
-  {
-    id: '3',
-    name: 'Finn Mertens',
-    rating: 4.0,
-    type: 'Paseo de prueba',
-    time: '11:22',
-    zone: 'Antofagasta',
-    region: 'Centro',
-    avatar: require('../../../assets/user_icon.png'),
-  },
-];
-
 export default function AvailableWalksScreen() {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [allWalks, setAllWalks] = useState<BackendWalk[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<'Fijo' | 'Esporádico'>('Fijo');
 
-  const renderItem = ({ item }: { item: Walk }) => {
+  useEffect(() => {
+    fetchWalks();
+  }, []);
+
+  const fetchWalks = async () => {
+    setLoading(true);
+    try {
+      const token = await get_token();
+      const res = await fetch(`${API_BASE_URL}/walk`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.msg || 'Error desconocido');
+      setAllWalks(json.data);
+    } catch (err: any) {
+      Alert.alert('Error al cargar paseos', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const walksToShow = allWalks.filter(
+    (w) => w.walk_type.toLowerCase() === selectedTab.toLowerCase()
+  );
+
+  const renderItem = ({ item }: { item: BackendWalk }) => {
+    const pet = item.pet;
+    const firstDay = item.days[0];
+
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => navigation.navigate('PetProfileScreen', { walk: item })}
+        onPress={() =>
+          navigation.navigate('PetProfileScreen', {
+            walkId: item.walk_id,
+          })
+        }
       >
         <View style={styles.cardHeader}>
-          <View style={styles.avatarContainer}>
-            <Image source={item.avatar} style={styles.avatar} />
-          </View>
+          {pet ? (
+            <Image source={{ uri: pet.avatarUrl }} style={styles.avatar} />
+          ) : (
+            <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
+          )}
 
           <View style={styles.info}>
-            <Text style={styles.name}>
-              {item.name}{' '}
-              <Text style={styles.star}>★</Text>
-              <Text style={styles.ratingValue}>{item.rating.toFixed(1)}</Text>
-            </Text>
+            {pet && (
+              <>
+                <Text style={styles.name}>{pet.name}</Text>
+                <Text style={styles.meta}>{pet.description}</Text>
+              </>
+            )}
             <Text style={styles.meta}>
-              {item.type} | {item.time}
-            </Text>
-            <Text style={styles.zone}>
-              {item.zone} – {item.region}
+              {selectedTab === 'Fijo'
+                ? `${item.days.length} día(s) a las ${firstDay.start_time}`
+                : `${firstDay.start_date} a las ${firstDay.start_time}`}
             </Text>
           </View>
 
@@ -96,7 +108,7 @@ export default function AvailableWalksScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      {/* Header sencillo con back */}
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
@@ -104,32 +116,50 @@ export default function AvailableWalksScreen() {
         <Text style={styles.headerTitle}>Paseos disponibles</Text>
       </View>
 
-      <FlatList
-        data={mockWalks}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-      />
+      <View style={styles.tabContainer}>
+        {(['Fijo', 'Esporádico'] as const).map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={[
+              styles.tabButton,
+              selectedTab === tab && styles.tabButtonActive,
+            ]}
+            onPress={() => setSelectedTab(tab)}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === tab && styles.tabTextActive,
+              ]}
+            >
+              Paseos {tab}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 20 }} />
+      ) : (
+        <FlatList
+          data={walksToShow}
+          keyExtractor={(w) => w.walk_id.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              No hay paseos {selectedTab.toLowerCase()} disponibles
+            </Text>
+          }
+        />
+      )}
     </View>
   );
 }
 
-export interface Walk {
-  id: string;
-  name: string;
-  rating: number;
-  type: string;
-  time: string;
-  zone: string;
-  region: string;
-  avatar: any;
-}
-
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,10 +176,36 @@ const styles = StyleSheet.create({
     color: '#111',
   },
 
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 12,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 8,
+    marginHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+  },
+  tabButtonActive: {
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
+  },
+  tabText: { fontSize: 14, color: '#555' },
+  tabTextActive: { color: '#fff', fontWeight: '600' },
+
   list: {
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 24,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#666',
   },
 
   card: {
@@ -166,16 +222,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
-  avatarContainer: {
-    marginRight: 12,
-  },
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
+    marginRight: 12,
   },
-
   info: {
     flex: 1,
   },
@@ -184,23 +236,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
-  star: {
-    fontSize: 14,
-    color: '#FFDB58',
-  },
-  ratingValue: {
-    fontSize: 14,
-    color: '#333',
-  },
-
   meta: {
     color: '#666',
     marginTop: 4,
     fontSize: 14,
-  },
-  zone: {
-    color: '#888',
-    fontSize: 12,
-    marginTop: 2,
   },
 });

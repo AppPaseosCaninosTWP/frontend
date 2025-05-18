@@ -1,5 +1,3 @@
-// src/screens/paseador/WalkHistoryScreen.tsx
-
 import React from 'react';
 import {
   View,
@@ -74,7 +72,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    //poner texto en el medio
     flex: 0.9,
     textAlign: 'center',
     color: '#111',

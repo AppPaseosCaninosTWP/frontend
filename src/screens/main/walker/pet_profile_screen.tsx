@@ -1,5 +1,3 @@
-// src/screens/paseador/PetProfileScreen.tsx
-
 import React, { useState } from 'react';
 import {
   View,
@@ -33,7 +31,7 @@ export default function PetProfileScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color="#333" />
@@ -46,7 +44,7 @@ export default function PetProfileScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {activeTab === 'Acerca de' && (
           <>
-            {/* Perfil */}
+
             <View style={styles.profileContainer}>
               <Image
                 source={require('../../../assets/breeds/golden.png')}
@@ -56,13 +54,11 @@ export default function PetProfileScreen() {
               <Text style={styles.petBreed}>Perro | Border Collie</Text>
             </View>
 
-            {/* Apariencia */}
             <Text style={styles.sectionTitle}>Apariencia y signos distintivos</Text>
             <Text style={styles.description}>
               Mezcla de color marrón, blanco oscuro, con cejas claras y una mancha en forma de corazón en la pata izquierda.
             </Text>
 
-            {/* Datos principales */}
             <View style={styles.infoTable}>
               <View style={styles.row}><Text style={styles.label}>Género</Text><Text style={styles.value}>Macho</Text></View>
               <View style={styles.row}><Text style={styles.label}>Tamaño</Text><Text style={styles.value}>Medio</Text></View>
@@ -73,7 +69,6 @@ export default function PetProfileScreen() {
               <View style={styles.row}><Text style={styles.label}>Hora término</Text><Text style={styles.value}>13:00</Text></View>
             </View>
 
-            {/* Datos importantes */}
             <Text style={styles.sectionTitle}>Datos importantes</Text>
             <View style={styles.card}><Text style={styles.cardIcon}>🎂</Text><Text style={styles.cardText}>3 Noviembre 2019</Text><Text style={styles.cardNote}>4 años</Text></View>
             <View style={styles.card}><Text style={styles.cardIcon}>📍</Text><Text style={styles.cardText}>Angamos 0610</Text></View>
