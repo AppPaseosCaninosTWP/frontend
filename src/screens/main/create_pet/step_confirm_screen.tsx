@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
@@ -25,10 +26,7 @@ export default function StepConfirmScreen() {
     try {
       await create_pet(pet_data);
       reset_pet_data();
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'DashboardCliente' }],
-      });
+      navigation.replace('Success');
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Error al registrar mascota');
     } finally {
@@ -36,49 +34,38 @@ export default function StepConfirmScreen() {
     }
   };
 
+  const InfoCard = ({
+    icon,
+    label,
+    value,
+  }: {
+    icon: keyof typeof Feather.glyphMap;
+    label: string;
+    value?: string | number | null;
+  }) =>
+    value ? (
+      <View style={styles.card}>
+        <Feather name={icon} size={20} color="#007BFF" style={styles.card_icon} />
+        <View style={styles.card_content}>
+          <Text style={styles.card_label}>{label}</Text>
+          <Text style={styles.card_value}>{value}</Text>
+        </View>
+      </View>
+    ) : null;
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {pet_data.photo && (
         <Image source={{ uri: pet_data.photo }} style={styles.image} />
       )}
-
       <Text style={styles.name}>{pet_data.name}</Text>
 
-      <View style={styles.detail}>
-        <Text style={styles.label}>Edad:</Text>
-        <Text>{pet_data.age} años</Text>
-      </View>
-
-      <View style={styles.detail}>
-        <Text style={styles.label}>Raza:</Text>
-        <Text>{pet_data.breed || 'No especificada'}</Text>
-      </View>
-
-      <View style={styles.detail}>
-        <Text style={styles.label}>Zona:</Text>
-        <Text>{pet_data.zone}</Text>
-      </View>
-
-      {pet_data.description ? (
-        <View style={styles.detail}>
-          <Text style={styles.label}>Descripción:</Text>
-          <Text>{pet_data.description}</Text>
-        </View>
-      ) : null}
-
-      {pet_data.comments ? (
-        <View style={styles.detail}>
-          <Text style={styles.label}>Comentarios:</Text>
-          <Text>{pet_data.comments}</Text>
-        </View>
-      ) : null}
-
-      {pet_data.medical_condition ? (
-        <View style={styles.detail}>
-          <Text style={styles.label}>Condición médica:</Text>
-          <Text>{pet_data.medical_condition}</Text>
-        </View>
-      ) : null}
+      <InfoCard icon="calendar" label="Edad" value={`${pet_data.age} años`} />
+      <InfoCard icon="tag" label="Raza" value={pet_data.breed || 'No especificada'} />
+      <InfoCard icon="map-pin" label="Zona" value={pet_data.zone} />
+      <InfoCard icon="info" label="Descripción" value={pet_data.description} />
+      <InfoCard icon="message-square" label="Comentarios" value={pet_data.comments} />
+      <InfoCard icon="activity" label="Condición médica" value={pet_data.medical_condition} />
 
       <View style={styles.actions}>
         {loading ? (
@@ -93,7 +80,7 @@ export default function StepConfirmScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 24,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
@@ -106,20 +93,43 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   name: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    marginBottom: 16,
+    marginBottom: 20,
+    color: '#111',
   },
-  detail: {
-    width: '100%',
+  card: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 14,
     marginBottom: 12,
+    width: '100%',
   },
-  label: {
+  card_icon: {
+    marginRight: 12,
+    marginTop: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card_content: {
+    flex: 1,
+  },
+  card_label: {
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 2,
+  },
+  card_value: {
+    fontSize: 15,
     fontWeight: '600',
-    color: '#444',
+    color: '#333',
   },
   actions: {
     marginTop: 30,
     marginBottom: 40,
+    width: '100%',
+    alignItems: 'center',
   },
 });
