@@ -14,7 +14,7 @@ export default function CreatePetHeader({
   title,
   subtitle,
   step,
-  total_steps = 9,
+  total_steps = 6,
   on_back_press,
 }: CreatePetHeaderProps) {
   const progress = (step / total_steps) * 100;
