@@ -31,7 +31,7 @@ export default function StepHealthScreen() {
       medical_condition: medical_condition.trim(),
     });
 
-    // navigation.navigate('StepConfirm');
+    navigation.navigate('StepConfirmScreen');
     console.log('Comentarios guardados:', comments);
   };
 

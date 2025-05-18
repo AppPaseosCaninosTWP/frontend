@@ -14,6 +14,7 @@ import StepBreedScreen from '../screens/main/create_pet/step_breed_screen';
 import StepZonaScreen from '../screens/main/create_pet/step_zona_screen';
 import StepAgeScreen from '../screens/main/create_pet/step_age_screen';
 import StepHealthScreen from '../screens/main/create_pet/step_health_screen';
+import StepConfirmScreen from '../screens/main/create_pet/step_confirm_screen';
 import UserScreen from '../screens/main/Admin/user_screen';
 import AvailableWalksScreen from '../screens/main/walker/available_walks_screen';
 import WalkHistoryScreen from '../screens/main/walker/walk_history_screen';
@@ -40,6 +41,7 @@ export type RootStackParamList = {
   StepNameScreen: undefined;
   StepAgeScreen: undefined;
   StepHealthScreen: undefined;
+  StepConfirmScreen: undefined;
   UserScreen: undefined;
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
@@ -69,6 +71,7 @@ export default function StackNavigator() {
       <Stack.Screen name="StepNameScreen" component={StepNameScreen} />
       <Stack.Screen name="StepAgeScreen" component={StepAgeScreen} />
       <Stack.Screen name="StepHealthScreen" component={StepHealthScreen} />
+      <Stack.Screen name="StepConfirmScreen" component={StepConfirmScreen} />
       <Stack.Screen name="UserScreen" component={UserScreen} />
       <Stack.Screen name="AvailableWalksScreen" component={AvailableWalksScreen} />
       <Stack.Screen name="WalkHistoryScreen" component={WalkHistoryScreen} />
