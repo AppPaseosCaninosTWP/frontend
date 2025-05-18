@@ -6,7 +6,7 @@ import { PetCreationProvider } from './src/context/pet_creation_context'; // ✅
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <PetCreationProvider> { }
+      <PetCreationProvider>
         <NavigationContainer>
           <StackNavigator />
         </NavigationContainer>
