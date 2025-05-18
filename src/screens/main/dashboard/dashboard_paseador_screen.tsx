@@ -44,7 +44,7 @@ const menuOptions: MenuOption[] = [
     {
       label: 'Buscar Paseos',
       icon: <Ionicons name="search" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Buscar Paseos'), //momentaneo hasta que se implemente
+      onPress: () => navigation.navigate('AvailableWalksScreen'),
     },
     {
       label: 'Calendario',
