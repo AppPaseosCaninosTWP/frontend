@@ -19,6 +19,7 @@ import PetProfileScreen from '../screens/main/walker/pet_profile_screen';
 import type { Walk } from '../screens/main/walker/available_walks_screen';
 import RatingsScreen from '../screens/main/walker/ratings_screen';
 import WalkerProfileScreen from '../screens/main/walker/walker_profile_screen';
+import StepNameScreen from '../screens/main/create_pet/step_name_screen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -34,6 +35,7 @@ export type RootStackParamList = {
   DashboardScreen: undefined;
   StepBreedScreen: undefined;
   StepZonaScreen: undefined;
+  StepNameScreen: undefined;
   UserScreen: undefined;
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
@@ -60,6 +62,7 @@ export default function StackNavigator() {
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
       <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
       <Stack.Screen name="StepBreedScreen" component={StepBreedScreen} />
+      <Stack.Screen name="StepNameScreen" component={StepNameScreen} />
       <Stack.Screen name="UserScreen" component={UserScreen} />
       <Stack.Screen name="AvailableWalksScreen" component={AvailableWalksScreen} />
       <Stack.Screen name="WalkHistoryScreen" component={WalkHistoryScreen} />

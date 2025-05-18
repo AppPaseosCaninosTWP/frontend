@@ -43,7 +43,18 @@ export default function DashboardClienteScreen() {
         }
 
         const pets = await get_user_pets();
-        set_user_pets(pets || []);
+        const mappedPets = (pets || []).map((pet: any) => ({
+          ...pet,
+          zone:
+            pet.zone === 'norte'
+              ? 'norte'
+              : pet.zone === 'centro'
+              ? 'centro'
+              : pet.zone === 'sur'
+              ? 'sur'
+              : 'centro',
+        }));
+        set_user_pets(mappedPets);
       } catch (error) {
         Alert.alert('Error', 'No se pudieron cargar las mascotas');
       } finally {
@@ -62,7 +73,7 @@ export default function DashboardClienteScreen() {
     },
     { label: '__separator__', icon: null, onPress: () => {} },
     {
-      label: 'Mascotas: ',
+      label: 'Mascotas',
       icon: <Ionicons name="paw" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Mascotas'),
     },

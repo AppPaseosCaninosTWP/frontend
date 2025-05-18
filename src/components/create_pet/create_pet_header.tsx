@@ -33,9 +33,12 @@ export default function CreatePetHeader({
           <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
 
-        <Text style={styles.step_text}>
-          Paso <Text style={styles.step_count}>{step}/{total_steps}</Text>
-        </Text>
+        <View style={styles.step_text_row}>
+          <Text style={styles.step_text}>Paso </Text>
+          <Text style={[styles.step_text, styles.step_count]}>
+            {step}/{total_steps}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.progress_bar}>
@@ -47,7 +50,6 @@ export default function CreatePetHeader({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
     paddingBottom: 16,
     backgroundColor: '#fff',
   },
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   back_button: {
-    paddingRight: 12,
+    paddingRight: 0,
   },
   centered_text: {
     flex: 1,
@@ -93,6 +95,11 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#FFB200',
   },
+  step_text_row: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+}
 });
 
 
