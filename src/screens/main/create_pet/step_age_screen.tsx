@@ -52,8 +52,9 @@ export default function StepAgeScreen() {
       description: description.trim(),
     });
 
-    // navigation.navigate('StepHealth');
+    navigation.navigate('StepHealthScreen');
     console.log('Edad guardada:', age);
+    console.log('Descripción guardada:', description);
   };
 
   const format_date = (date: Date) =>
@@ -79,7 +80,7 @@ export default function StepAgeScreen() {
       )}
 
       <TouchableOpacity onPress={() => set_show_picker(true)} style={styles.field}>
-        <Text style={styles.field_label}>🎂 Cumpleaños</Text>
+        <Text style={styles.field_label}>Cumpleaños</Text>
         <Text style={styles.field_value}>
           {format_date(birth_date)} - {age} años
         </Text>
