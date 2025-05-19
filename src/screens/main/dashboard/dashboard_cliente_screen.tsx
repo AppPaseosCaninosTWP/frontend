@@ -24,6 +24,7 @@ import ScreenWithMenu from '../../../components/shared/screen_with_menu';
 import type { MenuOption } from '../../../components/shared/side_menu';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { clear_session } from '../../../utils/token_service';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const API_UPLOADS_URL = process.env.EXPO_PUBLIC_URL;
@@ -107,6 +108,27 @@ export default function DashboardClienteScreen() {
       icon: <Feather name="settings" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Ajustes'),
     },
+{
+      label: 'Cerrar sesión',
+      icon: <Feather name="log-out" size={20} color="#000c14" />,
+      onPress: () => {
+        Alert.alert(
+          'Cerrar sesión',
+          '¿Estás seguro de que deseas cerrar sesión?',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            {
+              text: 'Cerrar sesión',
+              style: 'destructive',
+              onPress: async () => {
+                await clear_session();
+                navigation.replace('Login');
+              },
+            },
+          ]
+        );
+      },
+    }
   ];
 
   if (is_loading) {
