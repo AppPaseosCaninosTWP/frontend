@@ -19,19 +19,13 @@ import type { RootStackParamList } from '../../../navigation/stack_navigator';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 interface BackendWalk {
-  walk_id: number;
-  walk_type: string;
-  status: string;
-  comments: string | null;
-  days: { start_date: string; start_time: string; duration: number }[];
-  pet: {
-    id: number;
-    name: string;
-    avatarUrl: string;
-    description: string;
-    age: number;
-    zone: string;
-  } | null;
+  walk_id:  number;
+  pet_name: string;
+  pet_photo:string;
+  sector:   string;
+  walk_type:string;   // "Fijo" o "Esporádico"
+  date:     string;   // ej "2025-05-18"
+  time:     string;   // ej "10:00"
 }
 
 export default function AvailableWalksScreen() {
@@ -39,72 +33,71 @@ export default function AvailableWalksScreen() {
   const [allWalks, setAllWalks] = useState<BackendWalk[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'Fijo' | 'Esporádico'>('Fijo');
+  
 
   useEffect(() => {
     fetchWalks();
   }, []);
 
-  const fetchWalks = async () => {
-    setLoading(true);
-    try {
-      const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
-      if (json.error) throw new Error(json.msg || 'Error desconocido');
-      setAllWalks(json.data);
-    } catch (err: any) {
-      Alert.alert('Error al cargar paseos', err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchWalks = async () => {
+  setLoading(true);
+  try {
+    const token = await get_token();
+    const res = await fetch(`${API_BASE_URL}/walk/available`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { data, error, msg } = await res.json();
+    if (error) throw new Error(msg);
+    setAllWalks(data);
+  } catch (err: any) {
+    Alert.alert('Error al cargar paseos', err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const walksToShow = allWalks.filter(
-    (w) => w.walk_type.toLowerCase() === selectedTab.toLowerCase()
-  );
-
+    w => w.walk_type === selectedTab
+    );
   const renderItem = ({ item }: { item: BackendWalk }) => {
-    const pet = item.pet;
-    const firstDay = item.days[0];
+  const { pet_name, pet_photo, date, time, sector } = item;
 
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() =>
-          navigation.navigate('PetProfileScreen', {
-            walkId: item.walk_id,
-          })
-        }
-      >
-        <View style={styles.cardHeader}>
-          {pet ? (
-            <Image source={{ uri: pet.avatarUrl }} style={styles.avatar} />
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() =>
+        navigation.navigate('PetProfileScreen', {
+          walkId: item.walk_id,
+        })
+      }
+    >
+      <View style={styles.cardHeader}>
+        {pet_photo ? (
+            <Image source={{ uri: pet_photo }} style={styles.avatar} />
           ) : (
             <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
           )}
+      <View style={styles.info}>
+        <Text style={styles.name}>{pet_name}</Text>
+         {selectedTab === 'Fijo' ? (
+       <>
+          <Text style={styles.meta}>{`Paseo Fijo  |  ${time}  |  ${date}`}</Text>
+          <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
+          </>
+        ) : (
+         <>
+          <Text style={styles.meta}>{`${date}  |  ${time}  |  ${date}`}</Text>
+          <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
+        </>
+        )}
+     </View>
 
-          <View style={styles.info}>
-            {pet && (
-              <>
-                <Text style={styles.name}>{pet.name}</Text>
-                <Text style={styles.meta}>{pet.description}</Text>
-              </>
-            )}
-            <Text style={styles.meta}>
-              {selectedTab === 'Fijo'
-                ? `${item.days.length} día(s) a las ${firstDay.start_time}`
-                : `${firstDay.start_date} a las ${firstDay.start_time}`}
-            </Text>
-          </View>
-
-          <Feather name="chevron-right" size={20} color="#999" />
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
+        <Feather name="chevron-right" size={20} color="#999" />
+      </View>
+    </TouchableOpacity>
+  );
+};
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -211,7 +204,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 12,
+    padding: 20,
     marginVertical: 8,
     shadowColor: '#000',
     shadowOpacity: 0.05,
