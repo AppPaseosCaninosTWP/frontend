@@ -83,10 +83,13 @@ export default function DashboardClienteScreen() {
       onPress: () => Alert.alert('Mascotas'),
     },
     ...user_pets.map((pet) => ({
-      label: String(pet.name),
-      icon: <Image source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />,
+      label: pet.name, // debe ser string
+      icon: pet.photo
+        ? <Image source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />
+        : <Feather name="image" size={20} color="#000c14" />,
       onPress: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
     })),
+
     { label: '__separator__', icon: null, onPress: () => {} },
     {
       label: 'Contactos',
@@ -108,7 +111,7 @@ export default function DashboardClienteScreen() {
       icon: <Feather name="settings" size={20} color="#000c14" />,
       onPress: () => Alert.alert('Ajustes'),
     },
-{
+    {
       label: 'Cerrar sesión',
       icon: <Feather name="log-out" size={20} color="#000c14" />,
       onPress: () => {
@@ -168,10 +171,11 @@ export default function DashboardClienteScreen() {
 
   return (
     <ScreenWithMenu roleId={3} menuOptions={menuOptions}>
-      <Text style={styles.section_title}>
-        Perfiles de mascotas activos{' '}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+        <Text style={styles.section_title}>Perfiles de mascotas activos </Text>
         <Text style={styles.badge}>{user_pets.length}</Text>
-      </Text>
+      </View>
+
 
       <View style={styles.carousel_container}>
         <ScrollView

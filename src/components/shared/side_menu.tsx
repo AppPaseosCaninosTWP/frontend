@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+// src/components/shared/side_menu.tsx
+
+import React, { JSX, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -20,7 +22,7 @@ const getRoleLabel = (roleId: number): string => {
 };
 
 export interface MenuOption {
-  label: string;
+  label: string | JSX.Element;
   icon: React.ReactNode;
   onPress: () => void;
 }
@@ -72,16 +74,16 @@ const SideMenu: React.FC<SideMenuProps> = ({
           { width: DRAWER_WIDTH, transform: [{ translateX }] },
         ]}
       >
-       //Header del menú lateral
-       <View style={styles.menuHeader}>
-         <Image
-           source={
-             profileImage ?? require('../../assets/user_icon.png')
-           }
-           style={styles.headerAvatar}
-         />
-         <Text style={styles.headerName}>{displayName}</Text>
-       </View>
+        {/* Header del menú lateral */}
+        <View style={styles.menuHeader}>
+          <Image
+            source={
+              profileImage ?? require('../../assets/user_icon.png')
+            }
+            style={styles.headerAvatar}
+          />
+          <Text style={styles.headerName}>{displayName}</Text>
+        </View>
 
         <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
           <Text style={styles.closeTxt}>×</Text>
@@ -89,24 +91,27 @@ const SideMenu: React.FC<SideMenuProps> = ({
 
         {options.map((opt, index) => {
           if (opt.label === '__separator__') {
-             return <View key={`sep-${index}`} style={styles.separator} />;
+            return <View key={`sep-${index}`} style={styles.separator} />;
           }
 
-         return (
-           <TouchableOpacity
-             key={opt.label}
-            style={styles.option}
-            onPress={() => {
-            opt.onPress();
-          onClose();
-        }}
-    >
-      <View style={styles.iconWrapper}>{opt.icon}</View>
-      <Text style={styles.optionTxt}>{opt.label}</Text>
-    </TouchableOpacity>
-  );
-})}
-
+          return (
+            <TouchableOpacity
+              key={`opt-${index}`}
+              style={styles.option}
+              onPress={() => {
+                opt.onPress();
+                onClose();
+              }}
+            >
+              <View style={styles.iconWrapper}>{opt.icon}</View>
+              {typeof opt.label === 'string' ? (
+                <Text style={styles.optionTxt}>{opt.label}</Text>
+              ) : (
+                opt.label
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </Animated.View>
     </>
   );
