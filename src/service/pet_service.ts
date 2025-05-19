@@ -48,14 +48,34 @@ export interface PetPayload {
 
 export async function create_pet(pet_data: PetPayload): Promise<Pet> {
   const token = await get_token();
+  const form_data = new FormData();
+
+  form_data.append('name', pet_data.name || '');
+  form_data.append('breed', pet_data.breed || '');
+  form_data.append('age', String(pet_data.age || 0));
+  form_data.append('zone', pet_data.zone || '');
+  form_data.append('description', pet_data.description || '');
+  form_data.append('comments', pet_data.comments || '');
+  form_data.append('medical_condition', pet_data.medical_condition || '');
+
+  if (pet_data.photo && pet_data.photo.startsWith('file://')) {
+    const filename = pet_data.photo.split('/').pop()!;
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : `image`;
+
+    form_data.append('photo', {
+      uri: pet_data.photo,
+      name: filename,
+      type,
+    } as any);
+  }
 
   const response = await fetch(`${API_BASE_URL}/pet`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(pet_data),
+    body: form_data,
   });
 
   const json = await response.json();
@@ -67,5 +87,3 @@ export async function create_pet(pet_data: PetPayload): Promise<Pet> {
 
   return json.data;
 }
-
-
