@@ -25,6 +25,7 @@ import {
     const fade_anim = useRef(new Animated.Value(0)).current;
     const translate_anim = useRef(new Animated.Value(30)).current;
   
+    const [name, set_name] = useState('');
     const [email, set_email] = useState('');
     const [phone, set_phone] = useState('');
     const [password, set_password] = useState('');
@@ -104,7 +105,7 @@ import {
     
     
       try {
-        const user = await register_user(email, phone, password, confirm_password);
+        const user = await register_user(name, email, phone, password, confirm_password);
       
         // Enviar código de validación por correo
         await send_code(user.email);
@@ -163,6 +164,13 @@ import {
           <Text style={styles.title}>Crear una cuenta</Text>
           <Text style={styles.subtitle}>¡Bienvenido! Introduce tus datos a continuación y empieza.</Text>
   
+          <TextInput
+            style={styles.input_field}
+            placeholder="Nombre"
+            value={name}
+            onChangeText={set_name}
+          />
+
           <TextInput
             style={styles.input_field}
             placeholder="Correo electrónico"

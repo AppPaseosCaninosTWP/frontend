@@ -82,7 +82,7 @@ export default function DashboardClienteScreen() {
       onPress: () => Alert.alert('Mascotas'),
     },
     ...user_pets.map((pet) => ({
-      label: pet.name,
+      label: String(pet.name),
       icon: <Image source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />,
       onPress: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
     })),
@@ -165,8 +165,8 @@ export default function DashboardClienteScreen() {
           }}
         >
           {user_pets.map((pet, i) => {
-            console.log('🧩 Foto:', pet.photo);
-            console.log('🧩 URL:', `${API_UPLOADS_URL}/uploads/${pet.photo}`);
+            console.log('Foto:', pet.photo);
+            console.log('URL:', `${API_UPLOADS_URL}/uploads/${pet.photo}`);
             return (
               <View key={i} style={{ width: CARD_WIDTH, marginRight: 12 }}>
                 <LinearGradient
@@ -185,7 +185,7 @@ export default function DashboardClienteScreen() {
                     <Image
                       source={{ uri: `${API_UPLOADS_URL}/uploads/${pet.photo}` }}
                       style={styles.pet_image}
-                      onError={() => console.log('❌ Error al cargar imagen:', pet.photo)}
+                      onError={() => console.log('Error al cargar imagen:', pet.photo)}
                     />
                   ) : (
                     <Feather name="image" size={60} color="#fff" />
