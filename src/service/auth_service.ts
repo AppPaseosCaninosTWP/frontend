@@ -35,6 +35,7 @@ export async function login_user(email: string, password: string): Promise<login
   const user = {
     ...raw_user,
     role_name: raw_user.role || raw_user.role_name,
+    name: raw_user.name || "",
   };
 
   return { token, user };
@@ -43,6 +44,7 @@ export async function login_user(email: string, password: string): Promise<login
 
 
 export async function register_user(
+  name: string,
   email: string,
   phone: string,
   password: string,
@@ -50,14 +52,11 @@ export async function register_user(
 ): Promise<register_response> {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, phone, password, confirm_password }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, phone, password, confirm_password }),
   });
 
   const json = await response.json();
-  console.log('Respuesta del backend (register):', json);
 
   if (!response.ok || json.error) {
     throw new Error(json.msg || 'Error al registrarse');
@@ -65,6 +64,7 @@ export async function register_user(
 
   return json.data;
 }
+
 
 export async function verify_reset_code(email: string, code: string): Promise<void> {
   const token = await get_token();

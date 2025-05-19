@@ -17,7 +17,7 @@ export default function StepZonaScreen() {
 
   const handle_continue = () => {
     set_pet_data({ zone: selected_zone });
-    console.log('Zona seleccionada:', selected_zone);
+    navigation.navigate('StepNameScreen');
     // navigation.navigate('StepNombreEdad');
   };
 

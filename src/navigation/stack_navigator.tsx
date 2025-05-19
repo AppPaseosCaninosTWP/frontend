@@ -12,12 +12,17 @@ import DashboardClienteScreen from '../screens/main/dashboard/dashboard_cliente_
 import DashboardScreen from '../screens/main/dashboard/dashboard_screen'; 
 import StepBreedScreen from '../screens/main/create_pet/step_breed_screen';
 import StepZonaScreen from '../screens/main/create_pet/step_zona_screen';
+import StepAgeScreen from '../screens/main/create_pet/step_age_screen';
+import StepHealthScreen from '../screens/main/create_pet/step_health_screen';
+import StepConfirmScreen from '../screens/main/create_pet/step_confirm_screen';
+import SuccessScreen from '../screens/main/create_pet/success_screen';
 import UserScreen from '../screens/main/Admin/user_screen';
 import AvailableWalksScreen from '../screens/main/walker/available_walks_screen';
 import WalkHistoryScreen from '../screens/main/walker/walk_history_screen';
 import PetProfileScreen from '../screens/main/walker/pet_profile_screen';
 import RatingsScreen from '../screens/main/walker/ratings_screen';
 import WalkerProfileScreen from '../screens/main/walker/walker_profile_screen';
+import StepNameScreen from '../screens/main/create_pet/step_name_screen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -33,6 +38,11 @@ export type RootStackParamList = {
   DashboardScreen: undefined;
   StepBreedScreen: undefined;
   StepZonaScreen: undefined;
+  StepNameScreen: undefined;
+  StepAgeScreen: undefined;
+  StepHealthScreen: undefined;
+  StepConfirmScreen: undefined;
+  SuccessScreen: undefined;
   UserScreen: undefined;
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
@@ -59,6 +69,11 @@ export default function StackNavigator() {
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
       <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
       <Stack.Screen name="StepBreedScreen" component={StepBreedScreen} />
+      <Stack.Screen name="StepNameScreen" component={StepNameScreen} />
+      <Stack.Screen name="StepAgeScreen" component={StepAgeScreen} />
+      <Stack.Screen name="StepHealthScreen" component={StepHealthScreen} />
+      <Stack.Screen name="StepConfirmScreen" component={StepConfirmScreen} />
+      <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
       <Stack.Screen name="UserScreen" component={UserScreen} />
       <Stack.Screen name="AvailableWalksScreen" component={AvailableWalksScreen} />
       <Stack.Screen name="WalkHistoryScreen" component={WalkHistoryScreen} />

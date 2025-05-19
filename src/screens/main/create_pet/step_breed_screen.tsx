@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 40,
+    paddingHorizontal: 20,
   },
   list_container: {
     paddingHorizontal: 20,
