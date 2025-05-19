@@ -22,10 +22,12 @@ const getRoleLabel = (roleId: number): string => {
 };
 
 export interface MenuOption {
-  label: string | JSX.Element;
+  label: string | React.ReactNode;
   icon: React.ReactNode;
   onPress: () => void;
+  prevent_close?: boolean;
 }
+
 
 interface SideMenuProps {
   visible: boolean;
@@ -99,9 +101,12 @@ const SideMenu: React.FC<SideMenuProps> = ({
               key={`opt-${index}`}
               style={styles.option}
               onPress={() => {
-                opt.onPress();
+              opt.onPress();
+              if (!opt.prevent_close) {
                 onClose();
-              }}
+              }
+            }}
+
             >
               <View style={styles.iconWrapper}>{opt.icon}</View>
               {typeof opt.label === 'string' ? (
