@@ -42,7 +42,7 @@ interface Pet {
 export default function PetProfileScreen() {
   const route      = useRoute<PetProfileRouteProp>();
   const navigation = useNavigation<PetProfileNavProp>();
-  const { petId, duration } = route.params;
+  const { petId, duration, walkId} = route.params;
   const [showModal, setShowModal] = useState(false);
   const [pet, setPet]         = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
@@ -206,44 +206,67 @@ export default function PetProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      <Modal
-        visible={showModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Confirmar agendamiento</Text>
-            <Text style={styles.modalMessage}>
-              ¿Deseas agendar este paseo para {pet?.name}?
-            </Text>
+<Modal
+  visible={showModal}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setShowModal(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Confirmar agendamiento</Text>
+      <Text style={styles.modalMessage}>
+        ¿Deseas agendar este paseo para {pet?.name}?
+      </Text>
 
-            <View style={styles.modalButtonRow}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowModal(false)}
-              >
-                <Text style={[styles.modalButtonText, styles.cancelText]}>
-                  Cancelar
-                </Text>
-              </TouchableOpacity>
+      <View style={styles.modalButtonRow}>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.cancelButton]}
+          onPress={() => setShowModal(false)}
+        >
+          <Text style={[styles.modalButtonText, styles.cancelText]}>
+            Cancelar
+          </Text>
+        </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.modalButton, styles.confirmButton]}
-                onPress={() => {
-                  //logica cuando se confirma el agendamiento (en mantencion)
-                  setShowModal(false);
-                }}
-              >
-                <Text style={[styles.modalButtonText, styles.confirmText]}>
-                  Confirmar
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.confirmButton]}
+          onPress={async () => {
+            setShowModal(false);
+            try {
+              const token = await get_token();
+              const res = await fetch(`${API_BASE_URL}/walk/accept`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ walkId }),
+              });
+              const json = await res.json();
+              if (res.ok && !json.error) {
+               Alert.alert("¡Listo!",json.msg,[{text: "OK",
+                onPress: () => navigation.navigate('AvailableWalksScreen'),
+                },
+              ]
+              );
+              } else {
+                throw new Error(json.msg || "No se pudo aceptar el paseo");
+              }
+            } catch (err: any) {
+              Alert.alert("Error", err.message);
+            }
+          }}
+        >
+          <Text style={[styles.modalButtonText, styles.confirmText]}>
+            Confirmar
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 }
