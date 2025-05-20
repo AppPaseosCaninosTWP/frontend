@@ -15,17 +15,20 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { get_token } from '../../../utils/token_service';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
+import { useRoute } from '@react-navigation/native';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 interface BackendWalk {
   walk_id:  number;
+  pet_id:   number;
   pet_name: string;
   pet_photo:string;
   sector:   string;
-  walk_type:string;   // "Fijo" o "Esporádico"
-  date:     string;   // ej "2025-05-18"
-  time:     string;   // ej "10:00"
+  walk_type:string;  
+  date:     string;   
+  time:     string;
+  duration: number;   
 }
 
 export default function AvailableWalksScreen() {
@@ -49,6 +52,7 @@ const fetchWalks = async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const { data, error, msg } = await res.json();
     if (error) throw new Error(msg);
+    console.log("🚀 fetchWalks data:", data);
     setAllWalks(data);
   } catch (err: any) {
     Alert.alert('Error al cargar paseos', err.message);
@@ -61,16 +65,19 @@ const fetchWalks = async () => {
     w => w.walk_type === selectedTab
     );
   const renderItem = ({ item }: { item: BackendWalk }) => {
+    console.log("🏷  renderItem, pet_id =", item.pet_id);
   const { pet_name, pet_photo, date, time, sector } = item;
 
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() =>
-        navigation.navigate('PetProfileScreen', {
-          walkId: item.walk_id,
-        })
-      }
+      onPress={() => {
+        console.log("PetProfileScreen con petId =", item.pet_id);
+        navigation.navigate('PetProfileScreen', { 
+          petId: item.pet_id,
+          duration: item.duration,
+        });
+      }}
     >
       <View style={styles.cardHeader}>
         {pet_photo ? (
