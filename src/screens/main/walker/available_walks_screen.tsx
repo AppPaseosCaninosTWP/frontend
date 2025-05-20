@@ -52,7 +52,7 @@ const fetchWalks = async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const { data, error, msg } = await res.json();
     if (error) throw new Error(msg);
-    console.log("🚀 fetchWalks data:", data);
+    console.log("fetchWalks data:", data);
     setAllWalks(data);
   } catch (err: any) {
     Alert.alert('Error al cargar paseos', err.message);
@@ -74,6 +74,7 @@ const fetchWalks = async () => {
       onPress={() => {
         console.log("PetProfileScreen con petId =", item.pet_id);
         navigation.navigate('PetProfileScreen', { 
+          walkId: item.walk_id,
           petId: item.pet_id,
           duration: item.duration,
         });
