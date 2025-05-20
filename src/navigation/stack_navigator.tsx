@@ -46,7 +46,10 @@ export type RootStackParamList = {
   UserScreen: undefined;
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
-  PetProfileScreen: { walkId: number };
+  PetProfileScreen: { 
+    petId: number 
+    duration: number
+  };
   RatingsScreen: undefined
   WalkerProfileScreen: undefined;
 }
