@@ -43,7 +43,7 @@ export default function PetProfileScreen() {
   const route      = useRoute<PetProfileRouteProp>();
   const navigation = useNavigation<PetProfileNavProp>();
   const { petId, duration, walkId} = route.params;
-  const [showModal, setShowModal] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [pet, setPet]         = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"Acerca de"|"Salud"|"Nutrición"|"Contacto">("Acerca de");
@@ -70,7 +70,6 @@ export default function PetProfileScreen() {
       }
     };
 
-    // 2) Compruebo paseos asignados al paseador y filtro por este petId
     (async () => {
       try {
         const token = await get_token();
@@ -83,7 +82,7 @@ export default function PetProfileScreen() {
         const w = data.find(w => w.pet_id === petId);
         if (w) setScheduledWalkId(w.walk_id);
       } catch (_) {
-        // si falla, ignoramos; el botón de Agendar seguirá apareciendo
+
       }
     })();
 
@@ -116,7 +115,6 @@ async function handleCancel(walkId: number) {
       return;
     }
 
-    // éxito!
     Alert.alert('Listo', 'Paseo cancelado correctamente', [
       { text: 'OK', onPress: () => navigation.navigate('DashboardPaseador') }
     ]);
@@ -271,16 +269,16 @@ async function handleCancel(walkId: number) {
       <Text style={styles.cancelButtonText}>Cancelar paseo</Text>
     </TouchableOpacity>
   ) : (
-    <TouchableOpacity style={styles.scheduleButton} onPress={() => setShowModal(true)}>
+    <TouchableOpacity style={styles.scheduleButton} onPress={() => setShowAcceptModal(true)}>
       <Text style={styles.scheduleButtonText}>Agendar paseo</Text>
     </TouchableOpacity>
   )
 }
 <Modal
-  visible={showModal}
+  visible={showAcceptModal}
   transparent
   animationType="fade"
-  onRequestClose={() => setShowModal(false)}
+  onRequestClose={() => setShowAcceptModal(false)}
 >
   <View style={styles.modalOverlay}>
     <View style={styles.modalContainer}>
@@ -292,7 +290,7 @@ async function handleCancel(walkId: number) {
       <View style={styles.modalButtonRow}>
         <TouchableOpacity
           style={[styles.modalButton, styles.cancelButton]}
-          onPress={() => setShowModal(false)}
+          onPress={() => setShowAcceptModal(false)}
         >
           <Text style={[styles.modalButtonText, styles.cancelText]}>
             Cancelar
@@ -302,7 +300,7 @@ async function handleCancel(walkId: number) {
         <TouchableOpacity
           style={[styles.modalButton, styles.confirmButton]}
           onPress={async () => {
-            setShowModal(false);
+            setShowAcceptModal(false);
             try {
               const token = await get_token();
               const res = await fetch(`${API_BASE_URL}/walk/accept`, {
