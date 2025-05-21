@@ -17,6 +17,8 @@ import StepHealthScreen from '../screens/main/create_pet/step_health_screen';
 import StepConfirmScreen from '../screens/main/create_pet/step_confirm_screen';
 import SuccessScreen from '../screens/main/create_pet/success_screen';
 import UserScreen from '../screens/main/Admin/user_screen';
+import WalksScreen from '../screens/main/Admin/walks_screen';
+import PaymentsScreen from '../screens/main/Admin/payments_screen';
 import AvailableWalksScreen from '../screens/main/walker/available_walks_screen';
 import WalkHistoryScreen from '../screens/main/walker/walk_history_screen';
 import PetProfileScreen from '../screens/main/walker/pet_profile_screen';
@@ -45,6 +47,8 @@ export type RootStackParamList = {
   StepConfirmScreen: undefined;
   SuccessScreen: undefined;
   UserScreen: undefined;
+  WalksScreen: undefined;
+  PaymentsScreen: undefined;
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
   PetProfileScreen: { 
@@ -81,6 +85,8 @@ export default function StackNavigator() {
       <Stack.Screen name="StepConfirmScreen" component={StepConfirmScreen} />
       <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
       <Stack.Screen name="UserScreen" component={UserScreen} />
+      <Stack.Screen name="WalksScreen" component={WalksScreen} />
+      <Stack.Screen name="PaymentsScreen" component={PaymentsScreen} />
       <Stack.Screen name="AvailableWalksScreen" component={AvailableWalksScreen} />
       <Stack.Screen name="WalkHistoryScreen" component={WalkHistoryScreen} />
       <Stack.Screen name="PetProfileScreen" component={PetProfileScreen} />
