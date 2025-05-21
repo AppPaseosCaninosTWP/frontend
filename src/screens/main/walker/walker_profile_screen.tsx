@@ -1,5 +1,3 @@
-// src/screens/paseador/EditWalkerProfileScreen.tsx
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -23,129 +21,102 @@ export default function EditWalkerProfileScreen() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [description, setDescription] = useState('');
+
+  // Campos estáticos (no editables)
   const [name, setName] = useState('');
   const [experience, setExperience] = useState('');
   const [walkerType, setWalkerType] = useState('');
   const [zone, setZone] = useState('');
+
   const [isEditing, setIsEditing] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
-  const [showZoneOptions, setShowZoneOptions] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
+
   const [originalEmail, setOriginalEmail] = useState('');
   const [originalPhone, setOriginalPhone] = useState('');
   const [originalDescription, setOriginalDescription] = useState('');
-  const [originalName, setOriginalName] = useState('');
-  const [originalExperience, setOriginalExperience] = useState('');
-  const [originalWalkerType, setOriginalWalkerType] = useState('');
-  const [originalZone, setOriginalZone] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = await get_token();
         const user = await get_user();
-
-        if (!token || !user || !user.id) {
-          throw new Error('Sesión no válida o ID no disponible');
-        }
-
+        if (!token || !user?.id) throw new Error('Sesión no válida');
         setUserId(user.id);
 
         const res = await fetch(`${API_BASE_URL}/walker_profile/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
+        if (!res.ok) throw new Error(`Error ${res.status}`);
 
-        if (!res.ok) {
-          const msg = `Código ${res.status}: ${res.statusText}`;
-          throw new Error(`No se pudo obtener el perfil\n${msg}`);
+        const { data: profile } = await res.json();
+
+        // Setear datos estáticos
+        setName(profile.name);
+        setExperience(String(profile.experience));
+        setWalkerType(profile.walker_type);
+        setZone(profile.zone);
+
+        // Setear datos editables
+        setEmail(profile.email);
+        setOriginalEmail(profile.email);
+
+        let fmtPhone = profile.phone;
+        if (!fmtPhone.startsWith('+56 9')) {
+          fmtPhone = `+56 9${fmtPhone.replace(/\D/g, '').slice(-8)}`;
         }
+        setPhone(fmtPhone);
+        setOriginalPhone(fmtPhone);
 
-        const data = await res.json();
-        const profile = data.data;
+        setDescription(profile.description);
+        setOriginalDescription(profile.description);
 
-        setEmail(user.email || '');
-        setOriginalEmail(user.email || '');
-
-        let formattedPhone = user.phone || '';
-        if (!formattedPhone.startsWith('+56 9')) {
-          formattedPhone = `+56 9${formattedPhone.replace(/[^0-9]/g, '').slice(-8)}`;
-        }
-        setPhone(formattedPhone);
-        setOriginalPhone(formattedPhone);
-
-        setDescription(profile.description || '');
-        setOriginalDescription(profile.description || '');
-
-        setName(profile.name || '');
-        setOriginalName(profile.name || '');
-
-        setExperience(profile.experience?.toString() || '');
-        setOriginalExperience(profile.experience?.toString() || '');
-
-        setWalkerType(profile.walker_type || '');
-        setOriginalWalkerType(profile.walker_type || '');
-
-        setZone(profile.zone || '');
-        setOriginalZone(profile.zone || '');
-
-        if (profile.photo) {
-          setImage(`${API_BASE_URL}/${profile.photo}`);
-        }
-      } catch (error) {
-        Alert.alert('Error', (error as Error).message);
+        if (profile.photo) setImage(`${API_BASE_URL}/${profile.photo}`);
+      } catch (err) {
+        Alert.alert('Error', (err as Error).message);
       }
     };
-
     fetchProfile();
   }, []);
 
   const handleSubmit = async () => {
-    if (!email || !phone || !description || !name || !experience || !walkerType || !zone) {
-      Alert.alert('Campos requeridos', 'Todos los campos son obligatorios.');
+    if (!email || !phone || !description) {
+      Alert.alert('Campos requeridos', 'Email, teléfono y descripción son obligatorios.');
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\+?56\s?9\d{8}$/;
+    const raw = phone.replace(/\D/g, '');
+    const e164 = `+${raw}`;
 
-    const emailValid = emailRegex.test(email);
-    const phoneValid = phoneRegex.test(phone);
-
-    setEmailError(emailValid ? '' : 'Formato de correo inválido');
-    setPhoneError(phoneValid ? '' : 'Teléfono debe ser formato +56 9XXXXXXXX');
-
-    if (!emailValid || !phoneValid) {
-      Alert.alert('Error de validación', 'Ajuste los campos con errores para continuar.');
-      return;
-    }
-
-    if (description.length > 250) {
-      Alert.alert('Límite excedido', 'La descripción debe tener máximo 250 caracteres.');
-      return;
-    }
+    const body = {
+      email: email.trim(),
+      phone: e164,
+      description: description.trim(),
+    };
 
     try {
       const token = await get_token();
       if (!token || !userId) throw new Error('Sesión no válida');
 
-      const res = await fetch(`${API_BASE_URL}/walkers/${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/walker_profile/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ email, phone, description, name, experience, walker_type: walkerType, zone }),
+        body: JSON.stringify(body),
       });
-
-      if (!res.ok) throw new Error('Error al actualizar los datos');
+      const payload = await res.json();
+      if (!res.ok) {
+        Alert.alert('Error al actualizar', payload.msg);
+        return;
+      }
 
       Alert.alert('Éxito', 'Tus datos están pendientes de aprobación.');
       setIsEditing(false);
-    } catch (error) {
-      Alert.alert('Error', (error as Error).message);
+    } catch (err) {
+      Alert.alert('Error', (err as Error).message);
     }
   };
 
@@ -153,10 +124,6 @@ export default function EditWalkerProfileScreen() {
     setEmail(originalEmail);
     setPhone(originalPhone);
     setDescription(originalDescription);
-    setName(originalName);
-    setExperience(originalExperience);
-    setWalkerType(originalWalkerType);
-    setZone(originalZone);
     setIsEditing(false);
     setEmailError('');
     setPhoneError('');
@@ -164,6 +131,7 @@ export default function EditWalkerProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color="#333" />
@@ -171,6 +139,7 @@ export default function EditWalkerProfileScreen() {
         <Text style={styles.title}>Perfil del paseador</Text>
       </View>
 
+      {/* Foto */}
       <View style={styles.imagePicker}>
         <Image
           source={image ? { uri: image } : require('../../../assets/user_icon.png')}
@@ -178,92 +147,45 @@ export default function EditWalkerProfileScreen() {
         />
       </View>
 
+      {/* Nombre (no editable) */}
       <Text style={styles.label}>Nombre</Text>
-      <TextInput
-        style={[styles.input, !isEditing && styles.disabledInput]}
-        value={name}
-        onChangeText={setName}
-        editable={isEditing}
-      />
+      <TextInput style={[styles.input, styles.disabledInput]} value={name} editable={false} />
 
+      {/* Experiencia (no editable) */}
       <Text style={styles.label}>Años de experiencia</Text>
-      <TextInput
-        style={[styles.input, styles.disabledInput]}
-        value={experience}
-        editable={false}
-        keyboardType="numeric"
-      />
+      <TextInput style={[styles.input, styles.disabledInput]} value={experience} editable={false} />
 
-
+      {/* Tipo de paseador (no editable) */}
       <Text style={styles.label}>Tipo de paseador</Text>
-      <TextInput
-        style={[styles.input, styles.disabledInput]}
-        value={walkerType}
-        editable={false}
-      />
+      <TextInput style={[styles.input, styles.disabledInput]} value={walkerType} editable={false} />
 
+      {/* Zona (no editable) */}
+      <Text style={styles.label}>Zona</Text>
+      <TextInput style={[styles.input, styles.disabledInput]} value={zone} editable={false} />
 
-      <Text style={styles.label}>Zona de Antofagasta</Text>
-      <TouchableOpacity
-        style={[styles.input, styles.selectInput, !isEditing && styles.disabledInput]}
-        onPress={() => isEditing && setShowZoneOptions(true)}
-        activeOpacity={isEditing ? 0.7 : 1}
-      >
-      <Text style={{ color: zone ? '#999' : '#333' }}>
-        {zone || 'Selecciona una zona'}
-      </Text>
-      </TouchableOpacity>
-
-      {showZoneOptions && (
-      <View style={styles.optionsContainer}>
-        {['Norte', 'Centro', 'Sur'].map((option) => (
-        <TouchableOpacity
-          key={option}
-          onPress={() => {
-            setZone(option);
-            setShowZoneOptions(false);
-          }}
-          style={styles.optionButton}
-        >
-          <Text style={styles.optionText}>{option}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  )}
-
-
-
+      {/* Correo electrónico (editable) */}
       <Text style={styles.label}>Correo electrónico</Text>
       <TextInput
-  style={[styles.input, !isEditing && styles.disabledInput]}
-  value={email}
-  onChangeText={(text) => {
-    setEmail(text);
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmailError(emailRegex.test(text) ? '' : 'Formato de correo inválido');
-  }}
-  editable={isEditing}
-  keyboardType="email-address"
-  autoCapitalize="none"
-/>
-{emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        style={[styles.input, !isEditing && styles.disabledInput]}
+        value={email}
+        onChangeText={setEmail}
+        editable={isEditing}
+        keyboardType="email-address"
+      />
+      {!!emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
-
+      {/* Teléfono móvil (editable) */}
       <Text style={styles.label}>Teléfono móvil</Text>
       <TextInput
-  style={[styles.input, !isEditing && styles.disabledInput]}
-  value={phone}
-  onChangeText={(text) => {
-    setPhone(text);
-    const phoneRegex = /^\+?56\s?9\d{8}$/;
-    setPhoneError(phoneRegex.test(text) ? '' : 'Teléfono debe ser formato +56 9XXXXXXXX');
-  }}
-  editable={isEditing}
-  keyboardType="phone-pad"
-/>
-{phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+        style={[styles.input, !isEditing && styles.disabledInput]}
+        value={phone}
+        onChangeText={setPhone}
+        editable={isEditing}
+        keyboardType="phone-pad"
+      />
+      {!!phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
 
-
+      {/* Descripción (editable) */}
       <Text style={styles.label}>Descripción (máx 250 caracteres)</Text>
       <TextInput
         style={[styles.input, styles.textArea, !isEditing && styles.disabledInput]}
@@ -274,6 +196,7 @@ export default function EditWalkerProfileScreen() {
         maxLength={250}
       />
 
+      {/* Botones */}
       {!isEditing ? (
         <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
           <Text style={styles.buttonText}>Editar datos</Text>
@@ -291,6 +214,7 @@ export default function EditWalkerProfileScreen() {
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

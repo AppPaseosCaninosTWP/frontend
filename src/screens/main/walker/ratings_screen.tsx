@@ -1,5 +1,3 @@
-// src/screens/paseador/RatingsScreen.tsx
-
 import React from 'react';
 import {
   View,
@@ -44,7 +42,7 @@ export default function RatingsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
@@ -52,7 +50,7 @@ export default function RatingsScreen() {
         <Text style={styles.headerTitle}>Calificaciones</Text>
       </View>
 
-      {/* Paseador destacado */}
+      
       <View style={styles.highlightCard}>
         <View>
           <Text style={styles.walkerName}>Carl "CJ" Johnson</Text>
@@ -121,6 +119,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 16,
+    marginTop: 20,
   },
   walkerName: {
     fontSize: 25,

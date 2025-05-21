@@ -20,7 +20,6 @@ import UserScreen from '../screens/main/Admin/user_screen';
 import AvailableWalksScreen from '../screens/main/walker/available_walks_screen';
 import WalkHistoryScreen from '../screens/main/walker/walk_history_screen';
 import PetProfileScreen from '../screens/main/walker/pet_profile_screen';
-import type { Walk } from '../screens/main/walker/available_walks_screen';
 import RatingsScreen from '../screens/main/walker/ratings_screen';
 import WalkerProfileScreen from '../screens/main/walker/walker_profile_screen';
 import StepNameScreen from '../screens/main/create_pet/step_name_screen';
@@ -47,7 +46,11 @@ export type RootStackParamList = {
   UserScreen: undefined;
   AvailableWalksScreen: undefined;
   WalkHistoryScreen: undefined;
-  PetProfileScreen: { walk: Walk };
+  PetProfileScreen: { 
+    walkId: number
+    petId: number 
+    duration: number
+  };
   RatingsScreen: undefined
   WalkerProfileScreen: undefined;
 }
