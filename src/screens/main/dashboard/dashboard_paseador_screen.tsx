@@ -188,7 +188,7 @@ const menuOptions: MenuOption[] = [
 
         <TouchableOpacity
           style={styles.card}
-          //onPress={() => navigation.navigate('MiAgenda')}
+          onPress={() => navigation.navigate('PlannerScreen')}
         >
           <Image
             source={require('../../../assets/plate_icon.png')}
