@@ -9,12 +9,13 @@ import ResetPasswordScreen from '../screens/auth/reset_password_screen';
 import DashboardPaseadorScreen from '../screens/main/dashboard/dashboard_paseador_screen';
 import DashboardAdminScreen from '../screens/main/dashboard/dashboard_admin_screen';
 import DashboardClienteScreen from '../screens/main/dashboard/dashboard_cliente_screen';
-import DashboardScreen from '../screens/main/dashboard/dashboard_screen'; 
+import DashboardScreen from '../screens/main/dashboard/dashboard_screen';
 import StepBreedScreen from '../screens/main/create_pet/step_breed_screen';
 import StepZonaScreen from '../screens/main/create_pet/step_zona_screen';
 import StepAgeScreen from '../screens/main/create_pet/step_age_screen';
 import StepHealthScreen from '../screens/main/create_pet/step_health_screen';
 import StepConfirmScreen from '../screens/main/create_pet/step_confirm_screen';
+import StepNameScreen from '../screens/main/create_pet/step_name_screen';
 import SuccessScreen from '../screens/main/create_pet/success_screen';
 import UserScreen from '../screens/main/Admin/user_screen';
 import AvailableWalksScreen from '../screens/main/walker/available_walks_screen';
@@ -22,7 +23,8 @@ import WalkHistoryScreen from '../screens/main/walker/walk_history_screen';
 import PetProfileScreen from '../screens/main/walker/pet_profile_screen';
 import RatingsScreen from '../screens/main/walker/ratings_screen';
 import WalkerProfileScreen from '../screens/main/walker/walker_profile_screen';
-import StepNameScreen from '../screens/main/create_pet/step_name_screen';
+import PetProfileScreen from '../screens/main/pet/pet_profile_screen'; // ✅ correcta
+import EditPetScreen from '../screens/main/pet/edit_pet_screen'; // ✅ añadida
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -53,7 +55,9 @@ export type RootStackParamList = {
   };
   RatingsScreen: undefined
   WalkerProfileScreen: undefined;
-}
+  PetProfileScreen: { pet_id: number; from_role: 'cliente' | 'paseador' };
+  EditPetScreen: { pet_id: number };
+};
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -71,8 +75,8 @@ export default function StackNavigator() {
       <Stack.Screen name="DashboardPaseador" component={DashboardPaseadorScreen} />
       <Stack.Screen name="DashboardAdmin" component={DashboardAdminScreen} />
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
-      <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
       <Stack.Screen name="StepBreedScreen" component={StepBreedScreen} />
+      <Stack.Screen name="StepZonaScreen" component={StepZonaScreen} />
       <Stack.Screen name="StepNameScreen" component={StepNameScreen} />
       <Stack.Screen name="StepAgeScreen" component={StepAgeScreen} />
       <Stack.Screen name="StepHealthScreen" component={StepHealthScreen} />
@@ -81,9 +85,10 @@ export default function StackNavigator() {
       <Stack.Screen name="UserScreen" component={UserScreen} />
       <Stack.Screen name="AvailableWalksScreen" component={AvailableWalksScreen} />
       <Stack.Screen name="WalkHistoryScreen" component={WalkHistoryScreen} />
-      <Stack.Screen name="PetProfileScreen" component={PetProfileScreen} />
       <Stack.Screen name="RatingsScreen" component={RatingsScreen} />
       <Stack.Screen name="WalkerProfileScreen" component={WalkerProfileScreen} />
+      <Stack.Screen name="PetProfileScreen" component={PetProfileScreen} />
+      <Stack.Screen name="EditPetScreen" component={EditPetScreen} />
     </Stack.Navigator>
   );
 }
