@@ -12,6 +12,11 @@ export interface register_response {
   phone: string;
   user_id: number;
 }
+export interface disable_enable_response {
+  user_id: number;
+  token: string;
+  is_enable: boolean;
+}
 
 export async function login_user(email: string, password: string): Promise<login_response> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -100,4 +105,24 @@ export async function send_code(email: string): Promise<void> {
   if (!response.ok || json.error) {
     throw new Error(json.msg || 'Error al enviar el código');
   }
+}
+
+export async function disable_enable_user(
+  user_id: number,
+  is_enable: boolean
+): Promise<disable_enable_response> {
+  const token = await get_token();
+  const response = await fetch(`${API_BASE_URL}/user/is_enable`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ user_id, is_enable }),
+  });
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al deshabilitar/habilitar el usuario');
+  }
+  return json.data;
 }
