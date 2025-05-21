@@ -245,11 +245,12 @@ export default function PetProfileScreen() {
               });
               const json = await res.json();
               if (res.ok && !json.error) {
-               Alert.alert("¡Listo!",json.msg,[{text: "OK",
-                onPress: () => navigation.navigate('AvailableWalksScreen'),
-                },
-              ]
-              );
+               Alert.alert("¡Listo!", json.msg, [
+                 {
+                   text: "OK",
+                   onPress: () => navigation.navigate('DashboardPaseador')
+                 }
+               ]);
               } else {
                 throw new Error(json.msg || "No se pudo aceptar el paseo");
               }
