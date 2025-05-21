@@ -1,6 +1,4 @@
-// src/screens/paseador/DashboardPaseadorScreen.tsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,13 +9,16 @@ import {
   Dimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
+import { get_token } from '../../../utils/token_service';
 
 import ScreenWithMenu from '../../../components/shared/screen_with_menu';
 import type { MenuOption } from '../../../components/shared/side_menu';
@@ -25,15 +26,48 @@ import type { MenuOption } from '../../../components/shared/side_menu';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HORIZONTAL_PADDING = 20 * 2; 
 const CARD_WIDTH = SCREEN_WIDTH - HORIZONTAL_PADDING;
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+
+
+interface AssignedWalk {
+  walk_id:   number;
+  pet_id:    number;
+  pet_name:  string;
+  pet_photo: string;
+  zone:      string;
+  time:      string;
+  date:      string;
+}
+
 
 export default function DashboardPaseadorScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [assigned_walks] = useState([
-    { pet_name: 'Maxi', zone: 'Antofagasta', time: '11:00', image: require('../../../assets/breeds/golden.png') },
-    { pet_name: 'Odie', zone: 'Antofagasta', time: '12:30', image: require('../../../assets/breeds/akita.png') },
-    { pet_name: 'Luna', zone: 'Antofagasta', time: '14:00', image: require('../../../assets/breeds/dalmatian.png') },
-  ]);
+  const [assignedWalks, setAssignedWalks] = useState<AssignedWalk[]>([]);
+  const [loading,        setLoading]        = useState(false);
+  const isFocused = useIsFocused();
+
+  const fetchAssigned = async () => {
+    setLoading(true);
+    try {
+      const token = await get_token();
+      const res = await fetch(`${API_BASE_URL}/walk/assigned`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const { data, error, msg } = await res.json();
+      if (error) throw new Error(msg);
+      setAssignedWalks(data);
+    } catch (err: any) {
+      Alert.alert("Error al cargar paseos", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+ useEffect(() => {
+  if (isFocused) fetchAssigned();
+}, [isFocused]);
+
 
 const menuOptions: MenuOption[] = [
     {
@@ -49,7 +83,7 @@ const menuOptions: MenuOption[] = [
     {
       label: 'Calendario',
       icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
+      onPress: () => Alert.alert('Calendario'), //en mantenimiento hasta que se implemente :D
     },
     { label: '__separator__', icon: null, onPress: () => {} },
     {
@@ -65,7 +99,7 @@ const menuOptions: MenuOption[] = [
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Ajustes'), //momentaneo hasta que se implemente
+      onPress: () => Alert.alert('Ajustes'), //en mantenimiento hasta que se implemente :D
     },
   ];
 
@@ -80,56 +114,65 @@ const menuOptions: MenuOption[] = [
     <ScreenWithMenu
       roleId={2}
       menuOptions={menuOptions}
-      //onSearchPress={() => navigation.navigate('BuscarPaseos')}
     >
-      <Text style={styles.section_title}>Tu próximo paseo: {' '}
-        <Text style={styles.badge}>{assigned_walks.length}</Text>
-        <Text  style={styles.badge}> paseos asignados</Text>
+      <Text style={styles.section_title}>
+        Tu próximo paseo:{' '}
+        <Text style={styles.badge}>{assignedWalks.length}</Text>{' '}
+        paseo(s) asignado(s)
       </Text>
 
-      {/* --- Carrusel de paseos --- */}
-      <View style={styles.carouselContainer}>
-        <ScrollView
-          horizontal
-          pagingEnabled
-          decelerationRate="fast"
-          showsHorizontalScrollIndicator={false}
-          onScroll={onScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={{ 
-            paddingLeft: 0,
-            paddingRight: 0, 
-          }}
-        >
-          {assigned_walks.map((walk, i) => (
-            <View key={i} style={{ width: CARD_WIDTH, marginRight: i < assigned_walks.length - 1 ? 16 : 0 }}>
-              <LinearGradient
-                colors={['#4facfe', '#00f2fe']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.walk_card}
-              >
-                <View style={styles.walk_text}>
-                  <Text style={styles.pet_name}>{walk.pet_name}</Text>
-                  <Text style={styles.detail}>{walk.zone} | {walk.time}</Text>
-                </View>
-                <Image source={walk.image} style={styles.pet_image} />
-              </LinearGradient>
-            </View>
-          ))}
-        </ScrollView>
-        <View style={styles.pagination}>
-          {assigned_walks.map((_, idx) => (
-            <View
-              key={idx}
-              style={[
-                styles.dot,
-                idx === activeIndex && styles.activeDot
-              ]}
-            />
-          ))}
-        </View>
+      {/*El carrusel*/}
+      { loading? <ActivityIndicator style={{ marginTop: 20 }} />
+      :(
+    <View style={styles.carouselContainer}>
+      <ScrollView
+        horizontal
+        pagingEnabled
+        decelerationRate="fast"
+        showsHorizontalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+      >
+        {assignedWalks.map((w, i) => (
+          <View
+            key={w.walk_id}
+            style={{ width: CARD_WIDTH, marginRight: i < assignedWalks.length - 1 ? 16 : 0, }}
+          >
+            <LinearGradient
+              colors={['#4facfe', '#00f2fe']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.walk_card}
+            >
+              <View style={styles.walk_text}>
+                <Text style={styles.pet_name}>{w.pet_name}</Text>
+                <Text style={styles.detail}>
+                  {w.zone} | {w.time}
+                </Text>
+              </View>
+              {w.pet_photo
+                ? <Image
+                    source={{ uri: `${API_BASE_URL}/uploads/${w.pet_photo}` }}
+                    style={styles.pet_image}
+                  />
+                : <Feather name="user" size={80} color="#fff" style={{ marginLeft: 12 }} />
+              }
+            </LinearGradient>
+          </View>
+        ))}
+      </ScrollView>
+      <View style={styles.pagination}>
+        {assignedWalks.map((_, idx) => (
+          <View
+            key={idx}
+            style={[styles.dot, idx === activeIndex && styles.activeDot]}
+          />
+        ))}
       </View>
+    </View>
+  )
+}
+
 
       <View style={styles.grid}>
         <TouchableOpacity
@@ -212,13 +255,13 @@ const styles = StyleSheet.create({
   },
   pet_name: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '700',
     marginBottom: 4,
   },
   detail: {
     color: '#D0E7FF',
-    fontSize: 14,
+    fontSize: 18,
   },
   pet_image: {
     width: 80,
