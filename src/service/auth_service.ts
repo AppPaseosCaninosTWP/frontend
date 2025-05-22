@@ -107,6 +107,22 @@ export async function send_code(email: string): Promise<void> {
   }
 }
 
+export async function get_all_users(): Promise<user_model[]> {
+  const token = await get_token();
+  const response = await fetch(`${API_BASE_URL}/user/get_all_user`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al obtener los usuarios');
+  }
+  return json.data;
+}
+
 export async function disable_enable_user(
   user_id: number,
   is_enable: boolean
