@@ -142,3 +142,18 @@ export async function disable_enable_user(
   }
   return json.data;
 }
+export async function getprofilewalker(): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${API_BASE_URL}/walker_profile/get_profiles`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al obtener el perfil del paseador');
+  }
+  return json.data;
+}
