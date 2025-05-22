@@ -128,7 +128,7 @@ export async function disable_enable_user(
   is_enable: boolean
 ): Promise<disable_enable_response> {
   const token = await get_token();
-  const response = await fetch(`${API_BASE_URL}/user/is_enable`, {
+  const response = await fetch(`${API_BASE_URL}/user/is_enable/${user_id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
