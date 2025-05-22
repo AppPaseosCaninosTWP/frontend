@@ -12,8 +12,23 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { get_token, get_user } from '../../../utils/token_service';
+import * as ImagePicker from 'expo-image-picker';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+
+interface WalkerProfile {
+  walker_id:   number;
+  name:        string;
+  email:       string;
+  phone:       string;
+  experience:  number;
+  walker_type: string;
+  zone:        string;
+  description: string;
+  balance:     number;
+  on_review:   boolean;
+  photoUrl:    string;
+}
 
 export default function EditWalkerProfileScreen() {
   const navigation = useNavigation();
@@ -22,7 +37,6 @@ export default function EditWalkerProfileScreen() {
   const [phone, setPhone] = useState('');
   const [description, setDescription] = useState('');
 
-  // Campos estáticos (no editables)
   const [name, setName] = useState('');
   const [experience, setExperience] = useState('');
   const [walkerType, setWalkerType] = useState('');
@@ -36,6 +50,7 @@ export default function EditWalkerProfileScreen() {
   const [originalEmail, setOriginalEmail] = useState('');
   const [originalPhone, setOriginalPhone] = useState('');
   const [originalDescription, setOriginalDescription] = useState('');
+  const [profile, setProfile] = useState<WalkerProfile | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,14 +60,14 @@ export default function EditWalkerProfileScreen() {
         if (!token || !user?.id) throw new Error('Sesión no válida');
         setUserId(user.id);
 
-        const res = await fetch(`${API_BASE_URL}/walker_profile/${user.id}`, {
+        const res = await fetch(`${API_BASE_URL}/walker_profile/get_profile/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(`Error ${res.status}`);
 
         const { data: profile } = await res.json();
+        setProfile(profile);
 
-        // Setear datos estáticos
         setName(profile.name);
         setExperience(String(profile.experience));
         setWalkerType(profile.walker_type);
@@ -72,7 +87,12 @@ export default function EditWalkerProfileScreen() {
         setDescription(profile.description);
         setOriginalDescription(profile.description);
 
-        if (profile.photo) setImage(`${API_BASE_URL}/${profile.photo}`);
+        if (profile.photoUrl) {
+          setImage(profile.photoUrl.startsWith('http')
+          ? profile.photoUrl
+          : `${API_BASE_URL.replace(/\/$/, "")}/uploads/${profile.photoUrl}`
+          );
+      }
       } catch (err) {
         Alert.alert('Error', (err as Error).message);
       }
@@ -80,45 +100,78 @@ export default function EditWalkerProfileScreen() {
     fetchProfile();
   }, []);
 
-  const handleSubmit = async () => {
-    if (!email || !phone || !description) {
-      Alert.alert('Campos requeridos', 'Email, teléfono y descripción son obligatorios.');
+const handleSubmit = async () => {
+  if (!email || !phone || !description) {
+    Alert.alert('Campos requeridos', 'Email, teléfono y descripción son obligatorios.');
+    return;
+  }
+
+  const raw = phone.replace(/\D/g, '');
+  const e164 = `+${raw}`;
+
+  try {
+    const token = await get_token();
+    if (!token || !userId) throw new Error('Sesión no válida');
+
+    const formData = new FormData();
+    formData.append('email', email.trim());
+    formData.append('phone', e164);
+    formData.append('description', description.trim());
+
+    if (image && image !== profile?.photoUrl) {
+      const uriParts = image.split('/');
+      const filename = uriParts[uriParts.length - 1];
+      const match = /\.(\w+)$/.exec(filename);
+      const mimeType = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('photo', {
+        uri: image,
+        name: filename,
+        type: mimeType,
+      } as any);
+    }
+
+    const res = await fetch(
+      `${API_BASE_URL.replace(/\/$/, '')}/walker_profile/update_walker_profile/${userId}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    const payload = await res.json();
+    if (!res.ok) {
+      Alert.alert('Error al actualizar', payload.msg);
       return;
     }
 
-    const raw = phone.replace(/\D/g, '');
-    const e164 = `+${raw}`;
+    Alert.alert('Éxito', 'Tus datos están pendientes de aprobación.');
+    setIsEditing(false);
+  } catch (err) {
+    Alert.alert('Error', (err as Error).message);
+  }
+};
 
-    const body = {
-      email: email.trim(),
-      phone: e164,
-      description: description.trim(),
-    };
-
-    try {
-      const token = await get_token();
-      if (!token || !userId) throw new Error('Sesión no válida');
-
-      const res = await fetch(`${API_BASE_URL}/walker_profile/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-      const payload = await res.json();
-      if (!res.ok) {
-        Alert.alert('Error al actualizar', payload.msg);
-        return;
-      }
-
-      Alert.alert('Éxito', 'Tus datos están pendientes de aprobación.');
-      setIsEditing(false);
-    } catch (err) {
-      Alert.alert('Error', (err as Error).message);
-    }
-  };
+  const pickImage = async () => {
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permiso denegado', 'Necesito acceso a tus fotos para cambiar la imagen.');
+    return;
+  }
+  // Abre galería
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 0.7,
+  });
+  if (!result.canceled && result.assets.length > 0) {
+  setImage(result.assets[0].uri);
+  }
+};
 
   const handleCancel = () => {
     setEmail(originalEmail);
@@ -131,7 +184,6 @@ export default function EditWalkerProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color="#333" />
@@ -139,31 +191,39 @@ export default function EditWalkerProfileScreen() {
         <Text style={styles.title}>Perfil del paseador</Text>
       </View>
 
-      {/* Foto */}
-      <View style={styles.imagePicker}>
-        <Image
-          source={image ? { uri: image } : require('../../../assets/user_icon.png')}
-          style={styles.image}
-        />
+<View style={styles.imagePicker}>
+  <TouchableOpacity
+    onPress={isEditing ? pickImage : undefined}
+    activeOpacity={0.7}
+  >
+    <Image
+      source={
+        image
+          ? { uri: image }
+          : require('../../../assets/user_icon.png')
+      }
+      style={styles.image}
+    />
+    {isEditing && (
+      <View style={styles.editOverlay}>
+        <Feather name="camera" size={24} color="#fff" />
       </View>
+    )}
+  </TouchableOpacity>
+</View>
 
-      {/* Nombre (no editable) */}
       <Text style={styles.label}>Nombre</Text>
       <TextInput style={[styles.input, styles.disabledInput]} value={name} editable={false} />
 
-      {/* Experiencia (no editable) */}
       <Text style={styles.label}>Años de experiencia</Text>
       <TextInput style={[styles.input, styles.disabledInput]} value={experience} editable={false} />
 
-      {/* Tipo de paseador (no editable) */}
       <Text style={styles.label}>Tipo de paseador</Text>
       <TextInput style={[styles.input, styles.disabledInput]} value={walkerType} editable={false} />
 
-      {/* Zona (no editable) */}
       <Text style={styles.label}>Zona</Text>
       <TextInput style={[styles.input, styles.disabledInput]} value={zone} editable={false} />
 
-      {/* Correo electrónico (editable) */}
       <Text style={styles.label}>Correo electrónico</Text>
       <TextInput
         style={[styles.input, !isEditing && styles.disabledInput]}
@@ -174,7 +234,6 @@ export default function EditWalkerProfileScreen() {
       />
       {!!emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
-      {/* Teléfono móvil (editable) */}
       <Text style={styles.label}>Teléfono móvil</Text>
       <TextInput
         style={[styles.input, !isEditing && styles.disabledInput]}
@@ -185,7 +244,6 @@ export default function EditWalkerProfileScreen() {
       />
       {!!phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
 
-      {/* Descripción (editable) */}
       <Text style={styles.label}>Descripción (máx 250 caracteres)</Text>
       <TextInput
         style={[styles.input, styles.textArea, !isEditing && styles.disabledInput]}
@@ -196,7 +254,6 @@ export default function EditWalkerProfileScreen() {
         maxLength={250}
       />
 
-      {/* Botones */}
       {!isEditing ? (
         <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
           <Text style={styles.buttonText}>Editar datos</Text>
@@ -214,7 +271,6 @@ export default function EditWalkerProfileScreen() {
     </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -237,15 +293,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#111',
-  },
-  imagePicker: {
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
   },
   label: {
     fontWeight: '600',
@@ -335,4 +382,25 @@ errorText: {
   marginBottom: 10,
   marginHorizontal: 16,
 },
+imagePicker: {
+    // asegúrate de tener posición relativa
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  // nuevo overlay para el icono de cámara
+  editOverlay: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 6,
+    borderRadius: 20,
+  },
 });

@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
-import { get_token } from '../../../utils/token_service';
+import { get_token , get_user} from '../../../utils/token_service';
 
 import ScreenWithMenu from '../../../components/shared/screen_with_menu';
 import type { MenuOption } from '../../../components/shared/side_menu';
@@ -39,6 +39,20 @@ interface AssignedWalk {
   date:      string;
 }
 
+interface WalkerProfile {
+  walker_id:   number;
+  name:        string;
+  email:       string;
+  phone:       string;
+  experience:  number;
+  walker_type: string;
+  zone:        string;
+  description: string;
+  balance:     number;
+  on_review:   boolean;
+  photoUrl:    string;
+}
+
 
 export default function DashboardPaseadorScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -46,6 +60,7 @@ export default function DashboardPaseadorScreen() {
   const [assignedWalks, setAssignedWalks] = useState<AssignedWalk[]>([]);
   const [loading,        setLoading]        = useState(false);
   const isFocused = useIsFocused();
+   const [walkerProfile, setWalkerProfile] = useState<WalkerProfile | null>(null);
 
   const fetchAssigned = async () => {
     setLoading(true);
@@ -64,8 +79,25 @@ export default function DashboardPaseadorScreen() {
     }
   };
 
+  const fetchProfile = async () => {
+  try {
+    const token = await get_token();
+    const user = await get_user();
+    if (!token || !user?.id) throw new Error('Sesión no válida');
+    const res = await fetch(
+      `${API_BASE_URL.replace(/\/$/, '')}/walker_profile/get_profile/${user.id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const { data, error, msg } = await res.json();
+    if (error) throw new Error(msg);
+    setWalkerProfile(data);
+  } catch (err: any) {
+    console.log('Error cargando perfil:', err.message);
+  }
+};
+
  useEffect(() => {
-  if (isFocused) fetchAssigned();
+  if (isFocused) fetchAssigned(), fetchProfile();
 }, [isFocused]);
 
 
@@ -112,9 +144,15 @@ const menuOptions: MenuOption[] = [
 
   return (
     <ScreenWithMenu
-      roleId={2}
-      menuOptions={menuOptions}
-    >
+  roleId={2}
+  menuOptions={menuOptions}
+  name={walkerProfile?.name}
+  profileImage={
+    walkerProfile
+      ? { uri: walkerProfile.photoUrl }
+      : require('../../../assets/user_icon.png')
+  }
+>
       <Text style={styles.section_title}>
         Tu próximo paseo:{' '}
         <Text style={styles.badge}>{assignedWalks.length}</Text>{' '}

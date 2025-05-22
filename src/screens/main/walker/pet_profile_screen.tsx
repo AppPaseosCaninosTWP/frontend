@@ -51,12 +51,11 @@ export default function PetProfileScreen() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [toCancelId, setToCancelId] = useState<number | null>(null);
 
-
   useEffect(() => {
     const fetchPet = async () => {
       try {
         const token = await get_token();
-        const res = await fetch(`${API_BASE_URL}/pet/${petId}`, {
+        const res = await fetch(`${API_BASE_URL}/pet/get_pet_by_id/${petId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
