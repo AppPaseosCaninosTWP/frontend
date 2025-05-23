@@ -23,13 +23,12 @@ interface BackendWalk {
   walk_id:  number;
   pet_id:   number;
   pet_name: string;
-  pet_photo:string;
   sector:   string;
   walk_type:string;  
   date:     string;   
   time:     string;
   duration: number;   
-  pet_photoUrl: string | null;
+  pet_photo_url: string | null;
 }
 
 export default function AvailableWalksScreen() {
@@ -73,7 +72,7 @@ const walksToShow = allWalks.filter(w =>
 
   const renderItem = ({ item }: { item: BackendWalk }) => {
     console.log("🏷  renderItem, pet_id =", item.pet_id);
-  const { pet_name, pet_photo, date, time, sector } = item;
+  const { pet_name, pet_photo_url, date, time, sector } = item;
 
   return (
     <TouchableOpacity
@@ -88,11 +87,11 @@ const walksToShow = allWalks.filter(w =>
       }}
     >
       <View style={styles.cardHeader}>
-        {item.pet_photoUrl ? (
+        {item.pet_photo_url ? (
     <Image
-      source={{ uri: item.pet_photoUrl }}
+      source={{ uri: item.pet_photo_url }}
       style={styles.avatar}
-      onError={() => console.warn('Error cargando imagen:', item.pet_photoUrl)}
+      onError={() => console.warn('Error cargando imagen:', item.pet_photo_url)}
     />
   ) : (
     <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
