@@ -30,7 +30,7 @@ interface Pet {
   description:       string | null;
   comments:          string | null;
   medical_condition: string | null;
-  photo:             string;
+  photo:             string | null;
   photoUrl:          string | null;
   owner: {
     user_id: number;
@@ -172,9 +172,11 @@ async function handleCancel(walkId: number) {
             <View style={styles.profileHeader}>
               <Image
                 source={{
-                  uri: pet.photo.startsWith('http')
+                  uri: pet.photo && pet.photo.startsWith('http')
                     ? pet.photo
-                    : `${API_BASE_URL.replace(/\/$/, '')}/uploads/${pet.photo}`
+                    : pet.photo
+                      ? `${API_BASE_URL.replace(/\/$/, '')}/uploads/${pet.photo}`
+                      : undefined
                 }}
                 style={styles.petImage}
                 onError={() => console.warn('Error cargando mascota:', pet.photo)}
