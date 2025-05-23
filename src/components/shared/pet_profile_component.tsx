@@ -1,5 +1,3 @@
-// Componente base pet_profile_component.tsx reutilizable para cliente y paseador con snake_case
-
 import React from "react";
 import {
   View,
@@ -10,9 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-
+import { useNavigation } from "@react-navigation/native";
 import { pet_model } from "../../models/pet_model";
-const API_UPLOADS_URL = process.env.EXPO_PUBLIC_URL;
 
 interface Pet extends pet_model {
   owner: {
@@ -48,10 +45,20 @@ const Pet_profile_component = ({
   on_tab_change,
   api_base_url,
 }: Props) => {
+  const navigation = useNavigation();
   const tab_labels = ["Acerca de", "Salud", "Contacto"] as const;
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back_btn}>
+          <Feather name="arrow-left" size={24} color="#333" />
+        </TouchableOpacity>
+        <View style={styles.header_center}>
+          <Text style={styles.header_title}>Perfil de {pet.name}</Text>
+        </View>
+     </View>
+ 
       <View style={styles.tab_row}>
         {tab_labels.map((label) => (
           <TouchableOpacity
@@ -79,8 +86,9 @@ const Pet_profile_component = ({
           <View style={styles.card}>
             <View style={styles.profile_header}>
               <Image
-                source={{ uri: `${API_UPLOADS_URL}/uploads/${pet.photo}` }}
+                source={pet.photo? { uri: `${api_base_url.replace(/\/$/, "")}/uploads/${pet.photo}` }: undefined}
                 style={styles.pet_image}
+                onError={() => console.warn("pet image error:", pet.photo)}
               />
               <View style={styles.name_row}>
                 <Text style={styles.pet_name}>{pet.name}</Text>
@@ -156,16 +164,18 @@ const Pet_profile_component = ({
                 <Text style={styles.contact_info}>{pet.owner.email}</Text>
               </View>
             </View>
+            <TouchableOpacity style={styles.message_button} onPress={on_edit_press}>
+              <Text style={styles.message_button_text}>Enviar mensaje</Text>
+            </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
 
+      </ScrollView>
       {show_schedule_button && (
         <TouchableOpacity style={styles.schedule_button} onPress={on_schedule_press}>
           <Text style={styles.schedule_button_text}>Agendar paseo</Text>
         </TouchableOpacity>
       )}
-
       {show_cancel_button && (
         <TouchableOpacity style={styles.cancel_button} onPress={on_cancel_press}>
           <Text style={styles.cancel_button_text}>Cancelar paseo</Text>
@@ -300,6 +310,30 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 2,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 5,
+    paddingBottom: 8,
+    backgroundColor: "#fff",
+
+  },
+  back_btn: {
+    padding: 8,
+    paddingVertical: 8 ,
+    marginLeft: 16,
+  },
+  header_center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  header_title: {
+    marginRight: 50,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+  },
   schedule_button: {
     backgroundColor: "#007BFF",
     paddingVertical: 24,
@@ -329,6 +363,19 @@ const styles = StyleSheet.create({
 
 edit_icon: {
   marginLeft: 8,
+},
+message_button: {
+  marginTop: 16,
+  backgroundColor: "#70c72a",
+  paddingVertical: 12,
+  borderRadius: 8,
+  alignItems: "center",
+},
+message_button_text: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 16,
+
 },
 
 });
