@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   separator: {
   height: 1,
-  backgroundColor: '#000c14', // Gris suave
+  backgroundColor: '#000c14',
   marginVertical: 8,
   opacity: 0.6,
 },

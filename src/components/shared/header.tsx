@@ -55,14 +55,14 @@ const Header: React.FC<HeaderProps> = ({
         {/* Icono de búsqueda siempre visible */}
         <TouchableOpacity onPress={handleSearch} style={styles.iconBtn}>
           <Image
-            source={require('../../assets/search_icon.png')}
+            source={require('../../assets/notification.png')}
             style={styles.icon}
           />
         </TouchableOpacity>
         {onMenuPress && (
           <TouchableOpacity onPress={onMenuPress} style={styles.iconBtn}>
             <Image
-              source={require('../../assets/menu_icon.png')}
+              source={require('../../assets/menu_icon2.png')}
               style={styles.icon}
             />
           </TouchableOpacity>
