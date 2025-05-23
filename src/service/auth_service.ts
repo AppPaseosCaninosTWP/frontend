@@ -202,3 +202,18 @@ export async function approveToChange(walker_id: number): Promise<user_model> {
   }
   return json.data;
 }
+export async function rejectToChange(walker_id: number): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${API_BASE_URL}/walker_profile/requests/${walker_id}/reject`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al rechazar la solicitud de cambio');
+  }
+  return json.data;
+}
