@@ -1,681 +1,125 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-  Modal,
-} from "react-native";
-import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
+import { View, ActivityIndicator, Alert, Text } from "react-native";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { get_token } from "../../../utils/token_service";
+import PetProfileComponent from "../../../components/shared/pet_profile_component";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
+import type { pet_model } from "../../../models/pet_model";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-
-type PetProfileRouteProp = RouteProp<RootStackParamList, "PetProfileScreen">;
-type PetProfileNavProp   = NativeStackNavigationProp<RootStackParamList, "PetProfileScreen">;
-
-interface Pet {
-  pet_id: number;
-  name:   string;
-  breed:  string;
-  age:    number;
-  zone:   string;
-  description:       string | null;
-  comments:          string | null;
-  medical_condition: string | null;
-  photo:             string;
-  owner: {
-    user_id: number;
-    name:    string;
-    email:   string;
-    phone:   string;
-  };
-}
+type RouteParams = { petId: number; duration: number; walkId: number };
+type PetProfileRoute = RouteProp<RootStackParamList, "PetProfileScreen">;
+type Navigation = NativeStackNavigationProp<RootStackParamList, "PetProfileScreen">;
 
 export default function PetProfileScreen() {
-  const route      = useRoute<PetProfileRouteProp>();
-  const navigation = useNavigation<PetProfileNavProp>();
-  const { petId, duration, walkId} = route.params;
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [pet, setPet]         = useState<Pet | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"Acerca de"|"Salud"|"Nutrición"|"Contacto">("Acerca de");
-  const [scheduledWalkId, setScheduledWalkId] = useState<number|null>(null);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [toCancelId, setToCancelId] = useState<number | null>(null);
+  const { params } = useRoute<PetProfileRoute>();
+  const navigation = useNavigation<Navigation>();
+  const { petId, duration, walkId } = params;
+  const [pet, set_pet] = useState<pet_model & { owner: any } | null>(null);
+  const [loading, set_loading] = useState(true);
+  const [active_tab, set_active_tab] = useState<"Acerca de" | "Salud" | "Contacto">("Acerca de");
+  const [scheduled_walk_id, set_scheduled_walk_id] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchPet = async () => {
+    const fetch_data = async () => {
       try {
         const token = await get_token();
-        const res = await fetch(`${API_BASE_URL}/pet/get_pet_by_id/${petId}`, {
+
+        const res_pet = await fetch(`${API_BASE_URL}/pet/get_pet_by_id/${petId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const { data, error, msg } = await res.json();
-        if (error) throw new Error(msg);
-        setPet(data);
+        const { data: pet_data } = await res_pet.json();
+        set_pet(pet_data);
+
+        const res_walks = await fetch(`${API_BASE_URL}/walk/assigned`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const { data: walk_data } = await res_walks.json();
+        const walk = walk_data.find((w: any) => w.pet_id === petId);
+        if (walk) set_scheduled_walk_id(walk.walk_id);
       } catch (err: any) {
-        Alert.alert("Error al cargar mascota", err.message);
+        Alert.alert("Error", err.message);
       } finally {
-        setLoading(false);
+        set_loading(false);
       }
     };
 
-    (async () => {
-      try {
-        const token = await get_token();
-        const res = await fetch(`${API_BASE_URL}/walk/assigned`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const { data } = await res.json() as { data: Array<{ walk_id:number; pet_id:number }> };
-        // si hay un paseo para este pet, guardo su id
-        const w = data.find(w => w.pet_id === petId);
-        if (w) setScheduledWalkId(w.walk_id);
-      } catch (_) {
-
-      }
-    })();
-
-    fetchPet();
+    fetch_data();
   }, [petId]);
 
-async function handleCancel(walkId: number) {
-  try {
-    const token = await get_token();
-    const res = await fetch(`${API_BASE_URL}/walk/cancel`, {
-      method:  'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ walkId })
-    });
-
-    const json = await res.json();
-    if (!res.ok) {
-      if (res.status === 403) {
-        // este es el caso de los 30 min
-        Alert.alert(
-          'No puedes cancelar',
-          'Sólo puedes cancelar un paseo con al menos 30 minutos de antelación'
-        );
-      } else {
-        Alert.alert('Error cancelando paseo', json.msg || res.statusText);
-      }
-      return;
+  const handle_schedule = async () => {
+    try {
+      const token = await get_token();
+      const res = await fetch(`${API_BASE_URL}/walk/accept`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ walkId }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.msg || "Error al agendar");
+      Alert.alert("Éxito", "Paseo agendado", [{ text: "OK", onPress: () => navigation.navigate("DashboardPaseador") }]);
+    } catch (err: any) {
+      Alert.alert("Error", err.message);
     }
+  };
 
-    Alert.alert('Listo', 'Paseo cancelado correctamente', [
-      { text: 'OK', onPress: () => navigation.navigate('DashboardPaseador') }
-    ]);
+  const handle_cancel = async () => {
+    try {
+      const token = await get_token();
+      const res = await fetch(`${API_BASE_URL}/walk/cancel`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ walkId: scheduled_walk_id }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const msg = res.status === 403
+          ? "Solo puedes cancelar un paseo con 30 minutos de antelación"
+          : json.msg || "Error al cancelar";
+        throw new Error(msg);
+      }
+      Alert.alert("Cancelado", "Paseo cancelado", [{ text: "OK", onPress: () => navigation.navigate("DashboardPaseador") }]);
+    } catch (err: any) {
+      Alert.alert("Error", err.message);
+    }
+  };
 
-  } catch (err: any) {
-    Alert.alert('Error', err.message);
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
-}
 
-
-  if (loading) return (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-  if (!pet) return (
-    <View style={styles.loadingContainer}>
-      <Text style={styles.errorText}>Mascota no encontrada.</Text>
-    </View>
-  );
-
-  const TABS = ["Acerca de","Salud","Nutrición","Contacto"] as const;
+  if (!pet) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Mascota no encontrada.</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Feather name="arrow-left" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Perfil de {pet.name}</Text>
-      </View>
-
-      <View style={styles.tabRow}>
-        {TABS.map(label => (
-          <TouchableOpacity
-            key={label}
-            style={[
-              styles.tabButton,
-              activeTab === label && styles.tabButtonActive
-            ]}
-            onPress={() => setActiveTab(label)}
-          >
-            <Text style={[
-              styles.tabText,
-              activeTab === label && styles.tabTextActive
-            ]}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {activeTab === "Acerca de" && (
-          <View style={styles.card}>
-            <View style={styles.profileHeader}>
-              <Image
-                source={{ uri: `${API_BASE_URL}/uploads/${pet.photo}` }}
-                style={styles.petImage}
-              />
-              <Text style={styles.petName}>{pet.name}</Text>
-              <Text style={styles.petBreed}>{`${pet.breed}`}</Text>
-            </View>
-
-            <Text style={styles.sectionTitle}>Apariencia y signos distintivos</Text>
-            <Text style={styles.paragraph}>{pet.description ?? "–"}</Text>
-
-            <View style={styles.infoTable}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Edad</Text>
-                <Text style={styles.value}>{pet.age} años</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Sector</Text>
-                <Text style={styles.value}>{pet.zone}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Duración paseo</Text>
-                <Text style={styles.value}>{duration} min</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Comentarios</Text>
-                <Text style={styles.value}>{pet.comments ?? "–"}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Dueño</Text>
-                <Text style={styles.value}>{pet.owner.name}</Text>
-              </View>
-            </View>
-          </View>
-        )}
-
-{activeTab === "Salud" && (
-  <View style={styles.card}>
-    <View style={styles.sectionHeader}>
-      <Feather name="heart" size={20} color="#e74c3c" style={{ marginRight: 10 }}  />
-      <Text style={styles.sectionTitle}>Salud</Text>
-    </View>
-    <Text style={styles.paragraph}>
-      {pet.medical_condition ?? "Sin datos de salud registrados."}
-    </Text>
-  </View>
-)}
-
-
-{activeTab === "Nutrición" && (
-  <View style={styles.card}>
-    <View style={styles.sectionHeader}>
-      <Feather name="coffee" size={20} color="#f39c12"style={{ marginRight: 10 }} />
-      <Text style={styles.sectionTitle}>Nutrición</Text>
-    </View>
-    <Text style={styles.paragraph}>
-      No hay datos de nutrición registrados.
-    </Text>
-  </View>
-)}
-{activeTab === "Contacto" && (
-  <View style={styles.card}>
-    <View style={styles.sectionHeader}>
-      <Feather name="phone" size={20} color="#27ae60" style={{ marginRight: 10 }} />
-      <Text style={styles.sectionTitle}>Contacto</Text>
-    </View>
-    <View style={styles.contactCard}>
-      <Feather name="user" size={36} color="#666" style={{ marginRight: 12 }} />
-      <View>
-        <Text style={styles.contactName}>{pet.owner.name}</Text>
-        <Text style={styles.contactInfo}>{pet.owner.phone}</Text>
-        <Text style={styles.contactInfo}>{pet.owner.email}</Text>
-      </View>
-    </View>
-    <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.primaryButton}>
-        <Feather name="phone-call" size={16} color="#fff" />
-        <Text style={styles.primaryButtonText}>Llamar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.secondaryButton}>
-        <Feather name="mail" size={16} color="#27ae60" />
-        <Text style={styles.secondaryButtonText}>Enviar mensaje</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-)}
-      </ScrollView>
-{ scheduledWalkId
-  ? (
-    <TouchableOpacity
-      style={styles.cancel2Button}
-      onPress={() => {
-        setToCancelId(scheduledWalkId);
-        setShowCancelModal(true);
-      }}
-    >
-      <Text style={styles.cancelButtonText}>Cancelar paseo</Text>
-    </TouchableOpacity>
-  ) : (
-    <TouchableOpacity style={styles.scheduleButton} onPress={() => setShowAcceptModal(true)}>
-      <Text style={styles.scheduleButtonText}>Agendar paseo</Text>
-    </TouchableOpacity>
-  )
-}
-<Modal
-  visible={showAcceptModal}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setShowAcceptModal(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContainer}>
-      <Text style={styles.modalTitle}>Confirmar agendamiento</Text>
-      <Text style={styles.modalMessage}>
-        ¿Deseas agendar este paseo para {pet?.name}?
-      </Text>
-
-      <View style={styles.modalButtonRow}>
-        <TouchableOpacity
-          style={[styles.modalButton, styles.cancelButton]}
-          onPress={() => setShowAcceptModal(false)}
-        >
-          <Text style={[styles.modalButtonText, styles.cancelText]}>
-            Cancelar
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.modalButton, styles.confirmButton]}
-          onPress={async () => {
-            setShowAcceptModal(false);
-            try {
-              const token = await get_token();
-              const res = await fetch(`${API_BASE_URL}/walk/accept`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ walkId }),
-              });
-              const json = await res.json();
-              if (res.ok && !json.error) {
-               Alert.alert("¡Listo!", json.msg, [
-                 {
-                   text: "OK",
-                   onPress: () => navigation.navigate('DashboardPaseador')
-                 }
-               ]);
-              } else {
-                throw new Error(json.msg || "No se pudo aceptar el paseo");
-              }
-            } catch (err: any) {
-              Alert.alert("Error", err.message);
-            }
-          }}
-        >
-          <Text style={[styles.modalButtonText, styles.confirmText]}>
-            Confirmar
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
-
-<Modal
-  visible={showCancelModal}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setShowCancelModal(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContainer}>
-      <Text style={styles.modalTitle}>Confirmar cancelación</Text>
-      <Text style={styles.modalMessage}>
-        ¿Seguro que quieres cancelar este paseo para {pet?.name}?
-      </Text>
-      <View style={styles.modalButtonRow}>
-        <TouchableOpacity
-          style={[styles.modalButton, styles.cancelButton]}
-          onPress={() => setShowCancelModal(false)}
-        >
-          <Text style={[styles.modalButtonText, styles.cancelText]}>
-            No
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.modalButton, styles.confirmCancelButton]}
-          onPress={() => {
-            setShowCancelModal(false);
-            if (toCancelId !== null) handleCancel(toCancelId);
-          }}
-        >
-          <Text style={[styles.modalButtonText, styles.confirmText]}>
-            Sí, cancelar
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
-
-
-    </View>
+    <PetProfileComponent
+      pet={pet}
+      duration={duration}
+      active_tab={active_tab}
+      on_tab_change={set_active_tab}
+      show_schedule_button={!scheduled_walk_id}
+      show_cancel_button={!!scheduled_walk_id}
+      on_schedule_press={handle_schedule}
+      on_cancel_press={handle_cancel}
+      api_base_url={API_BASE_URL || ""}
+    />
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
-  },
 
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  errorText: {
-    fontSize: 16,
-    color: "#777",
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 10,
-    backgroundColor: "#fff",
-    elevation: 2,
-  },
-
-  backButton: {
-    marginRight: 16,
-  },
-
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111",
-    marginRight: 45,
-  },
-
-  tabRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 8,
-    backgroundColor: "#fff",
-  },
-
-  tabButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-  },
-
-  tabButtonActive: {
-    backgroundColor: "#007BFF",
-  },
-
-  tabText: {
-    fontSize: 14,
-    color: "#555",
-  },
-
-  tabTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-  },
-
-  profileHeader: {
-    alignItems: "center",
-    marginBottom: 12,
-  },
-
-  petImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 8,
-  },
-
-  petName: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#111",
-  },
-
-  petBreed: {
-    fontSize: 14,
-    color: "#777",
-  },
-
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginVertical: 12,
-  },
-
-  paragraph: {
-    fontSize: 14,
-    color: "#555",
-    lineHeight: 20,
-  },
-
-  infoTable: {
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    marginTop: 12,
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
-
-  label: {
-    fontSize: 14,
-    color: "#555",
-  },
-
-  value: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    maxWidth: "60%",
-    textAlign: "right",
-  },
-
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-    marginLeft: 8,
-  },
-
-  contactCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "#F9F9F9",
-  },
-
-  contactIcon: {
-    marginRight: 12,
-  },
-
-  contactName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
-  },
-
-  contactInfo: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 2,
-  },
-
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 16,
-  },
-
-  primaryButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#27ae60",
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginRight: 8,
-  },
-
-  primaryButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-    marginLeft: 6,
-  },
-
-  secondaryButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "#27ae60",
-    borderWidth: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-
-  secondaryButtonText: {
-    color: "#27ae60",
-    fontSize: 14,
-    fontWeight: "600",
-    marginLeft: 6,
-  },
-
-  footer: {
-    padding: 16,
-    backgroundColor: "#F3F4F6",
-  },
-
-  scheduleButton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 24,
-    borderRadius: 15,
-    alignItems: "center",
-    marginBottom: 20,
-    marginInline: 10,
-  },
-
-  scheduleButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 8,
-  },
-  modalMessage: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 20,
-  },
-  modalButtonRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-  cancelButton: {
-    backgroundColor: "#eee",
-  },
-  confirmButton: {
-    backgroundColor: "#007BFF",
-  },
-  confirmCancelButton: {
-    backgroundColor: "#E74C3C",
-  },
-  modalButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  cancelText: {
-    color: "#555",
-  },
-  confirmText: {
-    color: "#fff",
-  },
-   cancel2Button: {
-   backgroundColor: "#E74C3C",
-    paddingVertical: 24,
-    borderRadius: 15,
-    alignItems: "center",
-    marginBottom: 20,
-    marginInline: 10,
-  },
- cancelButtonText: {
-   color: "#fff",
-   fontSize: 16,
-   fontWeight: "600",
- },
-});
