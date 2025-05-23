@@ -17,7 +17,7 @@ export interface pet {
 export async function get_user_pets(): Promise<pet[]> {
   const token = await get_token();
 
-  const response = await fetch(`${api_base_url}/pet`, {
+  const response = await fetch(`${api_base_url}/pet/get_pets`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export async function create_pet(pet_data: pet_payload): Promise<pet> {
     } as any);
   }
 
-  const response = await fetch(`${api_base_url}/pet`, {
+const response = await fetch(`${api_base_url}/pet/create_pet`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

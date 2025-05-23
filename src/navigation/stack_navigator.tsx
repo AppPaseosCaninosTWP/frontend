@@ -31,6 +31,8 @@ import pet_profile_screen from '../screens/main/walker/pet_profile_screen';
 import ratings_screen from '../screens/main/walker/ratings_screen';
 import walker_profile_screen from '../screens/main/walker/walker_profile_screen';
 import planner_screen from '../screens/main/walker/planner_screen';
+import pet_profile_screen_cliente from '../screens/main/client/pet_profile_cliente_screen';
+import edit_pet_screen from '../screens/main/client/edit_pet_screen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -64,6 +66,8 @@ export type RootStackParamList = {
   RatingsScreen: undefined;
   WalkerProfileScreen: undefined;
   PlannerScreen: undefined;
+  PetProfileClienteScreen: { petId: number };
+  EditPetScreen: { petId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -98,6 +102,10 @@ export default function stack_navigator() {
       <Stack.Screen name="RatingsScreen" component={ratings_screen} />
       <Stack.Screen name="WalkerProfileScreen" component={walker_profile_screen} />
       <Stack.Screen name="PlannerScreen" component={planner_screen} />
+      <Stack.Screen name="PetProfileClienteScreen" component={pet_profile_screen_cliente }options={{ title: "Perfil Mascota (Cliente)" }}/>
+      <Stack.Screen name="EditPetScreen" component={edit_pet_screen} options={{ title: "Editar Mascota" }}
+      />
+
     </Stack.Navigator>
   );
 }
