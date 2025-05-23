@@ -51,6 +51,7 @@ interface Walker_profile {
 }
 
 export default function Dashboard_paseador_screen() {
+  console.log("Render DashboardPaseador")
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [active_index, set_active_index] = useState(0);
   const [assigned_walks, set_assigned_walks] = useState<Assigned_walk[]>([]);
@@ -65,6 +66,7 @@ export default function Dashboard_paseador_screen() {
       const res = await fetch(`${api_base_url}/walk/assigned`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
       set_assigned_walks(data);
@@ -210,6 +212,50 @@ export default function Dashboard_paseador_screen() {
           </View>
         </View>
       )}
+      <View style={styles.grid}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("AvailableWalksScreen")}
+        >
+        <Feather name="map" size={40} color="#007BFF" />
+          <Text style={styles.card_title}>Buscar paseo</Text>
+            <Text style={styles.card_text}>
+              Explora paseos publicados por clientes y acepta los que se adapten a tu zona y disponibilidad.
+            </Text>
+          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("PlannerScreen")}
+        >
+        <Image
+          source={require("../../../assets/plate_icon.png")}
+          style={styles.icon}
+        />
+        <Text style={styles.card_title}>Mi agenda</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate("WalkHistoryScreen")}
+      >
+        <Image
+          source={require("../../../assets/admin/admin_photo2.png")}
+          style={styles.icon}
+        />
+        <Text style={styles.card_title}>Historial</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate("RatingsScreen")}
+      >
+        <Image
+          source={require("../../../assets/admin/admin_photo1.png")}
+          style={styles.icon}
+        />
+        <Text style={styles.card_title}>Calificaciones</Text>
+      </TouchableOpacity>
+    </View>
     </Screen_with_menu>
   );
 }
@@ -231,9 +277,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   carousel_container: {
+    flex: 1,
     marginBottom: 24,
   },
   walk_card: {
+    flex: 1,
     borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
@@ -274,4 +322,38 @@ const styles = StyleSheet.create({
   active_dot: {
     backgroundColor: '#007BFF',
   },
+  grid: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  marginBottom: 40,
+},
+card: {
+  width: '48%',
+  backgroundColor: '#e3f2fd',
+  borderRadius: 16,
+  paddingVertical: 32,
+  paddingHorizontal: 12,
+  alignItems: 'center',
+  marginBottom: 12,
+},
+card_title: {
+  fontSize: 16,
+  fontWeight: '600',
+  textAlign: 'center',
+  color: '#111',
+  marginTop: 12,
+  marginBottom: 6,
+},
+card_text: {
+  fontSize: 12,
+  textAlign: 'center',
+  color: '#666',
+},
+icon: {
+  width: 130,
+  height: 130,
+  marginBottom: 12,
+  borderRadius: 16,
+},
 });
