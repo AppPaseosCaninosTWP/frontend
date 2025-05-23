@@ -157,3 +157,18 @@ export async function getprofilewalker(): Promise<user_model> {
   }
   return json.data;
 }
+export async function seeRequestToChange(): Promise<user_model[]> {
+  const token = await get_token();
+  const response = await fetch(`${API_BASE_URL}/walker_profile/requests`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al obtener las solicitudes de cambio');
+  }
+  return json.data;
+}
