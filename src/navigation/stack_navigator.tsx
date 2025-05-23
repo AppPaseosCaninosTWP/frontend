@@ -27,6 +27,7 @@ import WalkerProfileScreen from '../screens/main/walker/walker_profile_screen';
 import StepNameScreen from '../screens/main/create_pet/step_name_screen';
 import PLannerScreen from '../screens/main/walker/planner_screen';
 import RequestToChangeScreen from '../screens/main/Admin/requestTochange_screen';
+import RegisterWalkerScreen from '../screens/main/Admin/registerWalker_screen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -61,6 +62,7 @@ export type RootStackParamList = {
   WalkerProfileScreen: undefined;
   PlannerScreen: undefined;
   RequestToChangeScreen: undefined;
+  RegisterWalkerScreen: undefined;
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -96,6 +98,7 @@ export default function StackNavigator() {
       <Stack.Screen name="WalkerProfileScreen" component={WalkerProfileScreen} />
       <Stack.Screen name="PlannerScreen" component={PLannerScreen} />
       <Stack.Screen name="RequestToChangeScreen" component={RequestToChangeScreen} />
+      <Stack.Screen name="RegisterWalkerScreen" component={RegisterWalkerScreen} />
     </Stack.Navigator>
   );
 }
