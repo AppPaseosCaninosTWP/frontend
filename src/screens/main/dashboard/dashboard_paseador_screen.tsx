@@ -141,14 +141,21 @@ export default function Dashboard_paseador_screen() {
     set_active_index(idx);
   };
 
+  const profile_image_url = walker_profile?.photo_url
+    ? walker_profile.photo_url.startsWith('http')
+      ? walker_profile.photo_url
+      : `${api_base_url.replace(/\/$/, '')}/uploads/${walker_profile.photo_url}`
+    : null;
+
+
   return (
     <Screen_with_menu
       role_id={2}
       menu_options={menu_options}
       name={walker_profile?.name}
       profile_image={
-        walker_profile
-          ? { uri: walker_profile.photo_url }
+        profile_image_url
+          ? { uri: profile_image_url }
           : require('../../../assets/user_icon.png')
       }
     >

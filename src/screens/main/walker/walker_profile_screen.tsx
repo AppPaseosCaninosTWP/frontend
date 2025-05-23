@@ -27,7 +27,7 @@ interface WalkerProfile {
   description: string;
   balance:     number;
   on_review:   boolean;
-  photoUrl:    string;
+  photo_url:    string;
 }
 
 export default function EditWalkerProfileScreen() {
@@ -87,10 +87,10 @@ export default function EditWalkerProfileScreen() {
         setDescription(profile.description);
         setOriginalDescription(profile.description);
 
-        if (profile.photoUrl) {
-          setImage(profile.photoUrl.startsWith('http')
-          ? profile.photoUrl
-          : `${API_BASE_URL.replace(/\/$/, "")}/uploads/${profile.photoUrl}`
+        if (profile.photo_url) {
+          setImage(profile.photo_url.startsWith('http')
+          ? profile.photo_url
+          : `${API_BASE_URL.replace(/\/$/, "")}/uploads/${profile.photo_url}`
           );
       }
       } catch (err) {
@@ -118,7 +118,7 @@ const handleSubmit = async () => {
     formData.append('phone', e164);
     formData.append('description', description.trim());
 
-    if (image && image !== profile?.photoUrl) {
+    if (image && image !== profile?.photo_url) {
       const uriParts = image.split('/');
       const filename = uriParts[uriParts.length - 1];
       const match = /\.(\w+)$/.exec(filename);
