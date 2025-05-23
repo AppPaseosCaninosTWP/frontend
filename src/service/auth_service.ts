@@ -172,7 +172,22 @@ export async function seeRequestToChange(): Promise<user_model[]> {
   }
   return json.data;
 }
-export async function approveToChange(walker_id: number) {
+export async function seeRequestDetailsToChange(walker_id: number): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${API_BASE_URL}/walker_profile/requests_info/${walker_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al obtener los detalles de la solicitud de cambio');
+  }
+  return json.data;
+}
+export async function approveToChange(walker_id: number): Promise<user_model> {
   const token = await get_token();
   const response = await fetch(`${API_BASE_URL}/walker_profile/requests/${walker_id}/approve`, {
     method: 'POST',
