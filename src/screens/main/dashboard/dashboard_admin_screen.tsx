@@ -1,5 +1,3 @@
-// src/screens/admin/DashboardAdminScreen.tsx
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -17,32 +15,28 @@ import { user_model } from '../../../models/user_model';
 import { get_user, clear_session } from '../../../utils/token_service';
 
 import ScreenWithMenu from '../../../components/shared/screen_with_menu';
-import type { MenuOption } from '../../../components/shared/side_menu';
+import type { menu_option } from '../../../components/shared/side_menu';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
-export default function DashboardAdminScreen() {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [user, setUser] = useState<user_model | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function Dashboard_admin_screen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [user, set_user] = useState<user_model | null>(null);
+  const [loading, set_loading] = useState(true);
 
   useEffect(() => {
     const init = async () => {
-      const storedUser = await get_user();
-      if (!storedUser || storedUser.role_id !== 1) {
+      const stored_user = await get_user();
+      if (!stored_user || stored_user.role_id !== 1) {
         await clear_session();
-        Alert.alert(
-          'Acceso denegado',
-          'Debes iniciar sesión como administrador.'
-        );
+        Alert.alert('Acceso denegado', 'Debes iniciar sesión como administrador.');
         navigation.reset({
           index: 0,
           routes: [{ name: 'Login' }],
         });
         return;
       }
-      setUser(storedUser);
-      setLoading(false);
+      set_user(stored_user);
+      set_loading(false);
     };
 
     init();
@@ -56,47 +50,46 @@ export default function DashboardAdminScreen() {
     );
   }
 
-  // Opciones del menú lateral
-  const menuOptions: MenuOption[] = [
+  const menu_options: menu_option[] = [
     {
       label: 'Dashboard',
       icon: <Feather name="layout" size={20} color="#fff" />,
-      onPress: () => navigation.navigate('DashboardAdmin'),
+      on_press: () => navigation.navigate('DashboardAdmin'),
     },
     {
       label: 'Usuarios',
       icon: <Ionicons name="people" size={20} color="#fff" />,
-      onPress: () => navigation.navigate('UserScreen'),
+      on_press: () => navigation.navigate('UserScreen'),
     },
     {
       label: 'Calendario Global',
       icon: <MaterialIcons name="calendar-today" size={20} color="#fff" />,
-      onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
+      on_press: () => Alert.alert('Calendario'),
     },
     {
       label: 'Pagos',
       icon: <MaterialIcons name="payment" size={20} color="#fff" />,
-      onPress: () => Alert.alert('Pagos'), //momentaneo hasta que se implemente
+      on_press: () => Alert.alert('Pagos'),
     },
     {
       label: 'Cuenta',
       icon: <Ionicons name="person-circle" size={20} color="#fff" />,
-      onPress: () => Alert.alert('Cuenta'), //momentaneo hasta que se implemente
+      on_press: () => Alert.alert('Cuenta'),
     },
     {
       label: 'Calificaciones',
       icon: <Ionicons name="star" size={20} color="#fff" />,
-      onPress: () => Alert.alert('Calificaciones'), //momentaneo hasta que se implemente
+      on_press: () => Alert.alert('Calificaciones'),
     },
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#fff" />,
-      onPress: () => Alert.alert('Ajustes'), //momentaneo hasta que se implemente
+      on_press: () => Alert.alert('Ajustes'),
     },
     {
       label: 'Cerrar sesión',
       icon: <MaterialIcons name="logout" size={20} color="#fff" />,
-      onPress: async () => {
+      on_press: async () => {
         await clear_session();
         navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
       },
@@ -105,9 +98,9 @@ export default function DashboardAdminScreen() {
 
   return (
     <ScreenWithMenu
-      roleId={1}
-      menuOptions={menuOptions}
-      onSearchPress={() => navigation.navigate('UserScreen')}
+      role_id={1}
+      menu_options={menu_options}
+      on_search_press={() => navigation.navigate('UserScreen')}
     >
       <View style={styles.card_container}>
         <TouchableOpacity
@@ -156,7 +149,7 @@ const styles = StyleSheet.create({
   card_container: {
     flexDirection: 'column',
     gap: 16,
-    marginTop: 20, // separa un poco del Header
+    marginTop: 20,
   },
   card: {
     backgroundColor: '#fff',

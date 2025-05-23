@@ -16,7 +16,7 @@ import {
   import { LinearGradient } from 'expo-linear-gradient';
   import { Ionicons } from '@expo/vector-icons';
   
-  export default function ForgotPasswordScreen() {
+  export default function Forgot_password_screen() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const fade_anim = useRef(new Animated.Value(0)).current;
     const translate_anim = useRef(new Animated.Value(30)).current;

@@ -13,7 +13,7 @@ import { use_pet_creation } from '../../../context/pet_creation_context';
 import CreatePetHeader from '../../../components/create_pet/create_pet_header';
 import ContinueButton from '../../../components/shared/continue_button';
 
-export default function StepHealthScreen() {
+export default function Step_health_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pet_data, set_pet_data } = use_pet_creation();
 

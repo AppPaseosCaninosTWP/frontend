@@ -16,7 +16,7 @@ import { use_pet_creation } from '../../../context/pet_creation_context';
 import ContinueButton from '../../../components/shared/continue_button';
 import { create_pet } from '../../../service/pet_service';
 
-export default function StepConfirmScreen() {
+export default function Step_confirm_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pet_data, reset_pet_data } = use_pet_creation();
   const [loading, set_loading] = useState(false);
@@ -34,7 +34,7 @@ export default function StepConfirmScreen() {
     }
   };
 
-  const InfoCard = ({
+  const Info_card = ({
     icon,
     label,
     value,
@@ -60,12 +60,12 @@ export default function StepConfirmScreen() {
       )}
       <Text style={styles.name}>{pet_data.name}</Text>
 
-      <InfoCard icon="calendar" label="Edad" value={`${pet_data.age} años`} />
-      <InfoCard icon="tag" label="Raza" value={pet_data.breed || 'No especificada'} />
-      <InfoCard icon="map-pin" label="Zona" value={pet_data.zone} />
-      <InfoCard icon="info" label="Descripción" value={pet_data.description} />
-      <InfoCard icon="message-square" label="Comentarios" value={pet_data.comments} />
-      <InfoCard icon="activity" label="Condición médica" value={pet_data.medical_condition} />
+      <Info_card icon="calendar" label="Edad" value={`${pet_data.age} años`} />
+      <Info_card icon="tag" label="Raza" value={pet_data.breed || 'No especificada'} />
+      <Info_card icon="map-pin" label="Zona" value={pet_data.zone} />
+      <Info_card icon="info" label="Descripción" value={pet_data.description} />
+      <Info_card icon="message-square" label="Comentarios" value={pet_data.comments} />
+      <Info_card icon="activity" label="Condición médica" value={pet_data.medical_condition} />
 
       <View style={styles.actions}>
         {loading ? (

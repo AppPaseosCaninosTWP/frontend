@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 import { user_model } from '../models/user_model';
 import { get_token } from '../utils/token_service';
 
@@ -12,6 +12,7 @@ export interface register_response {
   phone: string;
   user_id: number;
 }
+
 export interface disable_enable_response {
   user_id: number;
   token: string;
@@ -19,19 +20,17 @@ export interface disable_enable_response {
 }
 
 export async function login_user(email: string, password: string): Promise<login_response> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${api_base_url}/auth/login`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
 
   const json = await response.json();
-  console.log('Respuesta del backend (login):', json);
+  console.log('respuesta_backend_login:', json);
 
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al iniciar sesión');
+    throw new Error(json.msg || 'error_login');
   }
 
   const token = json.data.token;
@@ -40,13 +39,11 @@ export async function login_user(email: string, password: string): Promise<login
   const user = {
     ...raw_user,
     role_name: raw_user.role || raw_user.role_name,
-    name: raw_user.name || "",
+    name: raw_user.name || '',
   };
 
   return { token, user };
 }
-
-
 
 export async function register_user(
   name: string,
@@ -55,7 +52,7 @@ export async function register_user(
   password: string,
   confirm_password: string
 ): Promise<register_response> {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+  const response = await fetch(`${api_base_url}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, phone, password, confirm_password }),
@@ -64,17 +61,16 @@ export async function register_user(
   const json = await response.json();
 
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al registrarse');
+    throw new Error(json.msg || 'error_registro');
   }
 
   return json.data;
 }
 
-
 export async function verify_reset_code(email: string, code: string): Promise<void> {
   const token = await get_token();
 
-  const response = await fetch(`${API_BASE_URL}/user/verify_reset_code`, {
+  const response = await fetch(`${api_base_url}/user/verify_reset_code`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -85,41 +81,43 @@ export async function verify_reset_code(email: string, code: string): Promise<vo
 
   const json = await response.json();
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Código inválido');
+    throw new Error(json.msg || 'codigo_invalido');
   }
 }
 
 export async function send_code(email: string): Promise<void> {
   const token = await get_token();
 
-  const response = await fetch(`${API_BASE_URL}/user/request_reset_code`, {
+  const response = await fetch(`${api_base_url}/user/request_reset_code`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`, 
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ email }),
   });
 
   const json = await response.json();
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al enviar el código');
+    throw new Error(json.msg || 'error_envio_codigo');
   }
 }
 
 export async function get_all_users(): Promise<user_model[]> {
   const token = await get_token();
-  const response = await fetch(`${API_BASE_URL}/user/get_all_user`, {
+  const response = await fetch(`${api_base_url}/user/get_all_user`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
+
   const json = await response.json();
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al obtener los usuarios');
+    throw new Error(json.msg || 'error_obtener_usuarios');
   }
+
   return json.data;
 }
 
@@ -128,7 +126,7 @@ export async function disable_enable_user(
   is_enable: boolean
 ): Promise<disable_enable_response> {
   const token = await get_token();
-  const response = await fetch(`${API_BASE_URL}/user/is_enable/${user_id}`, {
+  const response = await fetch(`${api_base_url}/user/is_enable/${user_id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -136,24 +134,29 @@ export async function disable_enable_user(
     },
     body: JSON.stringify({ user_id, is_enable }),
   });
+
   const json = await response.json();
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al deshabilitar/habilitar el usuario');
+    throw new Error(json.msg || 'error_toggle_usuario');
   }
+
   return json.data;
 }
-export async function getprofilewalker(): Promise<user_model> {
+
+export async function get_profile_walker(): Promise<user_model> {
   const token = await get_token();
-  const response = await fetch(`${API_BASE_URL}/walker_profile/get_profiles`, {
+  const response = await fetch(`${api_base_url}/walker_profile/get_profiles`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
+
   const json = await response.json();
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al obtener el perfil del paseador');
+    throw new Error(json.msg || 'error_perfil_paseador');
   }
+
   return json.data;
 }

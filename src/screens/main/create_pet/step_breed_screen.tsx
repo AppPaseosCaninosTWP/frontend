@@ -16,12 +16,12 @@ import type { RootStackParamList } from '../../../navigation/stack_navigator';
 import CreatePetHeader from '../../../components/create_pet/create_pet_header';
 import ContinueButton from '../../../components/shared/continue_button';
 
-export default function StepBreedScreen() {
+export default function Step_breed_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pet_data, set_pet_data } = use_pet_creation();
   const [selected_breed, set_selected_breed] = useState(pet_data.breed);
 
-  const on_continue = () => {
+  const handle_continue = () => {
     set_pet_data({ breed: selected_breed });
     navigation.navigate('StepZonaScreen');
   };
@@ -51,7 +51,7 @@ export default function StepBreedScreen() {
       />
 
       <View style={styles.actions}>
-        <ContinueButton on_press={on_continue} disabled={!selected_breed} />
+        <ContinueButton on_press={handle_continue} disabled={!selected_breed} />
       </View>
     </View>
   );

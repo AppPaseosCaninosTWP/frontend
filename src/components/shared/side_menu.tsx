@@ -10,8 +10,8 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 
-const getRoleLabel = (roleId: number): string => {
-  switch (roleId) {
+const get_role_label = (role_id: number): string => {
+  switch (role_id) {
     case 1: return 'Administrador';
     case 2: return 'Paseador';
     case 3: return 'Cliente';
@@ -19,43 +19,43 @@ const getRoleLabel = (roleId: number): string => {
   }
 };
 
-export interface MenuOption {
+export interface menu_option {
   label: string;
   icon: React.ReactNode;
-  onPress: () => void;
+  on_press: () => void;
 }
 
-interface SideMenuProps {
+interface side_menu_props {
   visible: boolean;
-  options: MenuOption[];
-  onClose: () => void;
-  roleId: number;
+  options: menu_option[];
+  on_close: () => void;
+  role_id: number;
   name?: string;
-  profileImage?: ImageSourcePropType;
+  profile_image?: ImageSourcePropType;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.75;
+const { width: screen_width } = Dimensions.get('window');
+const drawer_width = screen_width * 0.75;
 
-const SideMenu: React.FC<SideMenuProps> = ({
+export default function Side_menu({
   visible,
   options,
-  onClose,
-  roleId,
+  on_close,
+  role_id,
   name,
-  profileImage,
-}) => {
-  const translateX = useMemo(() => new Animated.Value(-DRAWER_WIDTH), []);
+  profile_image,
+}: side_menu_props) {
+  const translate_x = useMemo(() => new Animated.Value(-drawer_width), []);
 
   useEffect(() => {
-    Animated.timing(translateX, {
-      toValue: visible ? 0 : -DRAWER_WIDTH,
+    Animated.timing(translate_x, {
+      toValue: visible ? 0 : -drawer_width,
       duration: 250,
       useNativeDriver: true,
     }).start();
   }, [visible]);
 
-  const displayName = name ?? getRoleLabel(roleId);
+  const display_name = name ?? get_role_label(role_id);
 
   return (
     <>
@@ -63,54 +63,50 @@ const SideMenu: React.FC<SideMenuProps> = ({
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
-          onPress={onClose}
+          onPress={on_close}
         />
       )}
       <Animated.View
         style={[
           styles.drawer,
-          { width: DRAWER_WIDTH, transform: [{ translateX }] },
+          { width: drawer_width, transform: [{ translateX: translate_x }] },
         ]}
       >
-       //Header del menú lateral
-       <View style={styles.menuHeader}>
-         <Image
-           source={
-             profileImage ?? require('../../assets/user_icon.png')
-           }
-           style={styles.headerAvatar}
-         />
-         <Text style={styles.headerName}>{displayName}</Text>
-       </View>
+        <View style={styles.menu_header}>
+          <Image
+            source={profile_image ?? require('../../assets/user_icon.png')}
+            style={styles.header_avatar}
+          />
+          <Text style={styles.header_name}>{display_name}</Text>
+        </View>
 
-        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-          <Text style={styles.closeTxt}>×</Text>
+        <TouchableOpacity style={styles.close_btn} onPress={on_close}>
+          <Text style={styles.close_txt}>×</Text>
         </TouchableOpacity>
 
         {options.map((opt, index) => {
           if (opt.label === '__separator__') {
-             return <View key={`sep-${index}`} style={styles.separator} />;
+            return <View key={`sep-${index}`} style={styles.separator} />;
           }
 
-         return (
-           <TouchableOpacity
-             key={opt.label}
-            style={styles.option}
-            onPress={() => {
-            opt.onPress();
-          onClose();
-        }}
-    >
-      <View style={styles.iconWrapper}>{opt.icon}</View>
-      <Text style={styles.optionTxt}>{opt.label}</Text>
-    </TouchableOpacity>
-  );
-})}
-
+          return (
+            <TouchableOpacity
+              key={opt.label}
+              style={styles.option}
+              onPress={() => {
+                opt.on_press();
+                on_close();
+              }}
+            >
+              <View style={styles.icon_wrapper}>{opt.icon}</View>
+              <Text style={styles.option_txt}>{opt.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </Animated.View>
     </>
   );
-};
+}
 
 const styles = StyleSheet.create({
   overlay: {
@@ -129,28 +125,28 @@ const styles = StyleSheet.create({
     elevation: 8,
     zIndex: 11,
   },
-  menuHeader: {
+  menu_header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
   },
-  headerAvatar: {
+  header_avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
     marginRight: 12,
   },
-  headerName: {
+  header_name: {
     fontSize: 18,
     fontWeight: '700',
     color: '#000c14',
   },
-  closeBtn: {
+  close_btn: {
     position: 'absolute',
     top: 20,
     right: 16,
   },
-  closeTxt: {
+  close_txt: {
     fontSize: 28,
     color: '#000c14',
   },
@@ -159,20 +155,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
   },
-  iconWrapper: {
+  icon_wrapper: {
     marginRight: 12,
   },
-  optionTxt: {
+  option_txt: {
     fontSize: 16,
     color: '#000c14',
   },
   separator: {
-  height: 1,
-  backgroundColor: '#000c14', // Gris suave
-  marginVertical: 8,
-  opacity: 0.6,
-},
-
+    height: 1,
+    backgroundColor: '#000c14',
+    marginVertical: 8,
+    opacity: 0.6,
+  },
 });
-
-export default SideMenu;

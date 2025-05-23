@@ -6,16 +6,15 @@ import type { user_model } from '../../../models/user_model';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
-export default function DashboardScreen() {
+export default function Dashboard_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [loading, set_loading] = useState(true);
+  const [is_loading, set_is_loading] = useState(true);
 
   useEffect(() => {
     const init = async () => {
       try {
         const user = await get_user() as user_model;
         console.log('Usuario recuperado:', user);
-
 
         if (!user) {
           Alert.alert('Error', 'Sesión no encontrada');
@@ -41,7 +40,7 @@ export default function DashboardScreen() {
         Alert.alert('Error', 'No se pudo cargar la sesión');
         navigation.replace('Login');
       } finally {
-        set_loading(false);
+        set_is_loading(false);
       }
     };
 

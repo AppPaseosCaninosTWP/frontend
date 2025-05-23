@@ -21,7 +21,7 @@ import type { pet_model } from '../../../models/pet_model';
 import SwipeButtonTWP from '../../../components/swipe_button';
 import Header from '../../../components/shared/header';
 import ScreenWithMenu from '../../../components/shared/screen_with_menu';
-import type { MenuOption } from '../../../components/shared/side_menu';
+import type { menu_option } from '../../../components/shared/side_menu';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -69,43 +69,43 @@ export default function DashboardClienteScreen() {
     fetch_pets();
   }, []);
 
-  const menuOptions: MenuOption[] = [
+  const menuOptions: menu_option[] = [
     {
       label: 'Dashboard',
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      onPress: () => navigation.navigate('DashboardCliente'),
+      on_press: () => navigation.navigate('DashboardCliente'),
     },
-    { label: '__separator__', icon: null, onPress: () => {} },
+    { label: '__separator__', icon: null, on_press: () => {} },
     {
       label: 'Mascotas',
       icon: <Ionicons name="paw" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Mascotas'),
+      on_press: () => Alert.alert('Mascotas'),
     },
     ...user_pets.map((pet) => ({
       label: String(pet.name),
       icon: <Image source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />,
-      onPress: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
+      on_press: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
     })),
-    { label: '__separator__', icon: null, onPress: () => {} },
+    { label: '__separator__', icon: null, on_press: () => {} },
     {
       label: 'Contactos',
       icon: <Ionicons name="search" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Contactos'),
+      on_press: () => Alert.alert('Contactos'),
     },
     {
       label: 'Calendario',
       icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Calendario'),
+      on_press: () => Alert.alert('Calendario'),
     },
     {
       label: 'Cuenta',
       icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Cuenta'),
+      on_press: () => Alert.alert('Cuenta'),
     },
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      onPress: () => Alert.alert('Ajustes'),
+      on_press: () => Alert.alert('Ajustes'),
     },
   ];
 
@@ -120,7 +120,7 @@ export default function DashboardClienteScreen() {
   if (user_pets.length === 0) {
     return (
       <View style={styles.empty_container}>
-        <Header roleId={3} />
+        <Header role_id={3} />
         <View style={styles.center_content}>
           <Image
             source={require('../../../assets/empty_state.png')}
@@ -145,7 +145,7 @@ export default function DashboardClienteScreen() {
   }
 
   return (
-    <ScreenWithMenu roleId={3} menuOptions={menuOptions}>
+    <ScreenWithMenu role_id={3} menu_options={menuOptions}>
       <Text style={styles.section_title}>
         Perfiles de mascotas activos{' '}
         <Text style={styles.badge}>{user_pets.length}</Text>
@@ -245,6 +245,7 @@ export default function DashboardClienteScreen() {
     </ScreenWithMenu>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

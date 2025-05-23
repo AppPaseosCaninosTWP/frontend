@@ -1,9 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from '../screens/main/welcome_screen';
 import AuthIntroScreen from '../screens/auth/auth_intro_screen';
-import LoginScreen from '../screens/auth/login_screen';
-import RegisterScreen from '../screens/auth/register_screen';
-import ForgotPasswordScreen from '../screens/auth/forgot_password_screen';
+import Login_screen from '../screens/auth/login_screen';
+import Register_screen from '../screens/auth/register_screen';
+import Forgot_password_screen from '../screens/auth/forgot_password_screen';
 import VerifyCodeScreen from '../screens/auth/verify_code_screen';
 import ResetPasswordScreen from '../screens/auth/reset_password_screen';
 import DashboardPaseadorScreen from '../screens/main/dashboard/dashboard_paseador_screen';
@@ -68,9 +68,9 @@ export default function StackNavigator() {
     <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="AuthIntro" component={AuthIntroScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="Login" component={Login_screen} />
+      <Stack.Screen name="Register" component={Register_screen} />
+      <Stack.Screen name="ForgotPassword" component={Forgot_password_screen} />
       <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       <Stack.Screen name="DashboardCliente" component={DashboardClienteScreen} />

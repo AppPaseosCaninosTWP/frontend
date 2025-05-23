@@ -1,5 +1,3 @@
-// src/components/shared/Header.tsx
-
 import React from 'react';
 import {
   View,
@@ -10,16 +8,16 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 
-interface HeaderProps {
-  roleId: number;
+interface header_props {
+  role_id: number;
   name?: string;
-  profileImage?: ImageSourcePropType;
-  onSearchPress?: () => void;
-  onMenuPress?: () => void;
+  profile_image?: ImageSourcePropType;
+  on_search_press?: () => void;
+  on_menu_press?: () => void;
 }
 
-const getRoleLabel = (roleId: number): string => {
-  switch (roleId) {
+const get_role_label = (role_id: number): string => {
+  switch (role_id) {
     case 1:
       return 'Administrador';
     case 2:
@@ -31,36 +29,35 @@ const getRoleLabel = (roleId: number): string => {
   }
 };
 
-const Header: React.FC<HeaderProps> = ({
-  roleId,
+export default function Header({
+  role_id,
   name,
-  profileImage,
-  onSearchPress,
-  onMenuPress,
-}) => {
-  const label = name ?? getRoleLabel(roleId);
-  const handleSearch = onSearchPress ?? (() => {});
+  profile_image,
+  on_search_press,
+  on_menu_press,
+}: header_props) {
+  const label = name ?? get_role_label(role_id);
+  const handle_search = on_search_press ?? (() => {});
 
   return (
     <View style={styles.container}>
-      <View style={styles.userInfo}>
+      <View style={styles.user_info}>
         <Image
-          source={profileImage ?? require('../../assets/user_icon.png')}
-          style={styles.profileImage}
+          source={profile_image ?? require('../../assets/user_icon.png')}
+          style={styles.profile_image}
         />
         <Text style={styles.greeting}>Hola, {label}</Text>
       </View>
 
       <View style={styles.actions}>
-        {/* Icono de búsqueda siempre visible */}
-        <TouchableOpacity onPress={handleSearch} style={styles.iconBtn}>
+        <TouchableOpacity onPress={handle_search} style={styles.icon_btn}>
           <Image
             source={require('../../assets/search_icon.png')}
             style={styles.icon}
           />
         </TouchableOpacity>
-        {onMenuPress && (
-          <TouchableOpacity onPress={onMenuPress} style={styles.iconBtn}>
+        {on_menu_press && (
+          <TouchableOpacity onPress={on_menu_press} style={styles.icon_btn}>
             <Image
               source={require('../../assets/menu_icon.png')}
               style={styles.icon}
@@ -70,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -83,11 +80,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#fff',
   },
-  userInfo: {
+  user_info: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileImage: {
+  profile_image: {
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -102,7 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  iconBtn: {
+  icon_btn: {
     marginLeft: 20,
   },
   icon: {
@@ -110,5 +107,3 @@ const styles = StyleSheet.create({
     height: 25,
   },
 });
-
-export default Header;

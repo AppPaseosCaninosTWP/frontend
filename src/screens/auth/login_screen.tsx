@@ -18,7 +18,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { login_user } from '../../service/auth_service';
 import { save_session } from '../../utils/token_service';
 
-
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const fade_anim = useRef(new Animated.Value(0)).current;
@@ -26,45 +25,42 @@ export default function LoginScreen() {
 
   const [email, set_email] = useState('');
   const [password, set_password] = useState('');
+  const [email_error, set_email_error] = useState('');
+  const [password_error, set_password_error] = useState('');
 
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-
-  const validateEmail = (value: string) => {
-      set_email(value);
-      const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!value) {
-        setEmailError('El correo electrónico es obligatorio');
-      }
-      else if (!email_regex.test(value)) {
-        setEmailError('Ingrese un correo electrónico válido');
-      } else {
-        setEmailError('');
-      }
-    };
-
-  const validatePassword = (value: string) => {
-    set_password(value);
+  const validate_email = (value: string) => {
+    set_email(value);
+    const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!value) {
-      setPasswordError('La contraseña es obligatoria');
+      set_email_error('El correo electrónico es obligatorio');
+    } else if (!email_regex.test(value)) {
+      set_email_error('Ingrese un correo electrónico válido');
     } else {
-      setPasswordError('');
+      set_email_error('');
     }
   };
 
-  const handleLogin = async () => {
+  const validate_password = (value: string) => {
+    set_password(value);
+    if (!value) {
+      set_password_error('La contraseña es obligatoria');
+    } else {
+      set_password_error('');
+    }
+  };
 
-    validateEmail(email);
-    validatePassword(password);
+  const handle_login = async () => {
+    validate_email(email);
+    validate_password(password);
 
-    if (emailError || passwordError) {
+    if (email_error || password_error) {
       Alert.alert('Error al iniciar sesión', 'Por favor complete todos los campos correctamente');
       return;
     }
-  
+
     try {
       const { token, user } = await login_user(email, password);
-      await save_session(token, user);     
+      await save_session(token, user);
       Alert.alert('Sesión iniciada', `Bienvenido, ${user.name}`);
       navigation.replace('DashboardScreen');
     } catch (err: any) {
@@ -72,9 +68,6 @@ export default function LoginScreen() {
       Alert.alert('Error', err.message);
     }
   };
-  
-  
-  
 
   useEffect(() => {
     Animated.parallel([
@@ -104,42 +97,39 @@ export default function LoginScreen() {
       <Animated.View
         style={[styles.card, { opacity: fade_anim, transform: [{ translateY: translate_anim }] }]}
       >
-        <TouchableOpacity style={styles.back_button} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-
         <View style={styles.icon_container}>
           <Image source={require('../../assets/user_icon.png')} style={styles.icon} />
         </View>
 
         <Text style={styles.title}>Inicia sesión</Text>
-        <Text style={styles.subtitle}>¡Bienvenido! Introduce tus datos a continuación y empieza.</Text>
+        <Text style={styles.subtitle}>
+          ¡Bienvenido! Introduce tus datos a continuación y empieza.
+        </Text>
 
         <TextInput
           style={styles.input_field}
           placeholder="Correo electrónico"
           value={email}
-          onChangeText={validateEmail}
+          onChangeText={validate_email}
         />
-        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        {email_error ? <Text style={styles.error_text}>{email_error}</Text> : null}
 
         <TextInput
           style={styles.input_field}
           placeholder="Contraseña"
           secureTextEntry
           value={password}
-          onChangeText={validatePassword}
+          onChangeText={validate_password}
         />
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {password_error ? <Text style={styles.error_text}>{password_error}</Text> : null}
 
         <View style={{ width: '100%' }}>
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgot_password}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={styles.forgot_password}>¿Olvidaste tu contraseña?</Text>
+          </TouchableOpacity>
         </View>
 
-
-        <TouchableOpacity style={styles.login_button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.login_button} onPress={handle_login}>
           <Text style={styles.login_text}>Iniciar sesión</Text>
         </TouchableOpacity>
 
@@ -168,13 +158,13 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-    errorText: {
-      color: 'red',
-      fontSize: 13,
-      marginBottom: 8,
-      marginLeft: 4,
-      alignSelf: 'flex-start',
-    },
+  error_text: {
+    color: 'red',
+    fontSize: 13,
+    marginBottom: 8,
+    marginLeft: 4,
+    alignSelf: 'flex-start',
+  },
   card: {
     position: 'absolute',
     bottom: 0,
@@ -186,15 +176,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     paddingHorizontal: 24,
     alignItems: 'center',
-  },
-  back_button: {
-    position: 'absolute',
-    left: 20,
-    top: 20,
-  },
-  back_icon: {
-    fontSize: 24,
-    color: '#333',
   },
   icon_container: {
     backgroundColor: '#fff',
@@ -247,9 +228,8 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     width: '100%',
     fontWeight: '600',
-    marginTop: 8, 
+    marginTop: 8,
     textDecorationLine: 'underline',
-  
   },
   login_button: {
     backgroundColor: '#007BFF',
@@ -272,6 +252,4 @@ const styles = StyleSheet.create({
     color: '#007BFF',
     fontWeight: '600',
   },
-}
-);
-
+});
