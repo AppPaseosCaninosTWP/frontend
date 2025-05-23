@@ -24,6 +24,7 @@ import ScreenWithMenu from '../../../components/shared/screen_with_menu';
 import type { menu_option } from '../../../components/shared/side_menu';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as SecureStore from 'expo-secure-store';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const API_UPLOADS_URL = process.env.EXPO_PUBLIC_URL;
@@ -69,45 +70,62 @@ export default function DashboardClienteScreen() {
     fetch_pets();
   }, []);
 
-  const menuOptions: menu_option[] = [
-    {
-      label: 'Dashboard',
-      icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('DashboardCliente'),
+const menu_options: menu_option[] = [
+  {
+    label: 'Dashboard',
+    icon: <Feather name="layout" size={20} color="#000c14" />,
+    on_press: () => navigation.navigate('DashboardCliente'),
+  },
+  { label: '__separator__', icon: null, on_press: () => {} },
+  {
+    label: 'Mascotas',
+    icon: <Ionicons name="paw" size={20} color="#000c14" />,
+    on_press: () => Alert.alert('Mascotas'),
+  },
+  ...user_pets.map((pet) => ({
+    label: String(pet.name),
+    icon: (
+      <Image
+        source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }}
+        style={{ width: 20, height: 20, borderRadius: 10 }}
+      />
+    ),
+    on_press: () => navigation.navigate('PetProfileClienteScreen', { petId: pet.pet_id }),
+  })),
+  { label: '__separator__', icon: null, on_press: () => {} },
+  {
+    label: 'Contactos',
+    icon: <Ionicons name="search" size={20} color="#000c14" />,
+    on_press: () => Alert.alert('Contactos'),
+  },
+  {
+    label: 'Calendario',
+    icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
+    on_press: () => Alert.alert('Calendario'),
+  },
+  {
+    label: 'Cuenta',
+    icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
+    on_press: () => Alert.alert('Cuenta'),
+  },
+  {
+    label: 'Ajustes',
+    icon: <Feather name="settings" size={20} color="#000c14" />,
+    on_press: () => Alert.alert('Ajustes'),
+  },
+  {
+    label: 'Cerrar sesión',
+    icon: <Feather name="log-out" size={20} color="#000c14" />,
+    on_press: async () => {
+      await SecureStore.deleteItemAsync("token");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Welcome" }],
+      });
     },
-    { label: '__separator__', icon: null, on_press: () => {} },
-    {
-      label: 'Mascotas',
-      icon: <Ionicons name="paw" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Mascotas'),
-    },
-    ...user_pets.map((pet) => ({
-      label: String(pet.name),
-      icon: <Image source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />,
-      on_press: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
-    })),
-    { label: '__separator__', icon: null, on_press: () => {} },
-    {
-      label: 'Contactos',
-      icon: <Ionicons name="search" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Contactos'),
-    },
-    {
-      label: 'Calendario',
-      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Calendario'),
-    },
-    {
-      label: 'Cuenta',
-      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Cuenta'),
-    },
-    {
-      label: 'Ajustes',
-      icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Ajustes'),
-    },
-  ];
+  },
+];
+;
 
   if (is_loading) {
     return (
@@ -145,7 +163,7 @@ export default function DashboardClienteScreen() {
   }
 
   return (
-    <ScreenWithMenu role_id={3} menu_options={menuOptions}>
+    <ScreenWithMenu role_id={3} menu_options={menu_options}>
       <Text style={styles.section_title}>
         Perfiles de mascotas activos{' '}
         <Text style={styles.badge}>{user_pets.length}</Text>
@@ -164,13 +182,19 @@ export default function DashboardClienteScreen() {
             set_active_index(idx);
           }}
         >
-          {user_pets.map((pet, i) => {
-            console.log('Foto:', pet.photo);
-            console.log('URL:', `${API_UPLOADS_URL}/uploads/${pet.photo}`);
-            return (
-              <View key={i} style={{ width: CARD_WIDTH, marginRight: 12 }}>
+          {user_pets.map((pet, i) => (
+            <View
+              key={i}
+              style={{
+                width: CARD_WIDTH,
+              }}
+  >
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate("PetProfileClienteScreen", { petId: pet.pet_id })}
+              >
                 <LinearGradient
-                  colors={['#4facfe', '#00f2fe']}
+                  colors={["#4facfe", "#00f2fe"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.pet_card}
@@ -178,26 +202,38 @@ export default function DashboardClienteScreen() {
                   <View style={styles.pet_info_box}>
                     <Text style={styles.pet_name}>{pet.name}</Text>
                     <Text style={styles.pet_info_text}>
-                      {pet.breed || 'Sin raza'} | {pet.zone}
+                      {pet.breed || "Sin raza"} | {pet.zone}
                     </Text>
                   </View>
                   {pet.photo ? (
                     <Image
                       source={{ uri: `${API_UPLOADS_URL}/uploads/${pet.photo}` }}
                       style={styles.pet_image}
-                      onError={() => console.log('Error al cargar imagen:', pet.photo)}
+                      onError={() => console.log("Error al cargar imagen:", pet.photo)}
                     />
                   ) : (
                     <Feather name="image" size={60} color="#fff" />
                   )}
                 </LinearGradient>
-              </View>
-            );
-          })}
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          <View style={{ width: CARD_WIDTH,}}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("StepBreedScreen")}
+              style={styles.card_add}
+            >
+              <Feather name="plus-circle" size={36} color="#007BFF" />
+              <Text style={{ marginTop: 8, fontSize: 16, color: "#007BFF", fontWeight: "600" }}>
+                Agregar mascota
+              </Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
 
         <View style={styles.pagination}>
-          {user_pets.map((_, idx) => (
+          {[...user_pets, {}].map((_, idx) => (
             <View
               key={idx}
               style={[
@@ -218,13 +254,6 @@ export default function DashboardClienteScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
-          <Image
-            source={require('../../../assets/admin/admin_photo3.png')}
-            style={styles.icon}
-          />
-          <Text style={styles.card_title}>Nutrición</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity style={styles.card}>
           <Image
@@ -376,5 +405,15 @@ icon: {
   marginBottom: 12,
   borderRadius: 16,
 },
+card_add: {
+  borderRadius: 20,
+  height: 120,
+  padding: 16,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#E3F2FD',
+  width: '100%',
+},
+
 
 });
