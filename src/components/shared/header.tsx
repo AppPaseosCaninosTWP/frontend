@@ -1,6 +1,6 @@
 // src/components/shared/Header.tsx
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import NotificationCenter from './notification_center';
 import {
   View,
   Text,
@@ -9,25 +9,21 @@ import {
   StyleSheet,
   ImageSourcePropType,
 } from 'react-native';
+import { get_user } from '../../utils/token_service';
 
 interface HeaderProps {
   roleId: number;
   name?: string;
   profileImage?: ImageSourcePropType;
-  onSearchPress?: () => void;
   onMenuPress?: () => void;
 }
 
 const getRoleLabel = (roleId: number): string => {
   switch (roleId) {
-    case 1:
-      return 'Administrador';
-    case 2:
-      return 'Paseador';
-    case 3:
-      return 'Cliente';
-    default:
-      return 'Usuario';
+    case 1: return 'Administrador';
+    case 2: return 'Paseador';
+    case 3: return 'Cliente';
+    default: return 'Usuario';
   }
 };
 
@@ -35,11 +31,17 @@ const Header: React.FC<HeaderProps> = ({
   roleId,
   name,
   profileImage,
-  onSearchPress,
   onMenuPress,
 }) => {
   const label = name ?? getRoleLabel(roleId);
-  const handleSearch = onSearchPress ?? (() => {});
+  const [userId, setUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const u = await get_user();
+      setUserId(u?.id ?? null);
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -52,13 +54,12 @@ const Header: React.FC<HeaderProps> = ({
       </View>
 
       <View style={styles.actions}>
-        {/* Icono de búsqueda siempre visible */}
-        <TouchableOpacity onPress={handleSearch} style={styles.iconBtn}>
-          <Image
-            source={require('../../assets/notification.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+        {/* Notis */}
+        {userId != null && (
+          <NotificationCenter userId={userId} />
+        )}
+
+        {/* Menu */}
         {onMenuPress && (
           <TouchableOpacity onPress={onMenuPress} style={styles.iconBtn}>
             <Image
