@@ -1,7 +1,5 @@
-// src/components/shared/ScreenWithMenu.tsx
-
 import React, { ReactNode, useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, ImageSourcePropType } from 'react-native';
 import Header from '../../components/shared/header';
 import SideMenu, { MenuOption } from '../../components/shared/side_menu';
 
@@ -9,20 +7,18 @@ interface ScreenWithMenuProps {
   roleId: number;
   menuOptions: MenuOption[];
   children: ReactNode;
-}
-
-interface ScreenWithMenuProps{
-    roleId: number;
-    menuOptions: MenuOption[];
-    children: ReactNode;
-    onSearchPress?: () => void;
+  name?: string;
+  profileImage?: ImageSourcePropType;
+  onSearchPress?: () => void;
 }
 
 export default function ScreenWithMenu({
   roleId,
   menuOptions,
   children,
-    onSearchPress,
+  name,
+  profileImage,
+  onSearchPress,
 }: ScreenWithMenuProps) {
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -30,8 +26,10 @@ export default function ScreenWithMenu({
     <View style={styles.wrapper}>
       <Header
         roleId={roleId}
-        onMenuPress={() => setMenuVisible(true)}
+        name={name}
+        profileImage={profileImage}
         onSearchPress={onSearchPress}
+        onMenuPress={() => setMenuVisible(true)}
       />
 
       <ScrollView
@@ -41,12 +39,12 @@ export default function ScreenWithMenu({
         {children}
       </ScrollView>
 
-        <SideMenu
-            visible={menuVisible}
-            options={menuOptions}
-            roleId={roleId}
-            onClose={() => setMenuVisible(false)}
-        />
+      <SideMenu
+        visible={menuVisible}
+        options={menuOptions}
+        roleId={roleId}
+        onClose={() => setMenuVisible(false)}
+      />
     </View>
   );
 }

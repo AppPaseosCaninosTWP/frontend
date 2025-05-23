@@ -43,29 +43,86 @@ export default function PetProfileScreen() {
   const route      = useRoute<PetProfileRouteProp>();
   const navigation = useNavigation<PetProfileNavProp>();
   const { petId, duration, walkId} = route.params;
-  const [showModal, setShowModal] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [pet, setPet]         = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"Acerca de"|"Salud"|"Nutrición"|"Contacto">("Acerca de");
+  const [scheduledWalkId, setScheduledWalkId] = useState<number|null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [toCancelId, setToCancelId] = useState<number | null>(null);
 
-  useEffect(() => { fetchPet() }, []);
+  useEffect(() => {
+    const fetchPet = async () => {
+      try {
+        const token = await get_token();
+        const res = await fetch(`${API_BASE_URL}/pet/get_pet_by_id/${petId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { data, error, msg } = await res.json();
+        if (error) throw new Error(msg);
+        setPet(data);
+      } catch (err: any) {
+        Alert.alert("Error al cargar mascota", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchPet = async () => {
-    try {
-      const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/pet/${petId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { data, error, msg } = await res.json();
-      if (error) throw new Error(msg);
-      setPet(data);
-    } catch (err: any) {
-      Alert.alert("Error al cargar mascota", err.message);
-    } finally {
-      setLoading(false);
+    (async () => {
+      try {
+        const token = await get_token();
+        const res = await fetch(`${API_BASE_URL}/walk/assigned`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { data } = await res.json() as { data: Array<{ walk_id:number; pet_id:number }> };
+        // si hay un paseo para este pet, guardo su id
+        const w = data.find(w => w.pet_id === petId);
+        if (w) setScheduledWalkId(w.walk_id);
+      } catch (_) {
+
+      }
+    })();
+
+    fetchPet();
+  }, [petId]);
+
+async function handleCancel(walkId: number) {
+  try {
+    const token = await get_token();
+    const res = await fetch(`${API_BASE_URL}/walk/cancel`, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ walkId })
+    });
+
+    const json = await res.json();
+    if (!res.ok) {
+      if (res.status === 403) {
+        // este es el caso de los 30 min
+        Alert.alert(
+          'No puedes cancelar',
+          'Sólo puedes cancelar un paseo con al menos 30 minutos de antelación'
+        );
+      } else {
+        Alert.alert('Error cancelando paseo', json.msg || res.statusText);
+      }
+      return;
     }
-  };
+
+    Alert.alert('Listo', 'Paseo cancelado correctamente', [
+      { text: 'OK', onPress: () => navigation.navigate('DashboardPaseador') }
+    ]);
+
+  } catch (err: any) {
+    Alert.alert('Error', err.message);
+  }
+}
+
 
   if (loading) return (
     <View style={styles.loadingContainer}>
@@ -199,18 +256,28 @@ export default function PetProfileScreen() {
   </View>
 )}
       </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.scheduleButton} onPress={() => setShowModal(true)}>
-          <Text style={styles.scheduleButtonText}>Agendar</Text>
-        </TouchableOpacity>
-      </View>
-
+{ scheduledWalkId
+  ? (
+    <TouchableOpacity
+      style={styles.cancel2Button}
+      onPress={() => {
+        setToCancelId(scheduledWalkId);
+        setShowCancelModal(true);
+      }}
+    >
+      <Text style={styles.cancelButtonText}>Cancelar paseo</Text>
+    </TouchableOpacity>
+  ) : (
+    <TouchableOpacity style={styles.scheduleButton} onPress={() => setShowAcceptModal(true)}>
+      <Text style={styles.scheduleButtonText}>Agendar paseo</Text>
+    </TouchableOpacity>
+  )
+}
 <Modal
-  visible={showModal}
+  visible={showAcceptModal}
   transparent
   animationType="fade"
-  onRequestClose={() => setShowModal(false)}
+  onRequestClose={() => setShowAcceptModal(false)}
 >
   <View style={styles.modalOverlay}>
     <View style={styles.modalContainer}>
@@ -222,7 +289,7 @@ export default function PetProfileScreen() {
       <View style={styles.modalButtonRow}>
         <TouchableOpacity
           style={[styles.modalButton, styles.cancelButton]}
-          onPress={() => setShowModal(false)}
+          onPress={() => setShowAcceptModal(false)}
         >
           <Text style={[styles.modalButtonText, styles.cancelText]}>
             Cancelar
@@ -232,7 +299,7 @@ export default function PetProfileScreen() {
         <TouchableOpacity
           style={[styles.modalButton, styles.confirmButton]}
           onPress={async () => {
-            setShowModal(false);
+            setShowAcceptModal(false);
             try {
               const token = await get_token();
               const res = await fetch(`${API_BASE_URL}/walk/accept`, {
@@ -267,6 +334,44 @@ export default function PetProfileScreen() {
     </View>
   </View>
 </Modal>
+
+<Modal
+  visible={showCancelModal}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setShowCancelModal(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Confirmar cancelación</Text>
+      <Text style={styles.modalMessage}>
+        ¿Seguro que quieres cancelar este paseo para {pet?.name}?
+      </Text>
+      <View style={styles.modalButtonRow}>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.cancelButton]}
+          onPress={() => setShowCancelModal(false)}
+        >
+          <Text style={[styles.modalButtonText, styles.cancelText]}>
+            No
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.confirmCancelButton]}
+          onPress={() => {
+            setShowCancelModal(false);
+            if (toCancelId !== null) handleCancel(toCancelId);
+          }}
+        >
+          <Text style={[styles.modalButtonText, styles.confirmText]}>
+            Sí, cancelar
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
 
     </View>
   );
@@ -500,6 +605,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     marginBottom: 20,
+    marginInline: 10,
   },
 
   scheduleButtonText: {
@@ -546,6 +652,9 @@ const styles = StyleSheet.create({
   confirmButton: {
     backgroundColor: "#007BFF",
   },
+  confirmCancelButton: {
+    backgroundColor: "#E74C3C",
+  },
   modalButtonText: {
     fontSize: 14,
     fontWeight: "600",
@@ -556,4 +665,17 @@ const styles = StyleSheet.create({
   confirmText: {
     color: "#fff",
   },
+   cancel2Button: {
+   backgroundColor: "#E74C3C",
+    paddingVertical: 24,
+    borderRadius: 15,
+    alignItems: "center",
+    marginBottom: 20,
+    marginInline: 10,
+  },
+ cancelButtonText: {
+   color: "#fff",
+   fontSize: 16,
+   fontWeight: "600",
+ },
 });

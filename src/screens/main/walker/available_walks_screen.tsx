@@ -60,10 +60,16 @@ const fetchWalks = async () => {
     setLoading(false);
   }
 };
+const normalize = (s: string) =>
+  s
+    .normalize('NFD')                  
+    .replace(/[\u0300-\u036f]/g, '')    
+    .toLowerCase();
 
-  const walksToShow = allWalks.filter(
-    w => w.walk_type === selectedTab
-    );
+const walksToShow = allWalks.filter(w =>
+  normalize(w.walk_type) === normalize(selectedTab)
+);
+
   const renderItem = ({ item }: { item: BackendWalk }) => {
     console.log("🏷  renderItem, pet_id =", item.pet_id);
   const { pet_name, pet_photo, date, time, sector } = item;
@@ -87,7 +93,9 @@ const fetchWalks = async () => {
             <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
           )}
       <View style={styles.info}>
+        
         <Text style={styles.name}>{pet_name}</Text>
+        
          {selectedTab === 'Fijo' ? (
        <>
           <Text style={styles.meta}>{`Paseo Fijo  |  ${time}  |  ${date}`}</Text>
