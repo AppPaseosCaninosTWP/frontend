@@ -16,7 +16,7 @@ import { use_pet_creation } from '../../../context/pet_creation_context';
 import ContinueButton from '../../../components/shared/continue_button';
 import { create_pet } from '../../../service/pet_service';
 
-export default function StepConfirmScreen() {
+export default function Step_confirm_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pet_data, reset_pet_data } = use_pet_creation();
   const [loading, set_loading] = useState(false);
@@ -34,7 +34,7 @@ export default function StepConfirmScreen() {
     }
   };
 
-  const InfoCard = ({
+  const Info_card = ({
     icon,
     label,
     value,
@@ -55,31 +55,23 @@ export default function StepConfirmScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Agregar perfil</Text>
-
-      {pet_data.photo ? (
+      {pet_data.photo && (
         <Image source={{ uri: pet_data.photo }} style={styles.image} />
-      ) : (
-        <View style={styles.placeholder_image} />
       )}
-
       <Text style={styles.name}>{pet_data.name}</Text>
-      <Text style={styles.sub}>{pet_data.breed || 'Raza desconocida'}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.section_title}>Datos importantes</Text>
-        <InfoCard icon="calendar" label="Años" value={`${pet_data.age} años`} />
-        <InfoCard icon="map-pin" label="Sector de la ciudad" value={pet_data.zone} />
-        <InfoCard icon="activity" label="Salud" value={pet_data.medical_condition} />
-        <InfoCard icon="message-square" label="Comportamiento" value={pet_data.comments} />
-        <InfoCard icon="info" label="Descripción" value={pet_data.description} />
-      </View>
+      <Info_card icon="calendar" label="Edad" value={`${pet_data.age} años`} />
+      <Info_card icon="tag" label="Raza" value={pet_data.breed || 'No especificada'} />
+      <Info_card icon="map-pin" label="Zona" value={pet_data.zone} />
+      <Info_card icon="info" label="Descripción" value={pet_data.description} />
+      <Info_card icon="message-square" label="Comentarios" value={pet_data.comments} />
+      <Info_card icon="activity" label="Condición médica" value={pet_data.medical_condition} />
 
       <View style={styles.actions}>
         {loading ? (
           <ActivityIndicator size="large" color="#007BFF" />
         ) : (
-          <ContinueButton on_press={handle_confirm} text="Añadir a la cuenta" />
+          <ContinueButton on_press={handle_confirm} text="Registrar mascota" />
         )}
       </View>
     </ScrollView>
@@ -94,45 +86,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexGrow: 1,
   },
-  header: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 20,
-    alignSelf: 'center',
-  },
   image: {
     width: 140,
     height: 140,
     borderRadius: 70,
     marginBottom: 16,
   },
-  placeholder_image: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#ddd',
-    marginBottom: 16,
-  },
   name: {
     fontSize: 22,
     fontWeight: '700',
+    marginBottom: 20,
     color: '#111',
-  },
-  sub: {
-    fontSize: 15,
-    color: '#888',
-    marginBottom: 24,
-  },
-  section: {
-    width: '100%',
-    marginBottom: 24,
-  },
-  section_title: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
   },
   card: {
     flexDirection: 'row',

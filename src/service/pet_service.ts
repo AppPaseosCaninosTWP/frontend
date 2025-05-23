@@ -1,8 +1,8 @@
 import { get_token } from '../utils/token_service';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 
-export interface Pet {
+export interface pet {
   id: number;
   name: string;
   breed: string;
@@ -14,10 +14,10 @@ export interface Pet {
   photo: string;
 }
 
-export async function get_user_pets(): Promise<Pet[]> {
+export async function get_user_pets(): Promise<pet[]> {
   const token = await get_token();
 
-  const response = await fetch(`${API_BASE_URL}/pet`, {
+  const response = await fetch(`${api_base_url}/pet`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -26,16 +26,16 @@ export async function get_user_pets(): Promise<Pet[]> {
   });
 
   const json = await response.json();
-  console.log('Respuesta del backend (mascotas):', json);
+  console.log('respuesta_backend_mascotas:', json);
 
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al obtener mascotas');
+    throw new Error(json.msg || 'error_obtener_mascotas');
   }
 
   return json.data || [];
 }
 
-export interface PetPayload {
+export interface pet_payload {
   name: string | null;
   breed: string | null;
   age: number | null;
@@ -46,7 +46,7 @@ export interface PetPayload {
   photo: string | null;
 }
 
-export async function create_pet(pet_data: PetPayload): Promise<Pet> {
+export async function create_pet(pet_data: pet_payload): Promise<pet> {
   const token = await get_token();
   const form_data = new FormData();
 
@@ -70,7 +70,7 @@ export async function create_pet(pet_data: PetPayload): Promise<Pet> {
     } as any);
   }
 
-  const response = await fetch(`${API_BASE_URL}/pet`, {
+  const response = await fetch(`${api_base_url}/pet`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -79,10 +79,10 @@ export async function create_pet(pet_data: PetPayload): Promise<Pet> {
   });
 
   const json = await response.json();
-  console.log('Respuesta del backend (create_pet):', json);
+  console.log('respuesta_backend_create_pet:', json);
 
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al registrar mascota');
+    throw new Error(json.msg || 'error_registrar_mascota');
   }
 
   return json.data;

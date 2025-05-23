@@ -21,24 +21,20 @@ import type { pet_model } from '../../../models/pet_model';
 import SwipeButtonTWP from '../../../components/swipe_button';
 import Header from '../../../components/shared/header';
 import ScreenWithMenu from '../../../components/shared/screen_with_menu';
-import type { MenuOption } from '../../../components/shared/side_menu';
+import type { menu_option } from '../../../components/shared/side_menu';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { clear_session } from '../../../utils/token_service';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const API_UPLOADS_URL = process.env.EXPO_PUBLIC_URL;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 40;
 
-
 export default function DashboardClienteScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [is_loading, set_is_loading] = useState(true);
   const [user_pets, set_user_pets] = useState<pet_model[]>([]);
   const [active_index, set_active_index] = useState(0);
-  const [show_pets, set_show_pets] = useState(false);
-
 
   useEffect(() => {
     const fetch_pets = async () => {
@@ -73,98 +69,45 @@ export default function DashboardClienteScreen() {
     fetch_pets();
   }, []);
 
-const menuOptions: MenuOption[] = [
-  // Sección: Inicio
-  {
-    label: 'Dashboard',
-    icon: <Feather name="layout" size={20} color="#000c14" />,
-    onPress: () => navigation.navigate('DashboardCliente'),
-  },
-
-  { label: '__separator__', icon: null, onPress: () => {} },
-
-  // Sección: Mascotas
-  {
-    label: 'Mascotas',
-    icon: <Ionicons name="paw" size={20} color="#000c14" />,
-    onPress: () => {},
-  },
-  {
-    label: 'Nueva mascota',
-    icon: <Feather name="plus-circle" size={20} color="#000c14" />,
-    onPress: () => navigation.navigate('StepBreedScreen'),
-  },
-  {
-    label: show_pets ? 'Ocultar mascotas' : 'Ver mascotas',
-    icon: <Feather name={show_pets ? 'chevron-up' : 'chevron-down'} size={20} color="#000c14" />,
-    onPress: () => set_show_pets(!show_pets),
-    prevent_close: true, // ✅ importante
-  },
-
-  ...(show_pets
-    ? user_pets.slice(0, 3).map((pet) => ({
-        label: pet.name,
-        icon: pet.photo
-          ? (
-              <Image
-                source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }}
-                style={{ width: 20, height: 20, borderRadius: 10 }}
-              />
-            )
-          : <Feather name="image" size={20} color="#000c14" />,
-        onPress: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
-      }))
-    : []),
-
-  { label: '__separator__', icon: null, onPress: () => {} },
-
-  // Funcionalidades
-  {
-    label: 'Contactos',
-    icon: <Ionicons name="search" size={20} color="#000c14" />,
-    onPress: () => Alert.alert('Contactos'),
-  },
-  {
-    label: 'Calendario',
-    icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-    onPress: () => Alert.alert('Calendario'),
-  },
-
-  // Cuenta
-  {
-    label: 'Cuenta',
-    icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-    onPress: () => Alert.alert('Cuenta'),
-  },
-  {
-    label: 'Ajustes',
-    icon: <Feather name="settings" size={20} color="#000c14" />,
-    onPress: () => Alert.alert('Ajustes'),
-  },
-  {
-    label: 'Cerrar sesión',
-    icon: <Feather name="log-out" size={20} color="#000c14" />,
-    onPress: () => {
-      Alert.alert(
-        'Cerrar sesión',
-        '¿Estás seguro de que deseas cerrar sesión?',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          {
-            text: 'Cerrar sesión',
-            style: 'destructive',
-            onPress: async () => {
-              await clear_session();
-              navigation.replace('Login');
-            },
-          },
-        ]
-      );
+  const menuOptions: menu_option[] = [
+    {
+      label: 'Dashboard',
+      icon: <Feather name="layout" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('DashboardCliente'),
     },
-  },
-];
-
-
+    { label: '__separator__', icon: null, on_press: () => {} },
+    {
+      label: 'Mascotas',
+      icon: <Ionicons name="paw" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Mascotas'),
+    },
+    ...user_pets.map((pet) => ({
+      label: String(pet.name),
+      icon: <Image source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }} style={{ width: 20, height: 20, borderRadius: 10 }} />,
+      on_press: () => Alert.alert('PetDetailScreen', `Ver perfil de ${pet.name}`),
+    })),
+    { label: '__separator__', icon: null, on_press: () => {} },
+    {
+      label: 'Contactos',
+      icon: <Ionicons name="search" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Contactos'),
+    },
+    {
+      label: 'Calendario',
+      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Calendario'),
+    },
+    {
+      label: 'Cuenta',
+      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Cuenta'),
+    },
+    {
+      label: 'Ajustes',
+      icon: <Feather name="settings" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Ajustes'),
+    },
+  ];
 
   if (is_loading) {
     return (
@@ -177,7 +120,7 @@ const menuOptions: MenuOption[] = [
   if (user_pets.length === 0) {
     return (
       <View style={styles.empty_container}>
-        <Header roleId={3} />
+        <Header role_id={3} />
         <View style={styles.center_content}>
           <Image
             source={require('../../../assets/empty_state.png')}
@@ -202,12 +145,11 @@ const menuOptions: MenuOption[] = [
   }
 
   return (
-    <ScreenWithMenu roleId={3} menuOptions={menuOptions}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-        <Text style={styles.section_title}>Perfiles de mascotas activos </Text>
+    <ScreenWithMenu role_id={3} menu_options={menuOptions}>
+      <Text style={styles.section_title}>
+        Perfiles de mascotas activos{' '}
         <Text style={styles.badge}>{user_pets.length}</Text>
-      </View>
-
+      </Text>
 
       <View style={styles.carousel_container}>
         <ScrollView
@@ -303,6 +245,7 @@ const menuOptions: MenuOption[] = [
     </ScreenWithMenu>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

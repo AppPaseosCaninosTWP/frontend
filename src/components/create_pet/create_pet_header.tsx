@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
-interface CreatePetHeaderProps {
+interface create_pet_header_props {
   title: string;
   subtitle: string;
   step: number;
@@ -10,13 +10,13 @@ interface CreatePetHeaderProps {
   on_back_press?: () => void;
 }
 
-export default function CreatePetHeader({
+export default function Create_pet_header({
   title,
   subtitle,
   step,
   total_steps = 6,
   on_back_press,
-}: CreatePetHeaderProps) {
+}: create_pet_header_props) {
   const progress = (step / total_steps) * 100;
 
   return (
@@ -29,8 +29,8 @@ export default function CreatePetHeader({
         )}
 
         <View style={styles.centered_text}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text style={styles.title_text}>{title}</Text>
+          <Text style={styles.subtitle_text}>{subtitle}</Text>
         </View>
 
         <View style={styles.step_text_row}>
@@ -67,12 +67,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     left: 20,
   },
-  title: {
+  title_text: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111',
   },
-  subtitle: {
+  subtitle_text: {
     fontSize: 13,
     color: '#888',
     marginTop: 4,
@@ -96,10 +96,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFB200',
   },
   step_text_row: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-}
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
 });
+
 
 

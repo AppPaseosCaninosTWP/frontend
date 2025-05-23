@@ -12,11 +12,11 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/stack_navigator';
 
-const { height } = Dimensions.get('window');
+const { height: window_height } = Dimensions.get('window');
 
-export default function WelcomeScreen() {
+export default function Welcome_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const dog_position = useRef(new Animated.Value(height)).current;
+  const dog_position = useRef(new Animated.Value(window_height)).current;
 
   useEffect(() => {
     Animated.timing(dog_position, {
@@ -60,8 +60,9 @@ const styles = StyleSheet.create({
   },
   dog_image: {
     width: '200%',
-    height: height * 0.75,
+    height: window_height * 0.75,
     position: 'absolute',
     bottom: -50,
   },
 });
+

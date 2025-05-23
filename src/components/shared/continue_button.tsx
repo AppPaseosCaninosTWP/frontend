@@ -1,17 +1,17 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-interface ContinueButtonProps {
+interface continue_button_props {
   on_press: () => void;
   text?: string;
   disabled?: boolean;
 }
 
-export default function ContinueButton({
+export default function Continue_button({
   on_press,
   text = 'Continuar',
   disabled = false,
-}: ContinueButtonProps) {
+}: continue_button_props) {
   return (
     <TouchableOpacity
       style={[styles.button, disabled && styles.button_disabled]}
@@ -47,3 +47,4 @@ const styles = StyleSheet.create({
     color: '#f1f1f1',
   },
 });
+

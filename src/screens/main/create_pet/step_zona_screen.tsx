@@ -8,9 +8,9 @@ import type { RootStackParamList } from '../../../navigation/stack_navigator';
 import CreatePetHeader from '../../../components/create_pet/create_pet_header';
 import ContinueButton from '../../../components/shared/continue_button';
 
-const ZONES = ['Norte', 'Centro', 'Sur'];
+const zone_options = ['Norte', 'Centro', 'Sur'];
 
-export default function StepZonaScreen() {
+export default function Step_zona_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pet_data, set_pet_data } = use_pet_creation();
   const [selected_zone, set_selected_zone] = useState(pet_data.zone);
@@ -18,7 +18,6 @@ export default function StepZonaScreen() {
   const handle_continue = () => {
     set_pet_data({ zone: selected_zone });
     navigation.navigate('StepNameScreen');
-    // navigation.navigate('StepNombreEdad');
   };
 
   return (
@@ -33,7 +32,7 @@ export default function StepZonaScreen() {
       <Text style={styles.question}>¿En qué sector vives?</Text>
 
       <View style={styles.options_container}>
-        {ZONES.map((zone) => (
+        {zone_options.map((zone) => (
           <TouchableOpacity
             key={zone}
             onPress={() => set_selected_zone(zone)}
@@ -103,4 +102,3 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 });
-

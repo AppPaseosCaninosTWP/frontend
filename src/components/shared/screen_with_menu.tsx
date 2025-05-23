@@ -1,49 +1,49 @@
 import React, { ReactNode, useState } from 'react';
 import { View, ScrollView, StyleSheet, ImageSourcePropType } from 'react-native';
 import Header from '../../components/shared/header';
-import SideMenu, { MenuOption } from '../../components/shared/side_menu';
+import Side_menu, { menu_option } from '../../components/shared/side_menu';
 
-interface ScreenWithMenuProps {
-  roleId: number;
-  menuOptions: MenuOption[];
+interface screen_with_menu_props {
+  role_id: number;
+  menu_options: menu_option[];
   children: ReactNode;
   name?: string;
-  profileImage?: ImageSourcePropType;
-  onSearchPress?: () => void;
+  profile_image?: ImageSourcePropType;
+  on_search_press?: () => void;
 }
 
-export default function ScreenWithMenu({
-  roleId,
-  menuOptions,
+export default function Screen_with_menu({
+  role_id,
+  menu_options,
   children,
   name,
-  profileImage,
-  onSearchPress,
-}: ScreenWithMenuProps) {
-  const [menuVisible, setMenuVisible] = useState(false);
+  profile_image,
+  on_search_press,
+}: screen_with_menu_props) {
+  const [menu_visible, set_menu_visible] = useState(false);
 
   return (
     <View style={styles.wrapper}>
       <Header
-        roleId={roleId}
+        role_id={role_id}
         name={name}
-        profileImage={profileImage}
-        onSearchPress={onSearchPress}
-        onMenuPress={() => setMenuVisible(true)}
+        profile_image={profile_image}
+        on_search_press={on_search_press}
+        on_menu_press={() => set_menu_visible(true)}
       />
 
       <ScrollView
         contentContainerStyle={styles.content}
-        style={{ opacity: menuVisible ? 0 : 1 }}
+        style={{ opacity: menu_visible ? 0 : 1 }}
       >
         {children}
       </ScrollView>
 
-      <SideMenu
-        visible={menuVisible}
-        options={menuOptions}
-        roleId={roleId}
-        onClose={() => setMenuVisible(false)}
+      <Side_menu
+        visible={menu_visible}
+        options={menu_options}
+        role_id={role_id}
+        on_close={() => set_menu_visible(false)}
       />
     </View>
   );

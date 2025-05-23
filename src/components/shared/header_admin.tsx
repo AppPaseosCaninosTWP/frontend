@@ -1,4 +1,3 @@
-// src/components/shared/header_admin.tsx
 import React from 'react';
 import {
   SafeAreaView,
@@ -12,39 +11,34 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 
-interface HeaderAdminProps {
+interface header_admin_props {
   title: string;
 }
 
-const HeaderAdmin: React.FC<HeaderAdminProps> = ({ title }) => {
+export default function Header_admin({ title }: header_admin_props) {
   const navigation = useNavigation();
 
   return (
     <>
-      {/* Fondo blanco bajo el status bar */}
-      <SafeAreaView style={styles.safeArea} />
-      {/* Barra de navegación */}
-      <View style={styles.header}>
+      <SafeAreaView style={styles.safe_area} />
+      <View style={styles.header_bar}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333333" />
         </TouchableOpacity>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title_text}>{title}</Text>
         <View style={styles.placeholder} />
       </View>
-      {/* Espacio reducido antes del contenido */}
-      <View style={styles.bottomSpacer} />
+      <View style={styles.bottom_spacer} />
     </>
   );
-};
-
-export default HeaderAdmin;
+}
 
 const styles = StyleSheet.create({
-  safeArea: {
+  safe_area: {
     backgroundColor: '#FFFFFF',
     ...(Platform.OS === 'android' ? { height: StatusBar.currentHeight } : {}),
   },
-  header: {
+  header_bar: {
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
@@ -53,7 +47,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
-  title: {
+  title_text: {
     flex: 1,
     textAlign: 'center',
     fontSize: 18,
@@ -63,8 +57,8 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 24,
   },
-  bottomSpacer: {
-    height: 8,            
+  bottom_spacer: {
+    height: 8,
     backgroundColor: '#FFFFFF',
   },
 });

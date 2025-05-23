@@ -4,27 +4,31 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
 
-export default function SuccessScreen() {
+export default function Success_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../assets/empty_state.png')} // usa una imagen de éxito
-        style={styles.image}
+        source={require('../../../assets/empty_state.png')}
+        style={styles.success_image}
       />
 
-      <Text style={styles.title}>¡Mascota registrada!</Text>
-      <Text style={styles.subtitle}>Tu perfil de mascota se ha guardado exitosamente.</Text>
+      <Text style={styles.title_text}>¡Mascota registrada!</Text>
+      <Text style={styles.subtitle_text}>
+        Tu perfil de mascota se ha guardado exitosamente.
+      </Text>
 
       <TouchableOpacity
-        onPress={() => navigation.reset({
-          index: 0,
-          routes: [{ name: 'DashboardCliente' }],
-        })}
-        style={styles.button}
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'DashboardCliente' }],
+          })
+        }
+        style={styles.primary_button}
       >
-        <Text style={styles.button_text}>Ir al inicio</Text>
+        <Text style={styles.primary_button_text}>Ir al inicio</Text>
       </TouchableOpacity>
     </View>
   );
@@ -38,30 +42,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
   },
-  image: {
+  success_image: {
     width: 160,
     height: 160,
     marginBottom: 20,
   },
-  title: {
+  title_text: {
     fontSize: 22,
     fontWeight: '700',
     marginBottom: 6,
     color: '#111',
   },
-  subtitle: {
+  subtitle_text: {
     fontSize: 14,
     textAlign: 'center',
     color: '#666',
     marginBottom: 30,
   },
-  button: {
+  primary_button: {
     backgroundColor: '#007BFF',
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 28,
   },
-  button_text: {
+  primary_button_text: {
     color: '#fff',
     fontWeight: '600',
     fontSize: 14,

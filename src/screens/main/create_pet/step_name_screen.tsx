@@ -16,7 +16,7 @@ import { use_pet_creation } from '../../../context/pet_creation_context';
 import CreatePetHeader from '../../../components/create_pet/create_pet_header';
 import ContinueButton from '../../../components/shared/continue_button';
 
-export default function StepNameScreen() {
+export default function Step_name_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pet_data, set_pet_data } = use_pet_creation();
   const [name, set_name] = useState(pet_data.name || '');
@@ -36,20 +36,19 @@ export default function StepNameScreen() {
   };
 
   const handle_continue = () => {
-  if (!name.trim()) {
-    Alert.alert('Error', 'El nombre es obligatorio.');
-    return;
-  }
+    if (!name.trim()) {
+      Alert.alert('Error', 'El nombre es obligatorio.');
+      return;
+    }
 
-  if (name.length > 25) {
-    Alert.alert('Error', 'El nombre no debe superar los 25 caracteres.');
-    return;
-  }
+    if (name.length > 25) {
+      Alert.alert('Error', 'El nombre no debe superar los 25 caracteres.');
+      return;
+    }
 
-  set_pet_data({ name: name.trim(), photo });
-  navigation.navigate('StepAgeScreen');
-};
-
+    set_pet_data({ name: name.trim(), photo });
+    navigation.navigate('StepAgeScreen');
+  };
 
   return (
     <View style={styles.container}>
