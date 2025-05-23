@@ -74,9 +74,14 @@ export default function DashboardAdminScreen() {
       onPress: () => Alert.alert('Calendario'), //momentaneo hasta que se implemente
     },
     {
+      label: 'Solicitudes',
+      icon: <MaterialIcons name="request-page" size={20} color="#fff" />,
+      onPress: () => navigation.navigate('RequestToChangeScreen'), //momentaneo hasta que se implemente
+    },
+    {
       label: 'Pagos',
       icon: <MaterialIcons name="payment" size={20} color="#fff" />,
-      onPress: () => Alert.alert('Pagos'), //momentaneo hasta que se implemente
+      onPress: () => navigation.navigate('PaymentsScreen'), //momentaneo hasta que se implemente
     },
     {
       label: 'Cuenta',
