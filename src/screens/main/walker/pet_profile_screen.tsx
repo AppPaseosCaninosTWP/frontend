@@ -31,6 +31,7 @@ interface Pet {
   comments:          string | null;
   medical_condition: string | null;
   photo:             string;
+  photoUrl:          string | null;
   owner: {
     user_id: number;
     name:    string;
@@ -170,8 +171,13 @@ async function handleCancel(walkId: number) {
           <View style={styles.card}>
             <View style={styles.profileHeader}>
               <Image
-                source={{ uri: `${API_BASE_URL}/uploads/${pet.photo}` }}
+                source={{
+                  uri: pet.photo.startsWith('http')
+                    ? pet.photo
+                    : `${API_BASE_URL.replace(/\/$/, '')}/uploads/${pet.photo}`
+                }}
                 style={styles.petImage}
+                onError={() => console.warn('Error cargando mascota:', pet.photo)}
               />
               <Text style={styles.petName}>{pet.name}</Text>
               <Text style={styles.petBreed}>{`${pet.breed}`}</Text>

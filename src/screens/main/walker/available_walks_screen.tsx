@@ -29,6 +29,7 @@ interface BackendWalk {
   date:     string;   
   time:     string;
   duration: number;   
+  pet_photoUrl: string | null;
 }
 
 export default function AvailableWalksScreen() {
@@ -87,11 +88,15 @@ const walksToShow = allWalks.filter(w =>
       }}
     >
       <View style={styles.cardHeader}>
-        {pet_photo ? (
-            <Image source={{ uri: pet_photo }} style={styles.avatar} />
-          ) : (
-            <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
-          )}
+        {item.pet_photoUrl ? (
+    <Image
+      source={{ uri: item.pet_photoUrl }}
+      style={styles.avatar}
+      onError={() => console.warn('Error cargando imagen:', item.pet_photoUrl)}
+    />
+  ) : (
+    <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
+  )}
       <View style={styles.info}>
         
         <Text style={styles.name}>{pet_name}</Text>
@@ -103,7 +108,7 @@ const walksToShow = allWalks.filter(w =>
           </>
         ) : (
          <>
-          <Text style={styles.meta}>{`${date}  |  ${time}  |  ${date}`}</Text>
+          <Text style={styles.meta}>{`Paseo Esporádico  |  ${time}  |  ${date}`}</Text>
           <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
         </>
         )}
