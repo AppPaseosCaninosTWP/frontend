@@ -28,7 +28,6 @@ export default function ScreenWithMenu({
         roleId={roleId}
         name={name}
         profileImage={profileImage}
-        onSearchPress={onSearchPress}
         onMenuPress={() => setMenuVisible(true)}
       />
 
