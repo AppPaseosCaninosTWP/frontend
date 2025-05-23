@@ -79,6 +79,11 @@ export default function DashboardAdminScreen() {
       onPress: () => navigation.navigate('RequestToChangeScreen'), //momentaneo hasta que se implemente
     },
     {
+      label: 'Registrar Paseador',
+      icon: <MaterialIcons name="person-add" size={20} color="#fff" />,
+      onPress: () => navigation.navigate('RegisterWalkerScreen'), //momentaneo hasta que se implemente
+    },
+    {
       label: 'Pagos',
       icon: <MaterialIcons name="payment" size={20} color="#fff" />,
       onPress: () => navigation.navigate('PaymentsScreen'), //momentaneo hasta que se implemente
