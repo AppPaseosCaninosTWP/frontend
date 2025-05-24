@@ -217,34 +217,18 @@ export async function rejectToChange(walker_id: number): Promise<user_model> {
   }
   return json.data;
 }
-export async function registerWalker(
-  name: string,
-  email: string,
-  phone: string,
-  password: string,
-  confirm_password: string,
-  experience: number,
-  walker_type: string,
-  zone: string,
-  description: string,
-  photo: File 
-): Promise<register_response> {
+export async function get_all_walks(): Promise<user_model[]> {
   const token = await get_token();
-  const response = await fetch(`${API_BASE_URL}/walker_profile/register_walker`, {
-    method: 'POST',
+  const response = await fetch(`${API_BASE_URL}/walk/get_all_walks`, {
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ name, email, phone, password, confirm_password, experience,walker_type,zone, description, photo }),
   });
-
   const json = await response.json();
-
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'Error al registrar el paseador');
+    throw new Error(json.msg || 'Error al obtener los paseos');
   }
-
   return json.data;
-  
 }
