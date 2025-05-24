@@ -1,3 +1,4 @@
+// src/screens/main/Admin/user_screen.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -18,7 +19,7 @@ import {
   get_profile_walker,
 } from '../../../service/auth_service';
 
-interface Backend_user {
+interface BackendUser {
   user_id: number;
   name: string;
   email: string;
@@ -27,7 +28,7 @@ interface Backend_user {
   role_id: number;
 }
 
-interface Walker_profile {
+interface WalkerProfile {
   walker_id: number;
   name: string;
   email: string;
@@ -38,38 +39,40 @@ interface Walker_profile {
   description: string;
   balance: number;
   on_review: boolean;
-  photo_url: string;
+  photoUrl: string;
 }
 
 type Tab = 'Clientes' | 'Paseadores';
-type Status_filter = 'all' | 'enabled' | 'disabled';
+type StatusFilter = 'all' | 'enabled' | 'disabled';
 
-export default function User_screen() {
-  const [users, set_users] = useState<Backend_user[]>([]);
-  const [walker_profiles, set_walker_profiles] = useState<Walker_profile[]>([]);
-  const [loading, set_loading] = useState(true);
+export default function UserScreen() {
+  const [users, setUsers] = useState<BackendUser[]>([]);
+  const [walkerProfiles, setWalkerProfiles] = useState<WalkerProfile[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [tab, set_tab] = useState<Tab>('Clientes');
-  const [query, set_query] = useState('');
-  const [filter_status, set_filter_status] = useState<Status_filter>('all');
-  const [show_filter, set_show_filter] = useState(false);
-  const [expanded_id, set_expanded_id] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>('Clientes');
+  const [query, setQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<StatusFilter>('all');
+  const [showFilter, setShowFilter] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function load_data() {
+    async function loadData() {
       try {
-        const all_users = await get_all_users();
-        set_users(all_users);
+        // 1) traer todos los usuarios
+        const allUsers = await get_all_users();
+        setUsers(allUsers);
 
-        const profiles = (await get_profile_walker() as unknown) as Walker_profile[];
-        set_walker_profiles(profiles);
+        // 2) traer todos los perfiles de paseadores
+        const profiles = (await get_profile_walker() as unknown) as WalkerProfile[];
+        setWalkerProfiles(profiles);
       } catch (err) {
         console.error('Error cargando datos:', err);
       } finally {
-        set_loading(false);
+        setLoading(false);
       }
     }
-    load_data();
+    loadData();
   }, []);
 
   if (loading) {
@@ -80,27 +83,29 @@ export default function User_screen() {
     );
   }
 
-  const filter_by_status = (enabled: boolean) =>
-    filter_status === 'all'
+  const filterByStatus = (enabled: boolean) =>
+    filterStatus === 'all'
       ? true
-      : filter_status === 'enabled'
+      : filterStatus === 'enabled'
       ? enabled
       : !enabled;
 
+  // lista clientes
   const clients = users
     .filter(u => u.role_id === 3)
     .filter(u => u.name.toLowerCase().includes(query.toLowerCase()))
-    .filter(u => filter_by_status(u.is_enable));
+    .filter(u => filterByStatus(u.is_enable));
 
-  const walkers = walker_profiles
+  // lista paseadores
+  const walkers = walkerProfiles
     .filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
     .filter(p => {
       const usr = users.find(u => u.user_id === p.walker_id);
-      return usr ? filter_by_status(usr.is_enable) : true;
+      return usr ? filterByStatus(usr.is_enable) : true;
     });
 
-  const renderClient = ({ item }: { item: Backend_user }) => {
-    const isOpen = expanded_id === String(item.user_id);
+  const renderClient = ({ item }: { item: BackendUser }) => {
+    const isOpen = expandedId === String(item.user_id);
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
@@ -118,7 +123,7 @@ export default function User_screen() {
             <Text style={styles.sub}>{item.email}</Text>
             <Text style={styles.sub}>{item.phone}</Text>
           </View>
-          <TouchableOpacity onPress={() => set_expanded_id(isOpen ? null : String(item.user_id))}>
+          <TouchableOpacity onPress={() => setExpandedId(isOpen ? null : String(item.user_id))}>
             <Feather name={isOpen ? 'chevron-down' : 'chevron-right'} size={20} color="#333" />
           </TouchableOpacity>
         </View>
@@ -128,7 +133,7 @@ export default function User_screen() {
               style={styles.actionButton}
               onPress={async () => {
                 await disable_enable_user(item.user_id, !item.is_enable);
-                set_users(us =>
+                setUsers(us =>
                   us.map(u =>
                     u.user_id === item.user_id
                       ? { ...u, is_enable: !u.is_enable }
@@ -152,8 +157,8 @@ export default function User_screen() {
     );
   };
 
-  const render_walker = ({ item }: { item: Walker_profile }) => {
-    const isOpen = expanded_id === String(item.walker_id);
+  const renderWalker = ({ item }: { item: WalkerProfile }) => {
+    const isOpen = expandedId === String(item.walker_id);
     const usr = users.find(u => u.user_id === item.walker_id);
     const enabled = usr ? usr.is_enable : true;
 
@@ -161,7 +166,7 @@ export default function User_screen() {
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.avatarContainer}>
-            <Image source={{ uri: item.photo_url }} style={styles.avatar} />
+            <Image source={{ uri: item.photoUrl }} style={styles.avatar} />
             <View
               style={[
                 styles.statusDot,
@@ -182,7 +187,7 @@ export default function User_screen() {
             <Text style={styles.sub}>Tipo: {item.walker_type}</Text>
             <Text style={styles.sub}>Zona: Antofagasta, {item.zone}</Text>
           </View>
-          <TouchableOpacity onPress={() => set_expanded_id(isOpen ? null : String(item.walker_id))}>
+          <TouchableOpacity onPress={() => setExpandedId(isOpen ? null : String(item.walker_id))}>
             <Feather name={isOpen ? 'chevron-down' : 'chevron-right'} size={20} color="#333" />
           </TouchableOpacity>
         </View>
@@ -192,7 +197,7 @@ export default function User_screen() {
               style={styles.actionButton}
               onPress={async () => {
                 await disable_enable_user(usr.user_id, !usr.is_enable);
-                set_users(us =>
+                setUsers(us =>
                   us.map(u =>
                     u.user_id === usr.user_id
                       ? { ...u, is_enable: !u.is_enable }
@@ -227,8 +232,8 @@ export default function User_screen() {
             key={t}
             style={[styles.segmentTab, tab === t && styles.segmentTabActive]}
             onPress={() => {
-              set_tab(t);
-              set_filter_status('all');
+              setTab(t);
+              setFilterStatus('all');
             }}
           >
             <Text style={[styles.segmentText, tab === t && styles.segmentTextActive]}>
@@ -246,26 +251,26 @@ export default function User_screen() {
             placeholder="Buscar por nombre..."
             placeholderTextColor="#888"
             value={query}
-            onChangeText={set_query}
+            onChangeText={setQuery}
           />
         </View>
-        <TouchableOpacity style={styles.filterBtn} onPress={() => set_show_filter(v => !v)}>
+        <TouchableOpacity style={styles.filterBtn} onPress={() => setShowFilter(v => !v)}>
           <Feather name="filter" size={20} color="#FFF" />
         </TouchableOpacity>
       </View>
 
-      {show_filter && (
+      {showFilter && (
         <View style={styles.dropdown}>
-          {(['all', 'enabled', 'disabled'] as Status_filter[]).map(s => (
+          {(['all', 'enabled', 'disabled'] as StatusFilter[]).map(s => (
             <TouchableOpacity
               key={s}
-              style={[styles.opt, filter_status === s && styles.optActive]}
+              style={[styles.opt, filterStatus === s && styles.optActive]}
               onPress={() => {
-                set_filter_status(s);
-                set_show_filter(false);
+                setFilterStatus(s);
+                setShowFilter(false);
               }}
             >
-              <Text style={[styles.optText, filter_status === s && styles.optTextActive]}>
+              <Text style={[styles.optText, filterStatus === s && styles.optTextActive]}>
                 {s === 'all' ? 'Todos' : s === 'enabled' ? 'Habilitados' : 'Deshabilitados'}
               </Text>
             </TouchableOpacity>
@@ -274,7 +279,7 @@ export default function User_screen() {
       )}
 
       {tab === 'Clientes' ? (
-        <FlatList<Backend_user>
+        <FlatList<BackendUser>
           data={clients}
           keyExtractor={item => String(item.user_id)}
           renderItem={renderClient}
@@ -282,10 +287,10 @@ export default function User_screen() {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <FlatList<Walker_profile>
+        <FlatList<WalkerProfile>
           data={walkers}
           keyExtractor={item => String(item.walker_id)}
-          renderItem={render_walker}
+          renderItem={renderWalker}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
