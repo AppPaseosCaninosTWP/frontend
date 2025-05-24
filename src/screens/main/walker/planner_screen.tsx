@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { get_token } from "../../../utils/token_service";
-import SideMenu, { MenuOption } from '../../../components/shared/side_menu';
+import SideMenu, { menu_option } from '../../../components/shared/side_menu';
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
@@ -64,22 +64,22 @@ export default function PlannerScreen() {
     })();
   }, []);
 
-  const menuOptions: MenuOption[] = [
+  const menuOptions: menu_option[] = [
     {
       label: "Dashboard",
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      onPress: () => navigation.navigate("DashboardPaseador"),
+      on_press: () => navigation.navigate("DashboardPaseador"),
     },
     {
       label: "Search Walks",
       icon: <Feather name="search" size={20} color="#000c14" />,
-      onPress: () => navigation.navigate("AvailableWalksScreen"),
+      on_press: () => navigation.navigate("AvailableWalksScreen"),
     },
-    { label: "__separator__", icon: null, onPress: () => {} },
+    { label: "__separator__", icon: null, on_press: () => {} },
     {
       label: "Profile",
       icon: <Feather name="user" size={20} color="#000c14" />,
-      onPress: () => navigation.navigate("WalkerProfileScreen"),
+      on_press: () => navigation.navigate("WalkerProfileScreen"),
     },
   ];
 
