@@ -232,3 +232,19 @@ export async function get_all_walks(): Promise<user_model[]> {
   }
   return json.data;
 }
+export async function registerWalker(formData: FormData): Promise<any> {
+ const token = await get_token();
+ const res = await fetch(`${API_BASE_URL}/walker_profile/register_walker`, {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'multipart/form-data', // <- importante para file upload
+     Authorization: `Bearer ${token}`,
+   },
+   body: formData,
+ });
+ const json = await res.json();
+ if (!res.ok || json.error) {
+   throw new Error(json.msg || 'Error al registrar el paseador');
+ }
+ return json.data;
+}
