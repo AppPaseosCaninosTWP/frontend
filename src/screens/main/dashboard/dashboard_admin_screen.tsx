@@ -67,9 +67,20 @@ export default function Dashboard_admin_screen() {
       on_press: () => Alert.alert('Calendario'),
     },
     {
+      label: 'Solicitudes',
+      icon: <MaterialIcons name="request-page" size={20} color="#fff" />,
+      on_press: () => navigation.navigate('RequestToChangeScreen'),
+   },
+   {
+      label: 'Registrar Paseador',
+      icon: <MaterialIcons name="person-add" size={20} color="#fff" />,
+      on_press: () => navigation.navigate('RegisterWalkerScreen'), 
+   },
+
+    {
       label: 'Pagos',
       icon: <MaterialIcons name="payment" size={20} color="#fff" />,
-      on_press: () => Alert.alert('Pagos'),
+      on_press: () => navigation.navigate('PaymentsScreen'),
     },
     {
       label: 'Cuenta',
