@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import HeaderAdmin from '../../../components/shared/header_admin';
-import { registerWalker } from '../../../service/auth_service';
+import { register_Walker } from '../../../service/auth_service';
 
 export default function RegisterWalkerScreen() {
   const [name, setName] = useState('');
@@ -92,7 +92,7 @@ export default function RegisterWalkerScreen() {
         type: `image/${fileExt}`,
       } as any);
 
-      await registerWalker(form);
+      await register_Walker(form);
       Alert.alert('Éxito', 'Paseador registrado correctamente.');
       // opcional: limpiar campos o navegar atrás
     } catch (err: any) {
