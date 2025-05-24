@@ -161,7 +161,7 @@ export async function get_profile_walker(): Promise<user_model> {
   return json.data;
 }
 
-export async function seeRequestToChange(): Promise<user_model[]> {
+export async function see_Request_To_Change(): Promise<user_model[]> {
  const token = await get_token();
  const response = await fetch(`${api_base_url}/walker_profile/requests`, {
    method: 'GET',
@@ -178,7 +178,7 @@ export async function seeRequestToChange(): Promise<user_model[]> {
 }
 
 
-export async function approveToChange(walker_id: number) {
+export async function approve_To_Change(walker_id: number) {
  const token = await get_token();
  const response = await fetch(`${api_base_url}/walker_profile/requests/${walker_id}/approve`, {
    method: 'POST',
@@ -195,7 +195,7 @@ export async function approveToChange(walker_id: number) {
 }
 
 
-export async function seeRequestDetailsToChange(walker_id: number): Promise<user_model> {
+export async function see_Request_Details_To_Change(walker_id: number): Promise<user_model> {
  const token = await get_token();
  const response = await fetch(`${api_base_url}/walker_profile/requests_info/${walker_id}`, {
    method: 'GET',
@@ -212,7 +212,7 @@ export async function seeRequestDetailsToChange(walker_id: number): Promise<user
 }
 
 
-export async function rejectToChange(walker_id: number): Promise<user_model> {
+export async function reject_To_Change(walker_id: number): Promise<user_model> {
  const token = await get_token();
  const response = await fetch(`${api_base_url}/walker_profile/requests/${walker_id}/reject`, {
    method: 'POST',
@@ -229,7 +229,7 @@ export async function rejectToChange(walker_id: number): Promise<user_model> {
 }
 
 
-export async function registerWalker(formData: FormData): Promise<any> {
+export async function register_Walker(formData: FormData): Promise<any> {
 const token = await get_token();
 const res = await fetch(`${api_base_url}/walker_profile/register_walker`, {
   method: 'POST',
