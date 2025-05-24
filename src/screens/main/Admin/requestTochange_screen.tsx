@@ -14,9 +14,9 @@ import {
 import { Feather } from '@expo/vector-icons';
 import HeaderAdmin from '../../../components/shared/header_admin';
 import {
-  seeRequestToChange,
-  approveToChange,
-  rejectToChange,
+  see_Request_To_Change,
+  approve_To_Change,
+  reject_To_Change,
 } from '../../../service/auth_service';
 
 interface ChangeRequest {
@@ -48,7 +48,7 @@ export default function RequestToChangeScreen() {
 
   async function loadRequests() {
     try {
-      const data = await seeRequestToChange();
+      const data = await see_Request_To_Change();
       // Map user_model[] to ChangeRequest[]
       const mapped: ChangeRequest[] = data.map((user: any) => ({
         walker_id: user.walker_id,
@@ -79,7 +79,7 @@ export default function RequestToChangeScreen() {
   async function handleApprove(id: number) {
     setProcessingId(id);
     try {
-      await approveToChange(id);
+      await approve_To_Change(id);
       setRequests(rs => rs.filter(r => r.walker_id !== id));
     } catch (err) {
       console.error('Error aprobando cambio:', err);
@@ -92,7 +92,7 @@ export default function RequestToChangeScreen() {
   async function handleReject(id: number) {
     setProcessingId(id);
     try {
-      await rejectToChange(id);
+      await reject_To_Change(id);
       setRequests(rs => rs.filter(r => r.walker_id !== id));
     } catch (err) {
       console.error('Error rechazando cambio:', err);
