@@ -51,7 +51,6 @@ interface Walker_profile {
 }
 
 export default function Dashboard_paseador_screen() {
-  console.log("Render DashboardPaseador")
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [active_index, set_active_index] = useState(0);
   const [assigned_walks, set_assigned_walks] = useState<Assigned_walk[]>([]);

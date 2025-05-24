@@ -1,147 +1,204 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
-  ScrollView,
   TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  Dimensions,
+  Alert,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../../navigation/stack_navigator';
+import { get_token } from '../../../utils/token_service';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const historyItems = [
-  { id: '1', date: '11.05.2025', time: '09:30', label: 'Paseo fijo' },
-  { id: '2', date: '10.05.2025', time: '09:30', label: 'Paseo de prueba' },
-  { id: '3', date: '09.05.2025', time: '09:30', label: 'Paseo de prueba' },
-];
+const { width: screen_width } = Dimensions.get('window');
+const card_horizontal_padding = 20;
+const card_width = screen_width - 2 * card_horizontal_padding;
+
+const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 
 export default function WalkHistoryScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation();
+
+  const [history, set_history] = useState<any[]>([]);
+  const [loading, set_loading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      set_loading(true);
+      try {
+        const token = await get_token();
+        const res = await fetch(`${api_base_url}/walk/history`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const json = await res.json();
+        console.log('HISTORY DATA FROM API:', json.data);
+        if (json.error) throw new Error(json.msg);
+        set_history(json.data);
+      } catch (e: any) {
+        console.warn(e);
+        set_history([]);
+      } finally {
+        set_loading(false);
+      }
+    })();
+  }, []);
+
+  const render_item = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={styles.card_wrapper}
+      onPress={() => {}}
+      activeOpacity={0.8}
+    >
+      <LinearGradient
+        colors={['#4facfe', '#00f2fe']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.card}
+      >
+        <MaterialCommunityIcons
+          name="shoe-print"
+          size={32}
+          color="#fff"
+          style={{ marginHorizontal: 12 }}
+        />
+
+        <View style={styles.text_container}>
+          <Text style={styles.pet_name}>{item.pet_name}</Text>
+          <Text style={styles.details}>
+            {item.time} · {item.zone} · {item.date}
+          </Text>
+          <Text style={styles.duration}>
+            Duración: {item.duration} min
+          </Text>
+        </View>
+
+        {item.pet_photo ? (
+          <Image
+            source={{ uri: item.pet_photo }}
+            style={styles.pet_image}
+          />
+        ) : (
+          <Feather name="user" size={80} color="#fff" style={{ marginLeft: 12 }} />
+        )}
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator style={{ marginTop: 20 }} size="large" color="#007BFF" />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={styles.wrapper}>
+      <View style={styles.back_header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>History</Text>
+        <Text style={styles.screen_title}>Historial</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.mapCard}>
-          <Image source={require('../../../assets/map_sample.png')} style={styles.map} />
-          <View style={styles.marker}>
-            <Image source={require('../../../assets/user_icon.png')} style={styles.markerAvatar} />
-          </View>
-          <View style={styles.mapFooter}>
-            <Text style={styles.mapFooterText}>14.05.2025 | 09:30</Text>
-            <View style={styles.mapFooterRow}>
-              <Image source={require('../../../assets/walk.png')} style={styles.icon} />
-              <Text style={styles.mapFooterLabel}>Paseo fijo</Text>
-            </View>
-          </View>
-        </View>
+      <Text style={styles.header}>
+        Paseos finalizados:{' '}
+        <Text style={styles.badge}>{history.length}</Text>
+      </Text>
 
-        {historyItems.map((item) => (
-          <View key={item.id} style={styles.historyItem}>
-            <Text style={styles.historyTime}>{item.date} | {item.time}</Text>
-            <View style={styles.mapFooterRow}>
-              <Image source={require('../../../assets/walk.png')} style={styles.icon} />
-              <Text style={styles.historyLabel}>{item.label}</Text>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+      <FlatList
+        data={history}
+        keyExtractor={w => w.walk_id.toString()}
+        renderItem={render_item}
+        contentContainerStyle={styles.list_content}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: {
+  wrapper: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 38,
+    paddingHorizontal: card_horizontal_padding,
+  },
+  back_header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 40,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingBottom: 16,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    flex: 0.9,
+  screen_title: {
     textAlign: 'center',
+    flex: 1,
+    marginRight: 50,
+    fontSize: 20,
+    fontWeight: '700',
     color: '#111',
   },
-  scrollContent: {
-    padding: 16,
-  },
-  mapCard: {
-    backgroundColor: '#f6f6f6',
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: 20,
-    position: 'relative',
-  },
-  map: {
-    width: '100%',
-    height: 180,
-  },
-  marker: {
-    position: 'absolute',
-    top: 70,
-    left: '45%',
-    zIndex: 2,
-  },
-  markerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  mapFooter: {
-    backgroundColor: '#fff',
-    padding: 12,
-  },
-  mapFooterText: {
-    color: '#888',
-    fontSize: 14,
-  },
-  mapFooterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  mapFooterLabel: {
-    fontSize: 16,
+  header: {
+    marginTop: 15,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#333',
-    marginLeft: 8,
-  },
-  historyItem: {
-    backgroundColor: '#f9f9f9',
-    padding: 16,
-    borderRadius: 12,
+    color: '#111',
     marginBottom: 12,
   },
-  historyTime: {
-    fontSize: 14,
-    color: '#666',
+  badge: {
+    backgroundColor: '#E6F4FF',
+    color: '#007BFF',
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  list_content: {
+    paddingBottom: 40,
+  },
+  card_wrapper: {
+    width: card_width,
+    alignSelf: 'center',
+  },
+  card: {
+    borderRadius: 20,
+    height: 120,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  text_container: {
+    flex: 1,
+  },
+  pet_name: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700',
     marginBottom: 4,
   },
-  historyLabel: {
+  details: {
+    color: '#D0E7FF',
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginLeft: 8,
   },
-  icon: {
-    width: 18,
-    height: 18,
-    resizeMode: 'contain',
+  duration: {
+    color: '#D0E7FF',
+    fontSize: 16,
+    marginTop: 4,
+  },
+  pet_image: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginLeft: 12,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
