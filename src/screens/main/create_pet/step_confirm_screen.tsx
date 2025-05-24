@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 40,
     flexGrow: 1,
   },
   image: {
