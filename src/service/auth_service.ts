@@ -160,3 +160,109 @@ export async function get_profile_walker(): Promise<user_model> {
 
   return json.data;
 }
+
+export async function seeRequestToChange(): Promise<user_model[]> {
+ const token = await get_token();
+ const response = await fetch(`${api_base_url}/walker_profile/requests`, {
+   method: 'GET',
+   headers: {
+     'Content-Type': 'application/json',
+     Authorization: `Bearer ${token}`,
+   },
+ });
+ const json = await response.json();
+ if (!response.ok || json.error) {
+   throw new Error(json.msg || 'error_al_obtener_solicitudes_de_cambio');
+ }
+ return json.data;
+}
+
+
+export async function approveToChange(walker_id: number) {
+ const token = await get_token();
+ const response = await fetch(`${api_base_url}/walker_profile/requests/${walker_id}/approve`, {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+     Authorization: `Bearer ${token}`,
+   },
+ });
+ const json = await response.json();
+ if (!response.ok || json.error) {
+   throw new Error(json.msg || 'error_al_aprobar_la_solicitud_de_cambio');
+ }
+ return json.data;
+}
+
+
+export async function seeRequestDetailsToChange(walker_id: number): Promise<user_model> {
+ const token = await get_token();
+ const response = await fetch(`${api_base_url}/walker_profile/requests_info/${walker_id}`, {
+   method: 'GET',
+   headers: {
+     'Content-Type': 'application/json',
+     Authorization: `Bearer ${token}`,
+   },
+ });
+ const json = await response.json();
+ if (!response.ok || json.error) {
+   throw new Error(json.msg || 'error_al_obtener_detalles_de_la_solicitud_de_cambio');
+ }
+ return json.data;
+}
+
+
+export async function rejectToChange(walker_id: number): Promise<user_model> {
+ const token = await get_token();
+ const response = await fetch(`${api_base_url}/walker_profile/requests/${walker_id}/reject`, {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+     Authorization: `Bearer ${token}`,
+   },
+ });
+ const json = await response.json();
+ if (!response.ok || json.error) {
+   throw new Error(json.msg || 'error_al_rechazar_la_solicitud_de_cambio');
+ }
+ return json.data;
+}
+
+
+export async function registerWalker(formData: FormData): Promise<any> {
+const token = await get_token();
+const res = await fetch(`${api_base_url}/walker_profile/register_walker`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'multipart/form-data',
+    Authorization: `Bearer ${token}`,
+  },
+  body: formData,
+});
+const json = await res.json();
+if (!res.ok || json.error) {
+  throw new Error(json.msg || 'error_al_registrar_paseador');
+}
+return json.data;
+}
+
+
+export async function get_all_walks(): Promise<user_model[]> {
+ const token = await get_token();
+ const response = await fetch(`${api_base_url}/walk/get_all_walks`, {
+   method: 'GET',
+   headers: {
+     'Content-Type': 'application/json',
+     Authorization: `Bearer ${token}`,
+   },
+ });
+
+
+ const json = await response.json();
+ if (!response.ok || json.error) {
+   throw new Error(json.msg || 'error_obtener_walks');
+ }
+
+
+ return json.data;
+}
