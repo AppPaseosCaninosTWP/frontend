@@ -16,7 +16,7 @@ import HeaderAdmin from '../../../components/shared/header_admin';
 import {
   get_all_users,
   disable_enable_user,
-  getprofilewalker,
+  get_profile_walker,
 } from '../../../service/auth_service';
 
 interface BackendUser {
@@ -64,7 +64,7 @@ export default function UserScreen() {
         setUsers(allUsers);
 
         // 2) traer todos los perfiles de paseadores
-        const profiles = (await getprofilewalker() as unknown) as WalkerProfile[];
+        const profiles = (await get_profile_walker() as unknown) as WalkerProfile[];
         setWalkerProfiles(profiles);
       } catch (err) {
         console.error('Error cargando datos:', err);
