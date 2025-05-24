@@ -24,6 +24,8 @@ import success_screen from '../screens/main/create_pet/success_screen';
 import user_screen from '../screens/main/Admin/user_screen';
 import walks_screen from '../screens/main/Admin/walks_screen';
 import payments_screen from '../screens/main/Admin/payments_screen';
+import RequestToChangeScreen from '../screens/main/Admin/requestTochange_screen';
+import RegisterWalkerScreen from '../screens/main/Admin/registerWalker_screen';
 
 import available_walks_screen from '../screens/main/walker/available_walks_screen';
 import walk_history_screen from '../screens/main/walker/walk_history_screen';
@@ -68,6 +70,8 @@ export type RootStackParamList = {
   PlannerScreen: undefined;
   PetProfileClienteScreen: { petId: number };
   EditPetScreen: { petId: number };
+  RequestToChangeScreen: undefined;
+  RegisterWalkerScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -103,9 +107,9 @@ export default function stack_navigator() {
       <Stack.Screen name="WalkerProfileScreen" component={walker_profile_screen} />
       <Stack.Screen name="PlannerScreen" component={planner_screen} />
       <Stack.Screen name="PetProfileClienteScreen" component={pet_profile_screen_cliente }options={{ title: "Perfil Mascota (Cliente)" }}/>
-      <Stack.Screen name="EditPetScreen" component={edit_pet_screen} options={{ title: "Editar Mascota" }}
-      />
-
+      <Stack.Screen name="EditPetScreen" component={edit_pet_screen} options={{ title: "Editar Mascota" }}/>
+      <Stack.Screen name="RequestToChangeScreen" component={RequestToChangeScreen} />
+      <Stack.Screen name="RegisterWalkerScreen" component={RegisterWalkerScreen} />
     </Stack.Navigator>
   );
 }
