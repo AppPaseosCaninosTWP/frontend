@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: "#fff",
-    paddingTop: 24,
+    paddingTop: 40,
     flexGrow: 1,
   },
   label: {

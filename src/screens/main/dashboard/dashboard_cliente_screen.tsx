@@ -86,7 +86,7 @@ const menu_options: menu_option[] = [
     label: String(pet.name),
     icon: (
       <Image
-        source={{ uri: `${API_UPLOADS_URL}/${pet.photo}` }}
+        source={{ uri: `${API_UPLOADS_URL}/api/uploads/${pet.photo}` }}
         style={{ width: 20, height: 20, borderRadius: 10 }}
       />
     ),
@@ -207,9 +207,11 @@ const menu_options: menu_option[] = [
                   </View>
                   {pet.photo ? (
                     <Image
-                      source={{ uri: `${API_UPLOADS_URL}/uploads/${pet.photo}` }}
+                      source={{ uri: `${API_UPLOADS_URL}/api/uploads/${pet.photo}` }}
                       style={styles.pet_image}
                       onError={() => console.log("Error al cargar imagen:", pet.photo)}
+
+                      
                     />
                   ) : (
                     <Feather name="image" size={60} color="#fff" />
@@ -246,7 +248,10 @@ const menu_options: menu_option[] = [
       </View>
 
       <View style={styles.grid}>
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate('SelectWalkTypeScreen')}
+        >
           <Feather name="map" size={40} color="#007BFF" />
           <Text style={styles.card_title}>¿Un Paseo?</Text>
           <Text style={styles.card_text}>
@@ -263,13 +268,18 @@ const menu_options: menu_option[] = [
           <Text style={styles.card_title}>Tarjeta de Salud</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+       <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("WalkHistoryClienteScreen")}
+        >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
             style={styles.icon}
           />
           <Text style={styles.card_title}>Historial</Text>
         </TouchableOpacity>
+
+
       </View>
     </ScreenWithMenu>
   );
