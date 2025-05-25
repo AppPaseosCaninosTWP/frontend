@@ -103,21 +103,22 @@ export async function send_code(email: string): Promise<void> {
   }
 }
 
-export async function get_all_users(): Promise<user_model[]> {
+export async function get_all_users(page: number = 1): Promise<user_model[]> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/user/get_all_user`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${api_base_url}/user/get_all_user?page=${page}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   const json = await response.json();
   if (!response.ok || json.error) {
     throw new Error(json.msg || 'error_obtener_usuarios');
   }
-
   return json.data;
 }
 
