@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { get_token } from "../../../utils/token_service";
-import SideMenu, { menu_option } from '../../../components/shared/side_menu';
+import SideMenu, { menu_option } from "../../../components/shared/side_menu";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
@@ -23,23 +23,22 @@ const CARD_HORIZONTAL_PADDING = 20;
 const CARD_WIDTH = SCREEN_WIDTH - CARD_HORIZONTAL_PADDING * 2;
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-
-
 interface AssignedWalk {
-  walk_id:   number;
-  pet_id:    number;
-  pet_name:  string;
+  walk_id: number;
+  pet_id: number;
+  pet_name: string;
   pet_photo: string;
-  zone:      string;
-  date:      string;
-  time:      string;
-  duration:  number;
+  zone: string;
+  date: string;
+  time: string;
+  duration: number;
 }
 
 export default function PlannerScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [walks, setWalks]     = useState<AssignedWalk[]>([]);
+  const [walks, setWalks] = useState<AssignedWalk[]>([]);
   const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
@@ -88,8 +87,8 @@ export default function PlannerScreen() {
       style={styles.cardWrapper}
       onPress={() =>
         navigation.navigate("PetProfileScreen", {
-          walkId:   item.walk_id,
-          petId:    item.pet_id,
+          walkId: item.walk_id,
+          petId: item.pet_id,
           duration: item.duration,
         })
       }
@@ -122,17 +121,16 @@ export default function PlannerScreen() {
       </LinearGradient>
     </TouchableOpacity>
   );
-return (
-       <View style={styles.wrapper}>
-     <View style={styles.backHeader}>
-       <TouchableOpacity onPress={() => navigation.goBack()}>
-         <Feather name="arrow-left" size={24} color="#333" />
-       </TouchableOpacity>
-       <Text style={styles.screenTitle}>Agenda</Text>
-     </View>
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.backHeader}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="arrow-left" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.screenTitle}>Agenda</Text>
+      </View>
       <Text style={styles.header}>
-        Mis paseos:{' '}
-        <Text style={styles.badge}>{walks.length}</Text>
+        Mis paseos: <Text style={styles.badge}>{walks.length}</Text>
       </Text>
 
       {loading ? (
@@ -140,14 +138,14 @@ return (
       ) : (
         <FlatList
           data={walks}
-          keyExtractor={w => w.walk_id.toString()}
+          keyExtractor={(w) => w.walk_id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         />
       )}
-   </View>
-  )
+    </View>
+  );
 }
 const styles = StyleSheet.create({
   header: {
@@ -202,7 +200,7 @@ const styles = StyleSheet.create({
   backHeader: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 20,  
+    paddingTop: 20,
     paddingBottom: 16,
   },
   screenTitle: {
@@ -215,7 +213,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 20,
     paddingHorizontal: 20,
   },

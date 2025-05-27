@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {View,ActivityIndicator,Text,TouchableOpacity,Modal,StyleSheet,Dimensions,Alert} from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Dimensions,
+  Alert,
+} from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { get_token } from "../../../utils/token_service";
 import PetProfileComponent from "../../../components/shared/pet_profile_component";
@@ -9,27 +18,39 @@ import type { pet_model } from "../../../models/pet_model";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 type PetProfileRoute = RouteProp<RootStackParamList, "PetProfileScreen">;
-type Navigation = NativeStackNavigationProp<RootStackParamList, "PetProfileScreen">;
+type Navigation = NativeStackNavigationProp<
+  RootStackParamList,
+  "PetProfileScreen"
+>;
 
 export default function PetProfileScreen() {
   const { params } = useRoute<PetProfileRoute>();
   const navigation = useNavigation<Navigation>();
   const { petId, duration, walkId } = params;
 
-  const [pet, set_pet] = useState<pet_model & { owner: any } | null>(null);
+  const [pet, set_pet] = useState<(pet_model & { owner: any }) | null>(null);
   const [loading, set_loading] = useState(true);
-  const [active_tab, set_active_tab] = useState<"Acerca de" | "Salud" | "Contacto">("Acerca de");
-  const [scheduled_walk_id, set_scheduled_walk_id] = useState<number | null>(null);
+  const [active_tab, set_active_tab] = useState<
+    "Acerca de" | "Salud" | "Contacto"
+  >("Acerca de");
+  const [scheduled_walk_id, set_scheduled_walk_id] = useState<number | null>(
+    null
+  );
 
-  const [confirming, set_confirming] = useState<"schedule" | "cancel" | null>(null);
+  const [confirming, set_confirming] = useState<"schedule" | "cancel" | null>(
+    null
+  );
 
   useEffect(() => {
     (async () => {
       try {
         const token = await get_token();
-        const res_pet = await fetch(`${API_BASE_URL}/pet/get_pet_by_id/${petId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res_pet = await fetch(
+          `${API_BASE_URL}/pet/get_pet_by_id/${petId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const { data: pet_data } = await res_pet.json();
         set_pet(pet_data);
 
@@ -60,9 +81,10 @@ export default function PetProfileScreen() {
         body: JSON.stringify({ walkId }),
       });
       const json = await res.json();
-      if (!res.ok || json.error) throw new Error(json.msg || "Error al agendar");
+      if (!res.ok || json.error)
+        throw new Error(json.msg || "Error al agendar");
       Alert.alert("¡Listo!", "Paseo agendado", [
-        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") }
+        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -83,13 +105,14 @@ export default function PetProfileScreen() {
       });
       const json = await res.json();
       if (!res.ok) {
-        const msg = res.status === 403
-          ? "Solo puedes cancelar un paseo con 30 minutos de antelación"
-          : json.msg || "Error al cancelar";
+        const msg =
+          res.status === 403
+            ? "Solo puedes cancelar un paseo con 30 minutos de antelación"
+            : json.msg || "Error al cancelar";
         throw new Error(msg);
       }
       Alert.alert("Cancelado", "Paseo cancelado", [
-        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") }
+        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -143,22 +166,27 @@ export default function PetProfileScreen() {
                 style={[styles.modal_btn_half, styles.cancel_btn]}
                 onPress={() => set_confirming(null)}
               >
-              <Text style={styles.cancel_text}>No</Text>
-            </TouchableOpacity>
+                <Text style={styles.cancel_text}>No</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={[
-                styles.modal_btn_half,
-                confirming === "cancel" ? styles.red_btn : styles.confirm_btn
+                  styles.modal_btn_half,
+                  confirming === "cancel" ? styles.red_btn : styles.confirm_btn,
                 ]}
-                onPress={confirming === "schedule" ? handle_schedule : handle_cancel}
+                onPress={
+                  confirming === "schedule" ? handle_schedule : handle_cancel
+                }
               >
-              <Text
-                style={
-                confirming === "cancel"? styles.confirm_text_on_red: styles.confirm_text}
-              >
-                {confirming === "schedule" ? "Sí, agendar" : "Sí, cancelar"}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={
+                    confirming === "cancel"
+                      ? styles.confirm_text_on_red
+                      : styles.confirm_text
+                  }
+                >
+                  {confirming === "schedule" ? "Sí, agendar" : "Sí, cancelar"}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -173,28 +201,28 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   modal_overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   modal_box: {
     width: BOX_WIDTH,
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 20,
-    elevation: 5
+    elevation: 5,
   },
   modal_title: {
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 20,
-    textAlign: "center"
+    textAlign: "center",
   },
-    modal_buttons: {
+  modal_buttons: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -203,28 +231,28 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
-    marginHorizontal: 4
+    marginHorizontal: 4,
   },
- 
+
   cancel_btn: {
-    backgroundColor: "#eee"
+    backgroundColor: "#eee",
   },
   confirm_btn: {
-    backgroundColor: "#4caf50"
+    backgroundColor: "#4caf50",
   },
   red_btn: {
-    backgroundColor: "#f44336"
+    backgroundColor: "#f44336",
   },
   cancel_text: {
     color: "#333",
-    fontWeight: "500"
+    fontWeight: "500",
   },
   confirm_text: {
     color: "#fff",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   confirm_text_on_red: {
     color: "#fff",
-    fontWeight: "600"
-  }
+    fontWeight: "600",
+  },
 });

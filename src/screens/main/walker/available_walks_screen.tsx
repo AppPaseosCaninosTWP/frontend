@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,115 +9,120 @@ import {
   StatusBar,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { get_token } from '../../../utils/token_service';
-import type { RootStackParamList } from '../../../navigation/stack_navigator';
-import { useRoute } from '@react-navigation/native';
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { get_token } from "../../../utils/token_service";
+import type { RootStackParamList } from "../../../navigation/stack_navigator";
+import { useRoute } from "@react-navigation/native";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 interface BackendWalk {
-  walk_id:  number;
-  pet_id:   number;
+  walk_id: number;
+  pet_id: number;
   pet_name: string;
-  sector:   string;
-  walk_type:string;  
-  date:     string;   
-  time:     string;
-  duration: number;   
+  sector: string;
+  walk_type: string;
+  date: string;
+  time: string;
+  duration: number;
   pet_photo_url: string | null;
 }
 
 export default function AvailableWalksScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [allWalks, setAllWalks] = useState<BackendWalk[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<'Fijo' | 'Esporádico'>('Fijo');
-  
+  const [selectedTab, setSelectedTab] = useState<"Fijo" | "Esporádico">("Fijo");
 
   useEffect(() => {
     fetchWalks();
   }, []);
 
-const fetchWalks = async () => {
-  setLoading(true);
-  try {
-    const token = await get_token();
-    const res = await fetch(`${API_BASE_URL}/walk/available`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { data, error, msg } = await res.json();
-    if (error) throw new Error(msg);
-    console.log("fetchWalks data:", data);
-    setAllWalks(data);
-  } catch (err: any) {
-    Alert.alert('Error al cargar paseos', err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-const normalize = (s: string) =>
-  s
-    .normalize('NFD')                  
-    .replace(/[\u0300-\u036f]/g, '')    
-    .toLowerCase();
+  const fetchWalks = async () => {
+    setLoading(true);
+    try {
+      const token = await get_token();
+      const res = await fetch(`${API_BASE_URL}/walk/available`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { data, error, msg } = await res.json();
+      if (error) throw new Error(msg);
+      console.log("fetchWalks data:", data);
+      setAllWalks(data);
+    } catch (err: any) {
+      Alert.alert("Error al cargar paseos", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const normalize = (s: string) =>
+    s
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
 
-const walksToShow = allWalks.filter(w =>
-  normalize(w.walk_type) === normalize(selectedTab)
-);
+  const walksToShow = allWalks.filter(
+    (w) => normalize(w.walk_type) === normalize(selectedTab)
+  );
 
   const renderItem = ({ item }: { item: BackendWalk }) => {
     console.log("🏷  renderItem, pet_id =", item.pet_id);
-  const { pet_name, pet_photo_url, date, time, sector } = item;
+    const { pet_name, pet_photo_url, date, time, sector } = item;
 
-  return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => {
-        console.log("PetProfileScreen con petId =", item.pet_id);
-        navigation.navigate('PetProfileScreen', { 
-          walkId: item.walk_id,
-          petId: item.pet_id,
-          duration: item.duration,
-        });
-      }}
-    >
-      <View style={styles.cardHeader}>
-        {item.pet_photo_url ? (
-    <Image
-      source={{ uri: item.pet_photo_url }}
-      style={styles.avatar}
-      onError={() => console.warn('Error cargando imagen:', item.pet_photo_url)}
-    />
-  ) : (
-    <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
-  )}
-      <View style={styles.info}>
-        
-        <Text style={styles.name}>{pet_name}</Text>
-        
-         {selectedTab === 'Fijo' ? (
-       <>
-          <Text style={styles.meta}>{`Paseo Fijo  |  ${time}  |  ${date}`}</Text>
-          <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
-          </>
-        ) : (
-         <>
-          <Text style={styles.meta}>{`Paseo Esporádico  |  ${time}  |  ${date}`}</Text>
-          <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
-        </>
-        )}
-     </View>
+    return (
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => {
+          console.log("PetProfileScreen con petId =", item.pet_id);
+          navigation.navigate("PetProfileScreen", {
+            walkId: item.walk_id,
+            petId: item.pet_id,
+            duration: item.duration,
+          });
+        }}
+      >
+        <View style={styles.cardHeader}>
+          {item.pet_photo_url ? (
+            <Image
+              source={{ uri: item.pet_photo_url }}
+              style={styles.avatar}
+              onError={() =>
+                console.warn("Error cargando imagen:", item.pet_photo_url)
+              }
+            />
+          ) : (
+            <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
+          )}
+          <View style={styles.info}>
+            <Text style={styles.name}>{pet_name}</Text>
 
-        <Feather name="chevron-right" size={20} color="#999" />
-      </View>
-    </TouchableOpacity>
-  );
-};
+            {selectedTab === "Fijo" ? (
+              <>
+                <Text
+                  style={styles.meta}
+                >{`Paseo Fijo  |  ${time}  |  ${date}`}</Text>
+                <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
+              </>
+            ) : (
+              <>
+                <Text
+                  style={styles.meta}
+                >{`Paseo Esporádico  |  ${time}  |  ${date}`}</Text>
+                <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
+              </>
+            )}
+          </View>
+
+          <Feather name="chevron-right" size={20} color="#999" />
+        </View>
+      </TouchableOpacity>
+    );
+  };
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -130,7 +135,7 @@ const walksToShow = allWalks.filter(w =>
       </View>
 
       <View style={styles.tabContainer}>
-        {(['Fijo', 'Esporádico'] as const).map((tab) => (
+        {(["Fijo", "Esporádico"] as const).map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[
@@ -172,26 +177,26 @@ const walksToShow = allWalks.filter(w =>
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: "#fff" },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 40,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     flex: 0.9,
-    color: '#111',
+    color: "#111",
   },
 
   tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginVertical: 12,
   },
   tabButton: {
@@ -200,15 +205,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
-    alignItems: 'center',
+    borderColor: "#ccc",
+    alignItems: "center",
   },
   tabButtonActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: "#3b82f6",
+    borderColor: "#3b82f6",
   },
-  tabText: { fontSize: 14, color: '#555' },
-  tabTextActive: { color: '#fff', fontWeight: '600' },
+  tabText: { fontSize: 14, color: "#555" },
+  tabTextActive: { color: "#fff", fontWeight: "600" },
 
   list: {
     paddingHorizontal: 16,
@@ -216,24 +221,24 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   emptyText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
-    color: '#666',
+    color: "#666",
   },
 
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 20,
     marginVertical: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
   cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
     width: 48,
@@ -246,11 +251,11 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   meta: {
-    color: '#666',
+    color: "#666",
     marginTop: 4,
     fontSize: 14,
   },
