@@ -33,6 +33,8 @@ import pet_profile_screen from '../screens/main/walker/pet_profile_screen';
 import ratings_screen from '../screens/main/walker/ratings_screen';
 import walker_profile_screen from '../screens/main/walker/walker_profile_screen';
 import planner_screen from '../screens/main/walker/planner_screen';
+import Payments_walker_screen from  '../screens/main/walker/payments_walker_screen';
+
 import pet_profile_screen_cliente from '../screens/main/client/pet_profile_cliente_screen';
 import edit_pet_screen from '../screens/main/client/edit_pet_screen';
 
@@ -86,6 +88,7 @@ export type RootStackParamList = {
 
   SelectWalkTypeScreen: undefined;
   WalkConfirmationScreen: undefined;
+  payments_walker_screen: undefined;
 
   
 };
@@ -128,7 +131,7 @@ export default function stack_navigator() {
       <Stack.Screen name="EditPetScreen" component={edit_pet_screen} options={{ title: "Editar Mascota" }}/>
       <Stack.Screen name="RequestToChangeScreen" component={RequestToChangeScreen} />
       <Stack.Screen name="RegisterWalkerScreen" component={RegisterWalkerScreen} />
-
+      <Stack.Screen name="payments_walker_screen" component={Payments_walker_screen} />
       <Stack.Screen name="CreateWalkScreen" component={create_walk_screen} />
       <Stack.Screen name="SelectWalkTypeScreen" component={select_walk_type_screen} />
 

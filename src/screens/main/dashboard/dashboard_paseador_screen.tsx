@@ -128,6 +128,11 @@ export default function Dashboard_paseador_screen() {
       on_press: () => navigation.navigate('RatingsScreen'),
     },
     {
+      label: 'Pagos',
+      icon: <Feather name="credit-card" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('payments_walker_screen'),
+    },
+    {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
       on_press: () => Alert.alert('Ajustes'),
