@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,18 +11,18 @@ import {
   NativeScrollEvent,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../../navigation/stack_navigator';
-import { LinearGradient } from 'expo-linear-gradient';
-import { get_token, get_user } from '../../../utils/token_service';
+} from "react-native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../../navigation/stack_navigator";
+import { LinearGradient } from "expo-linear-gradient";
+import { get_token, get_user } from "../../../utils/token_service";
 
-import Screen_with_menu from '../../../components/shared/screen_with_menu';
-import type { menu_option } from '../../../components/shared/side_menu';
+import Screen_with_menu from "../../../components/shared/screen_with_menu";
+import type { menu_option } from "../../../components/shared/side_menu";
 
-const { width: screen_width } = Dimensions.get('window');
+const { width: screen_width } = Dimensions.get("window");
 const card_width = screen_width - 40;
 const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -51,11 +51,14 @@ interface Walker_profile {
 }
 
 export default function Dashboard_paseador_screen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [active_index, set_active_index] = useState(0);
   const [assigned_walks, set_assigned_walks] = useState<Assigned_walk[]>([]);
   const [loading, set_loading] = useState(false);
-  const [walker_profile, set_walker_profile] = useState<Walker_profile | null>(null);
+  const [walker_profile, set_walker_profile] = useState<Walker_profile | null>(
+    null
+  );
   const is_focused = useIsFocused();
 
   const fetch_assigned = async () => {
@@ -70,7 +73,7 @@ export default function Dashboard_paseador_screen() {
       if (error) throw new Error(msg);
       set_assigned_walks(data);
     } catch (err: any) {
-      Alert.alert('Error al cargar paseos', err.message);
+      Alert.alert("Error al cargar paseos", err.message);
     } finally {
       set_loading(false);
     }
@@ -80,16 +83,18 @@ export default function Dashboard_paseador_screen() {
     try {
       const token = await get_token();
       const user = await get_user();
-      if (!token || !user?.id) throw new Error('Sesión no válida');
+      if (!token || !user?.id) throw new Error("Sesión no válida");
       const res = await fetch(
-        `${api_base_url.replace(/\/$/, '')}/walker_profile/get_profile/${user.id}`,
+        `${api_base_url.replace(/\/$/, "")}/walker_profile/get_profile/${
+          user.id
+        }`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
       set_walker_profile(data);
     } catch (err: any) {
-      console.log('Error cargando perfil:', err.message);
+      console.log("Error cargando perfil:", err.message);
     }
   };
 
@@ -102,40 +107,40 @@ export default function Dashboard_paseador_screen() {
 
   const menu_options: menu_option[] = [
     {
-      label: 'Dashboard',
+      label: "Menu Principal",
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('DashboardPaseador'),
+      on_press: () => navigation.navigate("DashboardPaseador"),
     },
     {
-      label: 'Buscar Paseos',
+      label: "Buscar Paseos",
       icon: <Ionicons name="search" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('AvailableWalksScreen'),
+      on_press: () => navigation.navigate("AvailableWalksScreen"),
     },
     {
-      label: 'Calendario',
+      label: "Calendario",
       icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Calendario'),
+      on_press: () => Alert.alert("Calendario"),
     },
-    { label: '__separator__', icon: null, on_press: () => {} },
+    { label: "__separator__", icon: null, on_press: () => {} },
     {
-      label: 'Cuenta',
+      label: "Cuenta",
       icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('WalkerProfileScreen'),
+      on_press: () => navigation.navigate("WalkerProfileScreen"),
     },
     {
-      label: 'Calificaciones',
+      label: "Calificaciones",
       icon: <Ionicons name="star" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('RatingsScreen'),
+      on_press: () => navigation.navigate("RatingsScreen"),
     },
     {
-      label: 'Pagos',
+      label: "Pagos",
       icon: <Feather name="credit-card" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('payments_walker_screen'),
+      on_press: () => navigation.navigate("payments_walker_screen"),
     },
     {
-      label: 'Ajustes',
+      label: "Ajustes",
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Ajustes'),
+      on_press: () => navigation.navigate("settings_walker"),
     },
   ];
 
@@ -146,11 +151,10 @@ export default function Dashboard_paseador_screen() {
   };
 
   const profile_image_url = walker_profile?.photo_url
-    ? walker_profile.photo_url.startsWith('http')
+    ? walker_profile.photo_url.startsWith("http")
       ? walker_profile.photo_url
-      : `${api_base_url.replace(/\/$/, '')}/uploads/${walker_profile.photo_url}`
+      : `${api_base_url.replace(/\/$/, "")}/uploads/${walker_profile.photo_url}`
     : null;
-
 
   return (
     <Screen_with_menu
@@ -160,13 +164,13 @@ export default function Dashboard_paseador_screen() {
       profile_image={
         profile_image_url
           ? { uri: profile_image_url }
-          : require('../../../assets/user_icon.png')
+          : require("../../../assets/user_icon.png")
       }
     >
       <Text style={styles.section_title}>
-        Tu próximo paseo:{' '}
-        <Text style={styles.badge}>{assigned_walks.length}</Text>{' '}
-        paseo(s) asignado(s)
+        Tu próximo paseo:{" "}
+        <Text style={styles.badge}>{assigned_walks.length}</Text> paseo(s)
+        asignado(s)
       </Text>
 
       {loading ? (
@@ -190,7 +194,7 @@ export default function Dashboard_paseador_screen() {
                 }}
               >
                 <LinearGradient
-                  colors={['#4facfe', '#00f2fe']}
+                  colors={["#4facfe", "#00f2fe"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.walk_card}
@@ -203,11 +207,18 @@ export default function Dashboard_paseador_screen() {
                   </View>
                   {walk.pet_photo ? (
                     <Image
-                      source={{ uri: `${api_base_url}/uploads/${walk.pet_photo}` }}
+                      source={{
+                        uri: `${api_base_url}/uploads/${walk.pet_photo}`,
+                      }}
                       style={styles.pet_image}
                     />
                   ) : (
-                    <Feather name="user" size={80} color="#fff" style={{ marginLeft: 12 }} />
+                    <Feather
+                      name="user"
+                      size={80}
+                      color="#fff"
+                      style={{ marginLeft: 12 }}
+                    />
                   )}
                 </LinearGradient>
               </View>
@@ -228,45 +239,46 @@ export default function Dashboard_paseador_screen() {
           style={styles.card}
           onPress={() => navigation.navigate("AvailableWalksScreen")}
         >
-        <Feather name="map" size={40} color="#007BFF" />
+          <Feather name="map" size={40} color="#007BFF" />
           <Text style={styles.card_title}>Buscar paseo</Text>
-            <Text style={styles.card_text}>
-              Explora paseos publicados por clientes y acepta los que se adapten a tu zona y disponibilidad.
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.card_text}>
+            Explora paseos publicados por clientes y acepta los que se adapten a
+            tu zona y disponibilidad.
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.card}
           onPress={() => navigation.navigate("PlannerScreen")}
         >
-        <Image
-          source={require("../../../assets/plate_icon.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.card_title}>Mi agenda</Text>
-      </TouchableOpacity>
+          <Image
+            source={require("../../../assets/plate_icon.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.card_title}>Mi agenda</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate("WalkHistoryScreen")}
-      >
-        <Image
-          source={require("../../../assets/admin/admin_photo2.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.card_title}>Historial</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("WalkHistoryScreen")}
+        >
+          <Image
+            source={require("../../../assets/admin/admin_photo2.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.card_title}>Historial</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate("RatingsScreen")}
-      >
-        <Image
-          source={require("../../../assets/admin/admin_photo1.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.card_title}>Calificaciones</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("RatingsScreen")}
+        >
+          <Image
+            source={require("../../../assets/admin/admin_photo1.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.card_title}>Calificaciones</Text>
+        </TouchableOpacity>
+      </View>
     </Screen_with_menu>
   );
 }
@@ -275,17 +287,17 @@ const styles = StyleSheet.create({
   section_title: {
     marginTop: 16,
     fontSize: 18,
-    fontWeight: '600',
-    color: '#111',
+    fontWeight: "600",
+    color: "#111",
     marginBottom: 12,
   },
   badge: {
-    backgroundColor: '#E6F4FF',
-    color: '#007BFF',
+    backgroundColor: "#E6F4FF",
+    color: "#007BFF",
     paddingHorizontal: 8,
     borderRadius: 12,
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   carousel_container: {
     flex: 1,
@@ -295,21 +307,21 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 20,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     height: 120,
   },
   walk_text: {
     flex: 1,
   },
   pet_name: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   detail: {
-    color: '#D0E7FF',
+    color: "#D0E7FF",
     fontSize: 18,
   },
   pet_image: {
@@ -319,52 +331,52 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 8,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
     marginHorizontal: 4,
   },
   active_dot: {
-    backgroundColor: '#007BFF',
+    backgroundColor: "#007BFF",
   },
   grid: {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'space-between',
-  marginBottom: 40,
-},
-card: {
-  width: '48%',
-  backgroundColor: '#e3f2fd',
-  borderRadius: 16,
-  paddingVertical: 32,
-  paddingHorizontal: 12,
-  alignItems: 'center',
-  marginBottom: 12,
-},
-card_title: {
-  fontSize: 16,
-  fontWeight: '600',
-  textAlign: 'center',
-  color: '#111',
-  marginTop: 12,
-  marginBottom: 6,
-},
-card_text: {
-  fontSize: 12,
-  textAlign: 'center',
-  color: '#666',
-},
-icon: {
-  width: 130,
-  height: 130,
-  marginBottom: 12,
-  borderRadius: 16,
-},
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 40,
+  },
+  card: {
+    width: "48%",
+    backgroundColor: "#e3f2fd",
+    borderRadius: 16,
+    paddingVertical: 32,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  card_title: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    color: "#111",
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  card_text: {
+    fontSize: 12,
+    textAlign: "center",
+    color: "#666",
+  },
+  icon: {
+    width: 130,
+    height: 130,
+    marginBottom: 12,
+    borderRadius: 16,
+  },
 });
