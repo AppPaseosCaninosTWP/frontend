@@ -14,11 +14,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { reset_password } from '../../service/auth_service';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ResetPassword'>;
 
 export default function Reset_password_screen({ route, navigation }: Props) {
-  const { email } = route.params;
+  const { email, code } = route.params;
 
   const fade_anim = useRef(new Animated.Value(0)).current;
   const translate_anim = useRef(new Animated.Value(30)).current;
@@ -43,26 +45,34 @@ export default function Reset_password_screen({ route, navigation }: Props) {
     ]).start();
   }, []);
 
-  const handle_reset = () => {
-    if (password.length === 0 || confirm_password.length === 0) {
-      Alert.alert('Campo vacío', 'Por favor ingresa tu contraseña.');
-      return;
-    }
+  const handle_reset = async () => {
+  if (password.length === 0 || confirm_password.length === 0) {
+    Alert.alert('Campo vacío', 'Por favor ingresa tu contraseña.');
+    return;
+  }
 
-    if (password.length < 6) {
-      Alert.alert('Contraseña débil', 'Debe tener al menos 6 caracteres.');
-      return;
-    }
+  if (password.length < 8 || password.length > 15) {
+    Alert.alert('Contraseña inválida', 'Debe tener entre 8 y 15 caracteres.');
+    return;
+  }
 
-    if (password !== confirm_password) {
-      Alert.alert('Error', 'Las contraseñas no coinciden.');
-      return;
-    }
+  if (password !== confirm_password) {
+    Alert.alert('Error', 'Las contraseñas no coinciden.');
+    return;
+  }
 
-    // TODO: Lógica de backend para restablecer la contraseña
+  try {
+    await reset_password(email, code, password, confirm_password);
     Alert.alert('Contraseña actualizada', 'Ahora puedes iniciar sesión.');
-    navigation.navigate('Login');
-  };
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  } catch (err: any) {
+    Alert.alert('Error', err.message);
+  }
+};
+
 
   return (
     <LinearGradient colors={['#0096FF', '#E6F4FF']} style={styles.container}>
