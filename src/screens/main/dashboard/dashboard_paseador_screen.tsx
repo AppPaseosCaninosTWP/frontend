@@ -7,13 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   ActivityIndicator,
   Alert,
 } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,7 +28,7 @@ interface Assigned_walk {
   walk_id: number;
   pet_id: number;
   pet_name: string;
-  pet_photo: string;
+  pet_photo: string | null;
   zone: string;
   time: string;
   date: string;
@@ -68,7 +66,6 @@ export default function Dashboard_paseador_screen() {
       const res = await fetch(`${api_base_url}/walk/assigned`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
       set_assigned_walks(data);
@@ -84,12 +81,18 @@ export default function Dashboard_paseador_screen() {
       const token = await get_token();
       const user = await get_user();
       if (!token || !user?.id) throw new Error("Sesión no válida");
+
       const res = await fetch(
         `${api_base_url.replace(/\/$/, "")}/walker_profile/get_profile/${
           user.id
         }`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Error al cargar perfil, respuesta del servidor:", text);
+        throw new Error(`HTTP ${res.status} al cargar perfil`);
+      }
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
       set_walker_profile(data);
@@ -105,31 +108,43 @@ export default function Dashboard_paseador_screen() {
     }
   }, [is_focused]);
 
+  const on_scroll = (e: { nativeEvent: { contentOffset: { x: number } } }) => {
+    const x = e.nativeEvent.contentOffset.x;
+    const idx = Math.round(x / card_width);
+    set_active_index(idx);
+  };
+
+  const profile_image_url = walker_profile?.photo_url
+    ? walker_profile.photo_url.startsWith("http")
+      ? walker_profile.photo_url
+      : `${api_base_url.replace(/\/$/, "")}/uploads/${walker_profile.photo_url}`
+    : null;
+
   const menu_options: menu_option[] = [
     {
-      label: "Menu Principal",
+      label: "Menú Principal",
       icon: <Feather name="layout" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("DashboardPaseador"),
     },
     {
       label: "Buscar Paseos",
-      icon: <Ionicons name="search" size={20} color="#000c14" />,
+      icon: <Feather name="search" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("AvailableWalksScreen"),
     },
     {
       label: "Calendario",
-      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
+      icon: <Feather name="calendar" size={20} color="#000c14" />,
       on_press: () => Alert.alert("Calendario"),
     },
     { label: "__separator__", icon: null, on_press: () => {} },
     {
       label: "Cuenta",
-      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
+      icon: <Feather name="user" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("WalkerProfileScreen"),
     },
     {
       label: "Calificaciones",
-      icon: <Ionicons name="star" size={20} color="#000c14" />,
+      icon: <Feather name="star" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("RatingsScreen"),
     },
     {
@@ -144,18 +159,6 @@ export default function Dashboard_paseador_screen() {
     },
   ];
 
-  const on_scroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const x = e.nativeEvent.contentOffset.x;
-    const idx = Math.round(x / card_width);
-    set_active_index(idx);
-  };
-
-  const profile_image_url = walker_profile?.photo_url
-    ? walker_profile.photo_url.startsWith("http")
-      ? walker_profile.photo_url
-      : `${api_base_url.replace(/\/$/, "")}/uploads/${walker_profile.photo_url}`
-    : null;
-
   return (
     <Screen_with_menu
       role_id={2}
@@ -168,13 +171,12 @@ export default function Dashboard_paseador_screen() {
       }
     >
       <Text style={styles.section_title}>
-        Tu próximo paseo:{" "}
-        <Text style={styles.badge}>{assigned_walks.length}</Text> paseo(s)
-        asignado(s)
+        Próximos paseos:{" "}
+        <Text style={styles.badge}>{assigned_walks.length}</Text>
       </Text>
 
       {loading ? (
-        <ActivityIndicator style={{ marginTop: 20 }} />
+        <ActivityIndicator style={styles.loader} size="large" />
       ) : (
         <View style={styles.carousel_container}>
           <ScrollView
@@ -188,10 +190,10 @@ export default function Dashboard_paseador_screen() {
             {assigned_walks.map((walk, i) => (
               <View
                 key={walk.walk_id}
-                style={{
-                  width: card_width,
-                  marginRight: i < assigned_walks.length - 1 ? 16 : 0,
-                }}
+                style={[
+                  styles.card_wrapper,
+                  i < assigned_walks.length - 1 && styles.card_wrapper_margin,
+                ]}
               >
                 <LinearGradient
                   colors={["#4facfe", "#00f2fe"]}
@@ -204,6 +206,7 @@ export default function Dashboard_paseador_screen() {
                     <Text style={styles.detail}>
                       {walk.zone} | {walk.time}
                     </Text>
+                    <Text style={styles.date_text}>{walk.date}</Text>
                   </View>
                   {walk.pet_photo ? (
                     <Image
@@ -217,7 +220,7 @@ export default function Dashboard_paseador_screen() {
                       name="user"
                       size={80}
                       color="#fff"
-                      style={{ marginLeft: 12 }}
+                      style={styles.pet_placeholder}
                     />
                   )}
                 </LinearGradient>
@@ -234,6 +237,7 @@ export default function Dashboard_paseador_screen() {
           </View>
         </View>
       )}
+
       <View style={styles.grid}>
         <TouchableOpacity
           style={styles.card}
@@ -246,6 +250,7 @@ export default function Dashboard_paseador_screen() {
             tu zona y disponibilidad.
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.card}
           onPress={() => navigation.navigate("PlannerScreen")}
@@ -299,9 +304,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
   },
+  loader: {
+    marginTop: 20,
+  },
+
   carousel_container: {
     flex: 1,
     marginBottom: 24,
+  },
+  card_wrapper: {
+    width: card_width,
+  },
+  card_wrapper_margin: {
+    marginRight: 16,
   },
   walk_card: {
     flex: 1,
@@ -324,10 +339,18 @@ const styles = StyleSheet.create({
     color: "#D0E7FF",
     fontSize: 18,
   },
+  date_text: {
+    color: "#D0E7FF",
+    fontSize: 14,
+    marginTop: 4,
+  },
   pet_image: {
     width: 80,
     height: 80,
     borderRadius: 40,
+    marginLeft: 12,
+  },
+  pet_placeholder: {
     marginLeft: 12,
   },
   pagination: {
@@ -345,6 +368,7 @@ const styles = StyleSheet.create({
   active_dot: {
     backgroundColor: "#007BFF",
   },
+
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
