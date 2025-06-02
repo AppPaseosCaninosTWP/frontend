@@ -36,7 +36,6 @@ export default function PetProfileScreen() {
   const [scheduled_walk_id, set_scheduled_walk_id] = useState<number | null>(
     null
   );
-
   const [confirming, set_confirming] = useState<"schedule" | "cancel" | null>(
     null
   );
@@ -45,12 +44,13 @@ export default function PetProfileScreen() {
     (async () => {
       try {
         const token = await get_token();
-        const res_pet = await fetch(
-          `${API_BASE_URL}/pet/get_pet_by_id/${petId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+
+        const res_pet = await fetch(`${API_BASE_URL}/pet/${petId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res_pet.ok) {
+          throw new Error("Mascota no encontrada");
+        }
         const { data: pet_data } = await res_pet.json();
         set_pet(pet_data);
 
@@ -72,19 +72,22 @@ export default function PetProfileScreen() {
     set_confirming(null);
     try {
       const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk/accept`, {
-        method: "POST",
+      const res = await fetch(`${API_BASE_URL}/walk/${walkId}/status`, {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ walkId }),
+        body: JSON.stringify({ new_status: "confirmado" }),
       });
       const json = await res.json();
       if (!res.ok || json.error)
-        throw new Error(json.msg || "Error al agendar");
+        throw new Error(json.msg || "Error al agendar paseo");
       Alert.alert("¡Listo!", "Paseo agendado", [
-        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("DashboardPaseador"),
+        },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -93,26 +96,36 @@ export default function PetProfileScreen() {
 
   const handle_cancel = async () => {
     set_confirming(null);
+    if (scheduled_walk_id === null) {
+      Alert.alert("Error", "No hay paseo asignado que cancelar.");
+      return;
+    }
     try {
       const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk/cancel`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ walkId: scheduled_walk_id }),
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/walk/${scheduled_walk_id}/status`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ new_status: "cancelado" }),
+        }
+      );
       const json = await res.json();
       if (!res.ok) {
         const msg =
           res.status === 403
             ? "Solo puedes cancelar un paseo con 30 minutos de antelación"
-            : json.msg || "Error al cancelar";
+            : json.msg || "Error al cancelar paseo";
         throw new Error(msg);
       }
       Alert.alert("Cancelado", "Paseo cancelado", [
-        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("DashboardPaseador"),
+        },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -194,6 +207,7 @@ export default function PetProfileScreen() {
     </>
   );
 }
+
 const { width } = Dimensions.get("window");
 const BOX_WIDTH = width * 0.8;
 
@@ -233,7 +247,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 4,
   },
-
   cancel_btn: {
     backgroundColor: "#eee",
   },

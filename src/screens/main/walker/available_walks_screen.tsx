@@ -108,9 +108,9 @@ export default function AvailableWalksScreen() {
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
-  const walks_to_show = all_walks.filter(
-    (w) => normalize(w.walk_type) === normalize(selected_tab)
-  );
+  const walks_to_show = all_walks
+    .filter((w) => w.status === "pendiente")
+    .filter((w) => normalize(w.walk_type) === normalize(selected_tab));
 
   const render_item = ({ item }: { item: BackendWalk }) => {
     const first_day = item.days[0] || {
