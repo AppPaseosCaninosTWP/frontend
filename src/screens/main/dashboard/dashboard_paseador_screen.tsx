@@ -7,11 +7,13 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
   ActivityIndicator,
   Alert,
 } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,19 +24,9 @@ import type { menu_option } from "../../../components/shared/side_menu";
 
 const { width: screen_width } = Dimensions.get("window");
 const card_width = screen_width - 40;
-const api_base_url = process.env.EXPO_PUBLIC_API_URL;
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-interface Assigned_walk {
-  walk_id: number;
-  pet_id: number;
-  pet_name: string;
-  pet_photo: string | null;
-  zone: string;
-  time: string;
-  date: string;
-}
-
-interface Walker_profile {
+interface WalkerProfileResponse {
   walker_id: number;
   name: string;
   email: string;
@@ -48,24 +40,35 @@ interface Walker_profile {
   photo_url: string;
 }
 
+interface AssignedWalk {
+  walk_id: number;
+  pet_id: number;
+  pet_name: string;
+  pet_photo: string;
+  zone: string;
+  time: string;
+  date: string;
+}
+
 export default function Dashboard_paseador_screen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [active_index, set_active_index] = useState(0);
-  const [assigned_walks, set_assigned_walks] = useState<Assigned_walk[]>([]);
-  const [loading, set_loading] = useState(false);
-  const [walker_profile, set_walker_profile] = useState<Walker_profile | null>(
-    null
-  );
+  const [active_index, set_active_index] = useState<number>(0);
+  const [assigned_walks, set_assigned_walks] = useState<AssignedWalk[]>([]);
+  const [loading, set_loading] = useState<boolean>(false);
+  const [walker_balance, set_walker_balance] = useState<number | null>(null);
+  const [walker_profile, set_walker_profile] =
+    useState<WalkerProfileResponse | null>(null);
   const is_focused = useIsFocused();
 
   const fetch_assigned = async () => {
     set_loading(true);
     try {
       const token = await get_token();
-      const res = await fetch(`${api_base_url}/walk/assigned`, {
+      const res = await fetch(`${API_BASE_URL}/walk/assigned`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
       set_assigned_walks(data);
@@ -76,81 +79,67 @@ export default function Dashboard_paseador_screen() {
     }
   };
 
-  const fetch_profile = async () => {
+  const fetch_profile_and_balance = async () => {
     try {
       const token = await get_token();
       const user = await get_user();
       if (!token || !user?.id) throw new Error("Sesión no válida");
 
       const res = await fetch(
-        `${api_base_url.replace(/\/$/, "")}/walker_profile/get_profile/${
-          user.id
-        }`,
+        `${API_BASE_URL}/walker_profile/get_profile/${user.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!res.ok) {
         const text = await res.text();
-        console.error("Error al cargar perfil, respuesta del servidor:", text);
-        throw new Error(`HTTP ${res.status} al cargar perfil`);
+        console.error("Error cargando perfil:", text);
+        throw new Error(`Error ${res.status}`);
       }
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
+
       set_walker_profile(data);
+      set_walker_balance(data.balance);
     } catch (err: any) {
-      console.log("Error cargando perfil:", err.message);
+      console.error("Error en fetch_profile_and_balance:", err.message);
     }
   };
 
   useEffect(() => {
     if (is_focused) {
       fetch_assigned();
-      fetch_profile();
+      fetch_profile_and_balance();
     }
   }, [is_focused]);
 
-  const on_scroll = (e: { nativeEvent: { contentOffset: { x: number } } }) => {
-    const x = e.nativeEvent.contentOffset.x;
-    const idx = Math.round(x / card_width);
-    set_active_index(idx);
-  };
-
-  const profile_image_url = walker_profile?.photo_url
-    ? walker_profile.photo_url.startsWith("http")
-      ? walker_profile.photo_url
-      : `${api_base_url.replace(/\/$/, "")}/api/uploads/${
-          walker_profile.photo_url
-        }`
-    : null;
-
   const menu_options: menu_option[] = [
     {
-      label: "Menú Principal",
+      label: "Menu Principal",
       icon: <Feather name="layout" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("DashboardPaseador"),
     },
     {
       label: "Buscar Paseos",
-      icon: <Feather name="search" size={20} color="#000c14" />,
+      icon: <Ionicons name="search" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("AvailableWalksScreen"),
     },
     {
       label: "Calendario",
-      icon: <Feather name="calendar" size={20} color="#000c14" />,
+      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
       on_press: () => Alert.alert("Calendario"),
     },
     { label: "__separator__", icon: null, on_press: () => {} },
     {
-      label: "Cuenta",
-      icon: <Feather name="user" size={20} color="#000c14" />,
+      label: "Perfil",
+      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("WalkerProfileScreen"),
     },
     {
       label: "Calificaciones",
-      icon: <Feather name="star" size={20} color="#000c14" />,
+      icon: <Ionicons name="star" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("RatingsScreen"),
     },
     {
-      label: "Pagos",
+      label: "Billetera",
       icon: <Feather name="credit-card" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("payments_walker_screen"),
     },
@@ -160,6 +149,18 @@ export default function Dashboard_paseador_screen() {
       on_press: () => navigation.navigate("settings_walker"),
     },
   ];
+
+  const on_scroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const x = e.nativeEvent.contentOffset.x;
+    const idx = Math.round(x / card_width);
+    set_active_index(idx);
+  };
+
+  const profile_image_url = walker_profile?.photo_url
+    ? walker_profile.photo_url.startsWith("http")
+      ? walker_profile.photo_url
+      : `${API_BASE_URL.replace(/\/$/, "")}/uploads/${walker_profile.photo_url}`
+    : null;
 
   return (
     <Screen_with_menu
@@ -172,13 +173,46 @@ export default function Dashboard_paseador_screen() {
           : require("../../../assets/user_icon.png")
       }
     >
+      <TouchableOpacity
+        style={styles.balance_section}
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate("payments_walker_screen")}
+      >
+        <LinearGradient
+          colors={["#00AFFF", "#5ADFDE"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.balance_card}
+        >
+          <Feather
+            name="credit-card"
+            size={24}
+            color="#fff"
+            style={{ marginRight: 10 }}
+          />
+          <View style={styles.balance_text_container}>
+            <Text style={styles.balance_label}>Saldo disponible</Text>
+            <Text style={styles.balance_amount}>
+              {walker_balance != null
+                ? walker_balance.toLocaleString("es-CL", {
+                    style: "currency",
+                    currency: "CLP",
+                    minimumFractionDigits: 2,
+                  })
+                : "—"}
+            </Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+
       <Text style={styles.section_title}>
-        Próximos paseos:{" "}
-        <Text style={styles.badge}>{assigned_walks.length}</Text>
+        Tu próximo paseo:{" "}
+        <Text style={styles.badge}>{assigned_walks.length}</Text> paseo(s)
+        asignado(s)
       </Text>
 
       {loading ? (
-        <ActivityIndicator style={styles.loader} size="large" />
+        <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (
         <View style={styles.carousel_container}>
           <ScrollView
@@ -192,13 +226,13 @@ export default function Dashboard_paseador_screen() {
             {assigned_walks.map((walk, i) => (
               <View
                 key={walk.walk_id}
-                style={[
-                  styles.card_wrapper,
-                  i < assigned_walks.length - 1 && styles.card_wrapper_margin,
-                ]}
+                style={{
+                  width: card_width,
+                  marginRight: i < assigned_walks.length - 1 ? 16 : 0,
+                }}
               >
                 <LinearGradient
-                  colors={["#4facfe", "#00f2fe"]}
+                  colors={["#00AFFF", "#5ADFDE"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.walk_card}
@@ -208,12 +242,11 @@ export default function Dashboard_paseador_screen() {
                     <Text style={styles.detail}>
                       {walk.zone} | {walk.time}
                     </Text>
-                    <Text style={styles.date_text}>{walk.date}</Text>
                   </View>
                   {walk.pet_photo ? (
                     <Image
                       source={{
-                        uri: `${api_base_url}/uploads/${walk.pet_photo}`,
+                        uri: `${API_BASE_URL}/uploads/${walk.pet_photo}`,
                       }}
                       style={styles.pet_image}
                     />
@@ -222,7 +255,7 @@ export default function Dashboard_paseador_screen() {
                       name="user"
                       size={80}
                       color="#fff"
-                      style={styles.pet_placeholder}
+                      style={{ marginLeft: 12 }}
                     />
                   )}
                 </LinearGradient>
@@ -252,7 +285,6 @@ export default function Dashboard_paseador_screen() {
             tu zona y disponibilidad.
           </Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.card}
           onPress={() => navigation.navigate("PlannerScreen")}
@@ -291,8 +323,38 @@ export default function Dashboard_paseador_screen() {
 }
 
 const styles = StyleSheet.create({
+  balance_section: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  balance_card: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 14,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  balance_text_container: {
+    flex: 1,
+  },
+  balance_label: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  balance_amount: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "700",
+    marginTop: 2,
+  },
   section_title: {
-    marginTop: 16,
+    marginTop: 5,
     fontSize: 18,
     fontWeight: "600",
     color: "#111",
@@ -306,19 +368,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
   },
-  loader: {
-    marginTop: 20,
-  },
-
   carousel_container: {
     flex: 1,
     marginBottom: 24,
-  },
-  card_wrapper: {
-    width: card_width,
-  },
-  card_wrapper_margin: {
-    marginRight: 16,
   },
   walk_card: {
     flex: 1,
@@ -341,18 +393,10 @@ const styles = StyleSheet.create({
     color: "#D0E7FF",
     fontSize: 18,
   },
-  date_text: {
-    color: "#D0E7FF",
-    fontSize: 14,
-    marginTop: 4,
-  },
   pet_image: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginLeft: 12,
-  },
-  pet_placeholder: {
     marginLeft: 12,
   },
   pagination: {
@@ -370,7 +414,6 @@ const styles = StyleSheet.create({
   active_dot: {
     backgroundColor: "#007BFF",
   },
-
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -379,7 +422,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "48%",
-    backgroundColor: "#e3f2fd",
+    backgroundColor: "#A8F5FD",
     borderRadius: 16,
     paddingVertical: 32,
     paddingHorizontal: 12,

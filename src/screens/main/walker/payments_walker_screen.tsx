@@ -19,31 +19,35 @@ import { LinearGradient } from "expo-linear-gradient";
 const { width: screen_width } = Dimensions.get("window");
 const h_padding = 20;
 const card_width = screen_width - h_padding * 2;
-const api_base = process.env.EXPO_PUBLIC_API_URL;
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-//balance
-interface balance_response {
+interface BalanceResponse {
   walker_id: number;
   walker_name: string;
   balance: number;
-  currency: string;
+  currency?: string;
 }
 
-//historial
-interface payment_history_item {
-  id: number;
+interface PaymentHistoryItem {
+  payment_id: number;
   amount: number;
   date: string;
   status: string; // pendiente o completado
-  client: string;
+  client_email: string;
 }
 
 export default function PaymentsWalkerScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [loading, set_loading] = useState(true);
-  const [balance_info, set_balance] = useState<balance_response | null>(null);
-  const [payment_history, set_history] = useState<payment_history_item[]>([]);
+  const [loading, set_loading] = useState<boolean>(true);
+
+  const [balance_info, set_balance_info] = useState<BalanceResponse | null>(
+    null
+  );
+
+  const [payment_history, set_payment_history] = useState<PaymentHistoryItem[]>(
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -53,34 +57,60 @@ export default function PaymentsWalkerScreen() {
         const user = await get_user();
         const walker_id = user?.id;
 
-        // 1) balance
-        let res = await fetch(
-          `${api_base}/payment/walker/${walker_id}/balance`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (!res.ok) {
-          const text = await res.text();
-          console.error("balance no JSON:", text);
-          throw new Error(`Balance HTTP ${res.status}`);
+        if (!token || !walker_id) {
+          throw new Error("Sesión no válida");
         }
-        const bal_json = await res.json();
-        if (bal_json.error) throw new Error(bal_json.msg);
-        set_balance(bal_json.data);
 
-        // 2) historial
-        res = await fetch(`${api_base}/payment/walkers/${walker_id}/history`, {
+        const res_balance = await fetch(
+          `${API_BASE_URL}/walker_profile/get_profile/${walker_id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!res_balance.ok) {
+          const text = await res_balance.text();
+          console.error("Error al cargar balance:", text);
+          throw new Error(`Balance HTTP ${res_balance.status}`);
+        }
+        const bal_json = await res_balance.json();
+        if (bal_json.error) {
+          throw new Error(bal_json.msg);
+        }
+        const walker_data = bal_json.data as any;
+        set_balance_info({
+          walker_id: walker_data.walker_id,
+          walker_name: walker_data.name,
+          balance: walker_data.balance,
+          currency: "CLP",
+        });
+
+        const res_history = await fetch(`${API_BASE_URL}/payment/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) {
-          const text = await res.text();
-          console.error("history no JSON:", text);
-          throw new Error(`History HTTP ${res.status}`);
+        if (!res_history.ok) {
+          const text = await res_history.text();
+          console.error("Error al cargar historial:", text);
+          throw new Error(`History HTTP ${res_history.status}`);
         }
-        const hist_json = await res.json();
-        if (hist_json.error) throw new Error(hist_json.msg);
-        set_history(hist_json.data);
+        const hist_json = await res_history.json();
+        if (hist_json.error) {
+          throw new Error(hist_json.msg);
+        }
+
+        const raw_history: any[] = hist_json.data;
+        const mapped_history: PaymentHistoryItem[] = raw_history.map((p) => ({
+          payment_id: p.payment_id,
+          amount: Number(p.amount),
+          date: new Date(p.date).toLocaleDateString("es-CL", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }),
+          status: p.status,
+          client_email: p.walk?.client?.email ?? "—",
+        }));
+        set_payment_history(mapped_history);
       } catch (err: any) {
-        // error
         Alert.alert("Error", err.message);
       } finally {
         set_loading(false);
@@ -96,7 +126,6 @@ export default function PaymentsWalkerScreen() {
     );
   }
 
-  //balance a CLP, 2 decimales
   const formatted_balance = balance_info
     ? balance_info.balance.toLocaleString("es-CL", {
         style: "currency",
@@ -105,7 +134,7 @@ export default function PaymentsWalkerScreen() {
       })
     : "";
 
-  const render_history_item = ({ item }: { item: payment_history_item }) => {
+  const render_history_item = ({ item }: { item: PaymentHistoryItem }) => {
     const colors: [string, string] =
       item.status === "completado"
         ? ["#00bdff", "#54edfe"]
@@ -127,14 +156,10 @@ export default function PaymentsWalkerScreen() {
           />
 
           <View style={styles.text_container}>
-            //metodo pago
             <Text style={styles.amount}>CLP {item.amount.toFixed(2)}</Text>
-            //fecha
             <Text style={styles.details}>{item.date}</Text>
-            //nombre cliente
-            <Text style={styles.details}>Client: {item.client}</Text>
-            //estado
-            <Text style={styles.status}>Status: {item.status}</Text>
+            <Text style={styles.details}>Cliente: {item.client_email}</Text>
+            <Text style={styles.status}>Estado: {item.status}</Text>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -147,7 +172,7 @@ export default function PaymentsWalkerScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.title}>Payments</Text>
+        <Text style={styles.title}>Mi billetera</Text>
       </View>
 
       <View style={styles.balance_card}>
@@ -161,7 +186,7 @@ export default function PaymentsWalkerScreen() {
 
       <FlatList
         data={payment_history}
-        keyExtractor={(i) => i.id.toString()}
+        keyExtractor={(i) => i.payment_id.toString()}
         renderItem={render_history_item}
         contentContainerStyle={styles.list_content}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
