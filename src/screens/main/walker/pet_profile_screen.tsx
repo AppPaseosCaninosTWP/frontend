@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  Linking,
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { get_token } from "../../../utils/token_service";
@@ -40,11 +41,38 @@ export default function PetProfileScreen() {
     null
   );
 
+  const handleRedirectWhatsapp = async () => {
+    if (!pet?.owner?.user_id) {
+      Alert.alert("Error", "No se encontró información del dueño.");
+      return;
+    }
+
+    try {
+      const token = await get_token();
+      const res = await fetch(`${API_BASE_URL}/contact/${pet.owner.user_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+      }
+      const json = await res.json();
+      if (json.error) {
+        throw new Error(
+          json.msg || "No se pudo generar redirección de WhatsApp"
+        );
+      }
+      const { whatsapp_link } = json.data;
+      await Linking.openURL(whatsapp_link);
+    } catch (err: any) {
+      Alert.alert("Error", err.message);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
         const token = await get_token();
-
         const res_pet = await fetch(`${API_BASE_URL}/pet/${petId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -84,10 +112,7 @@ export default function PetProfileScreen() {
       if (!res.ok || json.error)
         throw new Error(json.msg || "Error al agendar paseo");
       Alert.alert("¡Listo!", "Paseo agendado", [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate("DashboardPaseador"),
-        },
+        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -122,10 +147,7 @@ export default function PetProfileScreen() {
         throw new Error(msg);
       }
       Alert.alert("Cancelado", "Paseo cancelado", [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate("DashboardPaseador"),
-        },
+        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -158,6 +180,8 @@ export default function PetProfileScreen() {
         show_cancel_button={!!scheduled_walk_id}
         on_schedule_press={() => set_confirming("schedule")}
         on_cancel_press={() => set_confirming("cancel")}
+        on_edit_press={undefined}
+        on_contact_press={handleRedirectWhatsapp}
         api_base_url={API_BASE_URL || ""}
       />
 

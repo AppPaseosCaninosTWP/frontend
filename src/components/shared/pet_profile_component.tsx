@@ -18,7 +18,7 @@ interface Pet extends pet_model {
     email: string;
     phone: string;
   };
-};
+}
 
 interface Props {
   pet: Pet;
@@ -28,6 +28,7 @@ interface Props {
   on_schedule_press?: () => void;
   on_cancel_press?: () => void;
   on_edit_press?: () => void;
+  on_contact_press?: () => void;
   active_tab: "Acerca de" | "Salud" | "Contacto";
   on_tab_change: (tab: "Acerca de" | "Salud" | "Contacto") => void;
   api_base_url: string;
@@ -41,6 +42,7 @@ const Pet_profile_component = ({
   on_schedule_press,
   on_cancel_press,
   on_edit_press,
+  on_contact_press,
   active_tab,
   on_tab_change,
   api_base_url,
@@ -51,14 +53,17 @@ const Pet_profile_component = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back_btn}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.back_btn}
+        >
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <View style={styles.header_center}>
           <Text style={styles.header_title}>Perfil de {pet.name}</Text>
         </View>
-     </View>
- 
+      </View>
+
       <View style={styles.tab_row}>
         {tab_labels.map((label) => (
           <TouchableOpacity
@@ -86,7 +91,15 @@ const Pet_profile_component = ({
           <View style={styles.card}>
             <View style={styles.profile_header}>
               <Image
-                source={pet.photo? { uri: `${api_base_url.replace(/\/$/, "")}/uploads/${pet.photo}` }: undefined}
+                source={
+                  pet.photo
+                    ? {
+                        uri: `${api_base_url.replace(/\/$/, "")}/uploads/${
+                          pet.photo
+                        }`,
+                      }
+                    : undefined
+                }
                 style={styles.pet_image}
                 onError={() => console.warn("pet image error:", pet.photo)}
               />
@@ -104,7 +117,9 @@ const Pet_profile_component = ({
               <Text style={styles.pet_breed}>{pet.breed}</Text>
             </View>
 
-            <Text style={styles.section_title}>Apariencia y signos distintivos</Text>
+            <Text style={styles.section_title}>
+              Apariencia y signos distintivos
+            </Text>
             <Text style={styles.paragraph}>{pet.description ?? "–"}</Text>
 
             <View style={styles.info_table}>
@@ -137,7 +152,12 @@ const Pet_profile_component = ({
         {active_tab === "Salud" && (
           <View style={styles.card}>
             <View style={styles.section_header}>
-              <Feather name="heart" size={20} color="#e74c3c" style={{ marginRight: 10 }} />
+              <Feather
+                name="heart"
+                size={20}
+                color="#e74c3c"
+                style={{ marginRight: 10 }}
+              />
               <Text style={styles.section_title}>Salud</Text>
             </View>
             <Text style={styles.paragraph}>
@@ -153,31 +173,53 @@ const Pet_profile_component = ({
         {active_tab === "Contacto" && (
           <View style={styles.card}>
             <View style={styles.section_header}>
-              <Feather name="phone" size={20} color="#27ae60" style={{ marginRight: 10 }} />
+              <Feather
+                name="phone"
+                size={20}
+                color="#27ae60"
+                style={{ marginRight: 10 }}
+              />
               <Text style={styles.section_title}>Contacto</Text>
             </View>
             <View style={styles.contact_card}>
-              <Feather name="user" size={36} color="#666" style={{ marginRight: 12 }} />
+              <Feather
+                name="user"
+                size={36}
+                color="#666"
+                style={{ marginRight: 12 }}
+              />
               <View>
                 <Text style={styles.contact_name}>{pet.owner.name}</Text>
                 <Text style={styles.contact_info}>{pet.owner.phone}</Text>
                 <Text style={styles.contact_info}>{pet.owner.email}</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.message_button} onPress={on_edit_press}>
-              <Text style={styles.message_button_text}>Enviar mensaje</Text>
+            <TouchableOpacity
+              style={styles.message_button}
+              onPress={on_contact_press}
+            >
+              <Feather name="message-circle" size={18} color="#fff" />
+              <Text style={[styles.message_button_text, { marginLeft: 6 }]}>
+                Enviar WhatsApp
+              </Text>
             </TouchableOpacity>
           </View>
         )}
-
       </ScrollView>
+
       {show_schedule_button && (
-        <TouchableOpacity style={styles.schedule_button} onPress={on_schedule_press}>
+        <TouchableOpacity
+          style={styles.schedule_button}
+          onPress={on_schedule_press}
+        >
           <Text style={styles.schedule_button_text}>Agendar paseo</Text>
         </TouchableOpacity>
       )}
       {show_cancel_button && (
-        <TouchableOpacity style={styles.cancel_button} onPress={on_cancel_press}>
+        <TouchableOpacity
+          style={styles.cancel_button}
+          onPress={on_cancel_press}
+        >
           <Text style={styles.cancel_button_text}>Cancelar paseo</Text>
         </TouchableOpacity>
       )}
@@ -185,12 +227,34 @@ const Pet_profile_component = ({
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: 30,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 5,
+    paddingBottom: 8,
+    backgroundColor: "#fff",
+  },
+  back_btn: {
+    padding: 8,
+    paddingVertical: 8,
+    marginLeft: 16,
+  },
+  header_center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  header_title: {
+    marginRight: 50,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
   },
   tab_row: {
     flexDirection: "row",
@@ -310,29 +374,18 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 2,
   },
-  header: {
+  message_button: {
+    marginTop: 16,
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 5,
-    paddingBottom: 8,
-    backgroundColor: "#fff",
-
+    backgroundColor: "#25D366",
+    paddingVertical: 12,
+    borderRadius: 8,
   },
-  back_btn: {
-    padding: 8,
-    paddingVertical: 8 ,
-    marginLeft: 16,
-  },
-  header_center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  header_title: {
-    marginRight: 50,
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#111",
+  message_button_text: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
   },
   schedule_button: {
     backgroundColor: "#007BFF",
@@ -360,26 +413,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-
-edit_icon: {
-  marginLeft: 8,
-},
-message_button: {
-  marginTop: 16,
-  backgroundColor: "#70c72a",
-  paddingVertical: 12,
-  borderRadius: 8,
-  alignItems: "center",
-},
-message_button_text: {
-  color: "#fff",
-  fontWeight: "600",
-  fontSize: 16,
-
-},
-
+  edit_icon: {
+    marginLeft: 8,
+  },
 });
 
 export default Pet_profile_component;
-
-
