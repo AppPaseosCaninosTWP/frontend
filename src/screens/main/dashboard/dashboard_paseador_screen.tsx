@@ -117,7 +117,9 @@ export default function Dashboard_paseador_screen() {
   const profile_image_url = walker_profile?.photo_url
     ? walker_profile.photo_url.startsWith("http")
       ? walker_profile.photo_url
-      : `${api_base_url.replace(/\/$/, "")}/uploads/${walker_profile.photo_url}`
+      : `${api_base_url.replace(/\/$/, "")}/api/uploads/${
+          walker_profile.photo_url
+        }`
     : null;
 
   const menu_options: menu_option[] = [
