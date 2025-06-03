@@ -3,10 +3,20 @@ export interface walk_model {
   status: 'pendiente' | 'confirmado' | 'cancelado' | string;
   walk_type: string;
   duration: number;
-  date: string;      // formato YYYY-MM-DD
-  time: string;      // formato HH:mm
+  date: string;
+  time: string;
   pet_id?: number;
   pet_name?: string;
   pet_photo?: string;
+  photo_url?: string; 
 }
 
+
+export interface create_walk_payload {
+  walk_type_id: number;
+  pet_ids: number[];
+  comments?: string;
+  start_time: string;
+  duration: number;
+  days: string[];
+}
