@@ -1,23 +1,12 @@
 import { get_token } from '../utils/token_service';
+import type { pet_model } from '../models/pet_model';
 
 const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 
-export interface pet {
-  id: number;
-  name: string;
-  breed: string;
-  age: number;
-  zone: string;
-  description: string;
-  comments: string;
-  medical_condition: string;
-  photo: string;
-}
 
-export async function get_user_pets(): Promise<pet[]> {
+export async function get_user_pets(): Promise<pet_model[]> {
   const token = await get_token();
-
-  const response = await fetch(`${api_base_url}/pet/get_pets`, {
+  const response = await fetch(`${api_base_url}/pet`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -26,14 +15,18 @@ export async function get_user_pets(): Promise<pet[]> {
   });
 
   const json = await response.json();
-  console.log('respuesta_backend_mascotas:', json);
-
   if (!response.ok || json.error) {
     throw new Error(json.msg || 'error_obtener_mascotas');
   }
 
-  return json.data || [];
+  const uploads_url = process.env.EXPO_PUBLIC_URL + '/uploads';
+
+  return (json.data || []).map((pet: pet_model) => ({
+    ...pet,
+    photo_url: pet.photo ? `${uploads_url}/${pet.photo}` : undefined,
+  }));
 }
+
 
 export interface pet_payload {
   name: string | null;
@@ -46,7 +39,7 @@ export interface pet_payload {
   photo: string | null;
 }
 
-export async function create_pet(pet_data: pet_payload): Promise<pet> {
+export async function create_pet(pet_data: pet_payload): Promise<pet_model> {
   const token = await get_token();
   const form_data = new FormData();
 
@@ -70,7 +63,7 @@ export async function create_pet(pet_data: pet_payload): Promise<pet> {
     } as any);
   }
 
-const response = await fetch(`${api_base_url}/pet/create_pet`, {
+const response = await fetch(`${api_base_url}/pet`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -86,4 +79,35 @@ const response = await fetch(`${api_base_url}/pet/create_pet`, {
   }
 
   return json.data;
+}
+
+export async function get_pet_by_id(pet_id: number): Promise<pet_model> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/pet/${pet_id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || "Error al obtener la mascota");
+  }
+
+  return json.data;
+}
+
+export async function update_pet(pet_id: number, data: Partial<pet_model>): Promise<void> {
+  const token = await get_token();
+  const res = await fetch(`${api_base_url}/pet/${pet_id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const json = await res.json();
+  if (!res.ok || json.error) throw new Error(json.msg || "Error al actualizar la mascota");
 }

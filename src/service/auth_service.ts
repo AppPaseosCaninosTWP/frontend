@@ -264,24 +264,3 @@ if (!res.ok || json.error) {
 }
 return json.data;
 }
-
-
-export async function get_all_walks(): Promise<user_model[]> {
- const token = await get_token();
- const response = await fetch(`${api_base_url}/walk/get_all_walks`, {
-   method: 'GET',
-   headers: {
-     'Content-Type': 'application/json',
-     Authorization: `Bearer ${token}`,
-   },
- });
-
-
- const json = await response.json();
- if (!response.ok || json.error) {
-   throw new Error(json.msg || 'error_obtener_walks');
- }
-
-
- return json.data;
-}
