@@ -50,8 +50,8 @@ export default function Verify_code_screen() {
       return;
     }
 
-    if (code.length !== 5) {
-      Alert.alert('Código inválido', 'Debe tener 5 dígitos.');
+    if (code.length !== 6) {
+      Alert.alert('Código inválido', 'Debe tener 6 dígitos.');
       return;
     }
 
@@ -60,10 +60,13 @@ export default function Verify_code_screen() {
 
       if (context === 'reset') {
         Alert.alert('Código verificado', 'Ahora puedes cambiar tu contraseña.');
-        navigation.navigate('ResetPassword', { email });
+        navigation.navigate('ResetPassword', { email, code });
       } else if (context === 'register') {
-        Alert.alert('Correo validado', 'Bienvenido a TWP');
-        navigation.replace('Welcome');
+        Alert.alert('Correo validado', 'Ahora puedes iniciar sesión');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
       }
     } catch (err: any) {
       Alert.alert('Error', err.message);

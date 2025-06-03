@@ -15,6 +15,8 @@ import {
   import { RootStackParamList } from '../../navigation/stack_navigator';
   import { LinearGradient } from 'expo-linear-gradient';
   import { Ionicons } from '@expo/vector-icons';
+  import { send_code } from '../../service/auth_service';
+
   
   export default function Forgot_password_screen() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -55,19 +57,22 @@ import {
     }, []);
   
     const handle_reset = async () => {
-
       validateEmail(email);
-      
+
       if (emailError) {
         Alert.alert('Por favor, corrija el error antes de continuar', emailError);
         return;
       }
-    
-      // Simular envío de código al correo
-      Alert.alert('Correo enviado', 'Revisa tu bandeja de entrada para el código.');
-      navigation.navigate('VerifyCode', { email, context: 'reset' });
+
+      try {
+        await send_code(email);
+        Alert.alert('Correo enviado', 'Revisa tu bandeja de entrada para el código.');
+        navigation.navigate('VerifyCode', { email, context: 'reset' });
+      } catch (err: any) {
+        Alert.alert('Error', err.message);
+      }
     };
-  
+
     return (
       <LinearGradient colors={['#0096FF', '#E6F4FF']} style={styles.container}>
         <Image

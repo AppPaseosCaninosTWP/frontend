@@ -86,13 +86,10 @@ export async function verify_reset_code(email: string, code: string): Promise<vo
 }
 
 export async function send_code(email: string): Promise<void> {
-  const token = await get_token();
-
-  const response = await fetch(`${api_base_url}/user/request_reset_code`, {
+  const response = await fetch(`${api_base_url}/auth/request_password_reset`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ email }),
   });
@@ -102,6 +99,27 @@ export async function send_code(email: string): Promise<void> {
     throw new Error(json.msg || 'error_envio_codigo');
   }
 }
+
+export async function reset_password(
+  email: string,
+  code: string,
+  password: string,
+  confirm_password: string
+): Promise<void> {
+  const response = await fetch(`${api_base_url}/auth/reset_password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, code, password, confirm_password }),
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_reset_password');
+  }
+}
+
 
 export async function get_all_users(page: number = 1): Promise<user_model[]> {
   const token = await get_token();
@@ -245,25 +263,4 @@ if (!res.ok || json.error) {
   throw new Error(json.msg || 'error_al_registrar_paseador');
 }
 return json.data;
-}
-
-
-export async function get_all_walks(): Promise<user_model[]> {
- const token = await get_token();
- const response = await fetch(`${api_base_url}/walk/get_all_walks`, {
-   method: 'GET',
-   headers: {
-     'Content-Type': 'application/json',
-     Authorization: `Bearer ${token}`,
-   },
- });
-
-
- const json = await response.json();
- if (!response.ok || json.error) {
-   throw new Error(json.msg || 'error_obtener_walks');
- }
-
-
- return json.data;
 }

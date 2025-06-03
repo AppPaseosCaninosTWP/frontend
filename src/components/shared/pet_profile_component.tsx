@@ -25,6 +25,7 @@ interface Props {
   duration?: number;
   show_schedule_button?: boolean;
   show_cancel_button?: boolean;
+  show_message_button?: boolean;
   on_schedule_press?: () => void;
   on_cancel_press?: () => void;
   on_edit_press?: () => void;
@@ -39,6 +40,7 @@ const Pet_profile_component = ({
   duration,
   show_schedule_button = false,
   show_cancel_button = false,
+  show_message_button = false,
   on_schedule_press,
   on_cancel_press,
   on_edit_press,
@@ -92,13 +94,13 @@ const Pet_profile_component = ({
             <View style={styles.profile_header}>
               <Image
                 source={
-                  pet.photo
+                  pet.photo 
                     ? {
                         uri: `${api_base_url.replace(/\/$/, "")}/uploads/${
                           pet.photo
                         }`,
                       }
-                    : undefined
+                     : undefined
                 }
                 style={styles.pet_image}
                 onError={() => console.warn("pet image error:", pet.photo)}
@@ -118,7 +120,7 @@ const Pet_profile_component = ({
             </View>
 
             <Text style={styles.section_title}>
-              Apariencia y signos distintivos
+              Sobre la mascota
             </Text>
             <Text style={styles.paragraph}>{pet.description ?? "–"}</Text>
 
@@ -160,6 +162,7 @@ const Pet_profile_component = ({
               />
               <Text style={styles.section_title}>Salud</Text>
             </View>
+            <Text style={styles.section_title}>Condición médica</Text>
             <Text style={styles.paragraph}>
               {pet.medical_condition ?? "Sin datos de salud registrados."}
             </Text>
@@ -194,15 +197,17 @@ const Pet_profile_component = ({
                 <Text style={styles.contact_info}>{pet.owner.email}</Text>
               </View>
             </View>
-            <TouchableOpacity
+            {show_message_button && (
+              <TouchableOpacity
               style={styles.message_button}
               onPress={on_contact_press}
             >
               <Feather name="message-circle" size={18} color="#fff" />
-              <Text style={[styles.message_button_text, { marginLeft: 6 }]}>
+                <Text style={[styles.message_button_text, { marginLeft: 6 }]}>
                 Enviar WhatsApp
               </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </ScrollView>
