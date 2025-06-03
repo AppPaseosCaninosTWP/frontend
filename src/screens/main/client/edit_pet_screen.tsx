@@ -12,10 +12,11 @@ import {
 } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { get_token } from "../../../utils/token_service";
 import type { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 import type { pet_model } from "../../../models/pet_model";
+import { get_pet_by_id, update_pet } from "../../../service/pet_service";
+import { colors, spacing, font_sizes } from "../../../config/theme";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 type PetEditRoute = RouteProp<RootStackParamList, "EditPetScreen">;
@@ -39,11 +40,7 @@ export default function EditPetScreen() {
   useEffect(() => {
     const fetch_pet = async () => {
       try {
-        const token = await get_token();
-        const res = await fetch(`${API_BASE_URL}/pet/get_pet_by_id/${petId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const { data } = await res.json();
+        const data = await get_pet_by_id(petId);
         set_pet(data);
         set_name(data.name);
         set_breed(data.breed || "");
@@ -69,24 +66,15 @@ export default function EditPetScreen() {
     }
 
     try {
-      const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/pet/update_pet/${petId}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          breed,
-          age: parseInt(age),
-          zone,
-          description,
-          comments,
-          medical_condition,
-        }),
+      await update_pet(petId, {
+        name,
+        breed,
+        age: parseInt(age),
+        zone,
+        description,
+        comments,
+        medical_condition,
       });
-      if (!res.ok) throw new Error("No se pudo actualizar la mascota");
       Alert.alert("Éxito", "Mascota actualizada correctamente", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
@@ -163,47 +151,63 @@ export default function EditPetScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+
+
+export const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: "#fff",
-    paddingTop: 40,
     flexGrow: 1,
+    backgroundColor: colors.background,
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.md,
   },
   label: {
-    fontSize: 14,
+    fontSize: font_sizes.medium,
     fontWeight: "600",
-    marginTop: 12,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
+    marginTop: spacing.lg,
+    color: colors.text_primary,
   },
   input: {
+    backgroundColor: colors.background,
+    borderRadius: 10,
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.md,
+    fontSize: font_sizes.medium,
+    borderColor: "#d0d7de",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 8,
-    fontSize: 14,
-    backgroundColor: "#f9f9f9",
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
   },
   picker_wrapper: {
+    backgroundColor: colors.background,
+    borderRadius: 10,
+    borderColor: "#d0d7de",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
     overflow: "hidden",
   },
   picker: {
     height: 50,
-    backgroundColor: "#f9f9f9",
+    paddingHorizontal: spacing.md,
   },
   button: {
-    marginTop: 24,
-    backgroundColor: "#007BFF",
-    padding: 14,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.md,
     alignItems: "center",
+    marginTop: spacing.lg,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
   },
   button_text: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    color: colors.background,
+    fontSize: font_sizes.large,
+    fontWeight: "700",
   },
 });

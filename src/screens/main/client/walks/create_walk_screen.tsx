@@ -19,6 +19,7 @@ import LocationPicker from "../../../../components/walks/location_picker";
 import type { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../../../../navigation/stack_navigator";
 import { Feather } from "@expo/vector-icons";
+import { create_walk } from '../../../../service/walk_service';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -57,46 +58,40 @@ export default function CreateWalkScreen() {
     fetch_pets();
   }, []);
 
-  const handle_submit = async () => {
-    if (!selected_pet_id || !duration || !selected_location || days.length === 0) {
-      Alert.alert("Faltan campos", "Completa todos los campos, elige días y confirma ubicación");
-      return;
-    }
+const handle_submit = async () => {
+  if (!selected_pet_id || !duration || !selected_location || days.length === 0) {
+    Alert.alert("Faltan campos", "Completa todos los campos, elige días y confirma ubicación");
+    return;
+  }
 
-    const walk_type_id = walk_type === "fijo" ? 1 : 2;
-    if (walk_type_id === 1 && days.length < 2) {
-      Alert.alert("Error", "Un paseo fijo requiere al menos 2 días");
-      return;
-    }
-    if (walk_type_id === 2 && days.length !== 1) {
-      Alert.alert("Error", "Un paseo esporádico debe tener exactamente 1 día");
-      return;
-    }
+  const walk_type_id = walk_type === "fijo" ? 1 : 2;
 
-    try {
-      const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk/create_walk`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          walk_type_id,
-          pet_id: selected_pet_id,
-          comments,
-          start_time: `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`,
-          duration: parseInt(duration),
-          days,
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok || json.error) throw new Error(json.msg || "Error en la solicitud");
-      navigation.navigate("WalkConfirmationScreen");
-    } catch (err: any) {
-      Alert.alert("Error", err.message);
-    }
-  };
+  if (walk_type_id === 1 && days.length < 2) {
+    Alert.alert("Error", "Un paseo fijo requiere al menos 2 días");
+    return;
+  }
+
+  if (walk_type_id === 2 && days.length !== 1) {
+    Alert.alert("Error", "Un paseo esporádico debe tener exactamente 1 día");
+    return;
+  }
+
+  try {
+    await create_walk({
+      walk_type_id,
+      pet_ids: [selected_pet_id],
+      comments,
+      start_time: `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`,
+      duration: parseInt(duration),
+      days,
+    });
+
+    navigation.navigate("WalkConfirmationScreen");
+  } catch (err: any) {
+    Alert.alert("Error", err.message);
+  }
+};
+
 
   const toggle_day = (day: string) => {
     set_days((prev) =>
