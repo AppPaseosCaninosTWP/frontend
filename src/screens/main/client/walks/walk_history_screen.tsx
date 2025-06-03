@@ -28,7 +28,7 @@ export default function WalkHistoryScreen() {
       try {
         const data = await get_all_walks();
 
-        const mapped = data.map((walk: { days: any[]; pets: any[] }) => {
+        const mapped = data.map((walk: { days: any[]; pets: any[]; walk_type: string }) => {
           const first_day = walk.days?.[0];
           const first_pet = walk.pets?.[0];
 
@@ -39,6 +39,7 @@ export default function WalkHistoryScreen() {
             duration: first_day?.duration || 0,
             pet_name: first_pet?.name || '',
             pet_photo: first_pet?.photo || '',
+            walk_type: walk.walk_type || '',
           };
         });
 
@@ -87,6 +88,7 @@ export default function WalkHistoryScreen() {
                 <Text style={styles.pet_name}>{w.pet_name}</Text>
                 <Text style={styles.detail}>{w.date} a las {w.time}</Text>
                 <Text style={styles.detail}>Duración: {w.duration} min</Text>
+                <Text style={styles.detail}>Tipo: {w.walk_type}</Text>
                 <Text style={styles.status}>{w.status}</Text>
               </View>
             </View>
@@ -127,13 +129,6 @@ const styles = StyleSheet.create({
     color: "#111",
     textAlign: "center",
     marginLeft: 8,
-
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 16,
-    textAlign: "center",
   },
   empty_text: {
     textAlign: "center",
