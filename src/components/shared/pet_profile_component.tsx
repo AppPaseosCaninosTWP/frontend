@@ -25,6 +25,7 @@ interface Props {
   duration?: number;
   show_schedule_button?: boolean;
   show_cancel_button?: boolean;
+  show_message_button?: boolean;
   on_schedule_press?: () => void;
   on_cancel_press?: () => void;
   on_edit_press?: () => void;
@@ -38,6 +39,7 @@ const Pet_profile_component = ({
   duration,
   show_schedule_button = false,
   show_cancel_button = false,
+  show_message_button = false,
   on_schedule_press,
   on_cancel_press,
   on_edit_press,
@@ -57,8 +59,8 @@ const Pet_profile_component = ({
         <View style={styles.header_center}>
           <Text style={styles.header_title}>Perfil de {pet.name}</Text>
         </View>
-     </View>
- 
+      </View>
+
       <View style={styles.tab_row}>
         {tab_labels.map((label) => (
           <TouchableOpacity
@@ -86,7 +88,7 @@ const Pet_profile_component = ({
           <View style={styles.card}>
             <View style={styles.profile_header}>
               <Image
-                source={pet.photo? { uri: `${api_base_url.replace(/\/$/, "")}/uploads/${pet.photo}` }: undefined}
+                source={pet.photo ? { uri: `${api_base_url.replace(/\/$/, "")}/uploads/${pet.photo}` } : undefined}
                 style={styles.pet_image}
                 onError={() => console.warn("pet image error:", pet.photo)}
               />
@@ -104,7 +106,7 @@ const Pet_profile_component = ({
               <Text style={styles.pet_breed}>{pet.breed}</Text>
             </View>
 
-            <Text style={styles.section_title}>Apariencia y signos distintivos</Text>
+            <Text style={styles.section_title}>Sobre la mascota</Text>
             <Text style={styles.paragraph}>{pet.description ?? "–"}</Text>
 
             <View style={styles.info_table}>
@@ -140,6 +142,7 @@ const Pet_profile_component = ({
               <Feather name="heart" size={20} color="#e74c3c" style={{ marginRight: 10 }} />
               <Text style={styles.section_title}>Salud</Text>
             </View>
+            <Text style={styles.section_title}>Condición médica</Text>
             <Text style={styles.paragraph}>
               {pet.medical_condition ?? "Sin datos de salud registrados."}
             </Text>
@@ -164,9 +167,11 @@ const Pet_profile_component = ({
                 <Text style={styles.contact_info}>{pet.owner.email}</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.message_button} onPress={on_edit_press}>
-              <Text style={styles.message_button_text}>Enviar mensaje</Text>
-            </TouchableOpacity>
+            {show_message_button && (
+              <TouchableOpacity style={styles.message_button} onPress={on_edit_press}>
+                <Text style={styles.message_button_text}>Enviar mensaje</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
