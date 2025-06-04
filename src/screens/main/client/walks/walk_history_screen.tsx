@@ -23,27 +23,11 @@ export default function WalkHistoryScreen() {
   const [walks, set_walks] = useState<walk_model[]>([]);
   const [loading, set_loading] = useState(true);
 
-  useEffect(() => {
+    useEffect(() => {
     const fetch_walks = async () => {
       try {
         const data = await get_all_walks();
-
-        const mapped = data.map((walk: { days: any[]; pets: any[]; walk_type: string }) => {
-          const first_day = walk.days?.[0];
-          const first_pet = walk.pets?.[0];
-
-          return {
-            ...walk,
-            date: first_day?.start_date || '',
-            time: first_day?.start_time || '',
-            duration: first_day?.duration || 0,
-            pet_name: first_pet?.name || '',
-            pet_photo: first_pet?.photo || '',
-            walk_type: walk.walk_type || '',
-          };
-        });
-
-        set_walks(mapped);
+        set_walks(data);
       } catch (err: any) {
         Alert.alert("Error", err.message);
       } finally {
@@ -52,6 +36,7 @@ export default function WalkHistoryScreen() {
     };
     fetch_walks();
   }, []);
+
 
   if (loading) {
     return (
@@ -86,7 +71,7 @@ export default function WalkHistoryScreen() {
               )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.pet_name}>{w.pet_name}</Text>
-                <Text style={styles.detail}>{w.date} a las {w.time}</Text>
+                <Text style={styles.detail}>{w.date || 'Fecha desconocida'} a las {w.time || 'Hora desconocida'}</Text>
                 <Text style={styles.detail}>Duración: {w.duration} min</Text>
                 <Text style={styles.detail}>Tipo: {w.walk_type}</Text>
                 <Text style={styles.status}>{w.status}</Text>
@@ -110,7 +95,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexGrow: 1,
     justifyContent: "flex-start",
-    paddingTop: 40,
+    paddingTop: 30,
     gap: 12,
   },
   header_row: {
