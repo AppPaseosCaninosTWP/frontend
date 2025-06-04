@@ -15,33 +15,16 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { get_token } from "../../../utils/token_service";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
+import type { walk_model } from "../../../models/walk_model";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-
-interface BackendWalk {
-  walk_id: number;
-  walk_type: string;
-  status: string;
-  client_email: string;
-  walker_email: string | null;
-  days: Array<{
-    start_date: string;
-    start_time: string;
-    duration: number;
-  }>;
-  pet_id: number;
-  pet_name: string;
-  pet_photo: string | null;
-}
 
 export default function AvailableWalksScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [all_walks, set_all_walks] = useState<BackendWalk[]>([]);
+  const [all_walks, set_all_walks] = useState<walk_model[]>([]);
   const [loading, set_loading] = useState(false);
-  const [selected_tab, set_selected_tab] = useState<"Fijo" | "Esporádico">(
-    "Fijo"
-  );
+  const [selected_tab, set_selected_tab] = useState<"Fijo" | "Esporádico">("Fijo");
 
   useEffect(() => {
     fetch_walks();
@@ -51,50 +34,33 @@ export default function AvailableWalksScreen() {
     set_loading(true);
     try {
       const token = await get_token();
-
       const res = await fetch(`${API_BASE_URL}/walk`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const { data: lista, error: err, msg } = json;
-      if (err) throw new Error(msg);
+      const { data, error, msg } = await res.json();
+      if (error) throw new Error(msg);
 
-      const detalles_con_mascota: BackendWalk[] = await Promise.all(
-        lista.map(async (w: any) => {
-          const detalle_res = await fetch(`${API_BASE_URL}/walk/${w.walk_id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (!detalle_res.ok)
-            throw new Error(`Detalle HTTP ${detalle_res.status}`);
-          const detalle_json = await detalle_res.json();
-          const { data: walk_detail, error: err2, msg: msg2 } = detalle_json;
-          if (err2) throw new Error(msg2);
-
-          const pet_data =
-            Array.isArray(walk_detail.pets) && walk_detail.pets.length > 0
-              ? walk_detail.pets[0]
-              : { pet_id: 0, name: "Sin mascota", photo: null };
-
-          const pet_photo_url = pet_data.photo
-            ? `${API_BASE_URL}/uploads/${pet_data.photo}`
-            : null;
-
+      const mapped: walk_model[] = data
+        .filter((w: any) => w.status === "pendiente")
+        .map((w: any) => {
+          const pet = w.pets?.[0] ?? {};
+          const day = w.days?.[0] ?? {};
           return {
             walk_id: w.walk_id,
             walk_type: w.walk_type,
             status: w.status,
-            client_email: w.client_email,
-            walker_email: w.walker_email,
-            days: w.days,
-            pet_id: pet_data.pet_id,
-            pet_name: pet_data.name,
-            pet_photo: pet_photo_url,
+            pet_id: pet.pet_id,
+            pet_name: pet.name,
+            photo_url: pet.photo ? `${API_BASE_URL}/uploads/${pet.photo}` : undefined,
+            sector: pet.zone ?? "desconocido",
+            date: day.start_date,
+            time: day.start_time,
+            duration: day.duration,
           };
-        })
-      );
+        });
 
-      set_all_walks(detalles_con_mascota);
+      set_all_walks(mapped);
     } catch (err: any) {
       Alert.alert("Error al cargar paseos", err.message);
     } finally {
@@ -105,19 +71,17 @@ export default function AvailableWalksScreen() {
   const normalize = (s: string) =>
     s
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\u0300-\u036f/g, "")
       .toLowerCase();
 
-  const walks_to_show = all_walks
-    .filter((w) => w.status === "pendiente")
-    .filter((w) => normalize(w.walk_type) === normalize(selected_tab));
+  const walks_to_show = all_walks.filter(
+    (w) =>
+      w.status === "pendiente" &&
+      normalize(w.walk_type) === normalize(selected_tab)
+  );
 
-  const render_item = ({ item }: { item: BackendWalk }) => {
-    const first_day = item.days[0] || {
-      start_date: "",
-      start_time: "",
-      duration: 0,
-    };
+  const render_item = ({ item }: { item: walk_model }) => {
+    const { pet_name, photo_url, date, time, sector } = item;
 
     return (
       <TouchableOpacity
@@ -125,40 +89,28 @@ export default function AvailableWalksScreen() {
         onPress={() => {
           navigation.navigate("PetProfileScreen", {
             walkId: item.walk_id,
-            petId: item.pet_id,
-            duration: first_day.duration,
+            petId: item.pet_id!,
+            duration: item.duration,
           });
         }}
       >
-        <View style={styles.card_header}>
-          {item.pet_photo ? (
+        <View style={styles.cardHeader}>
+          {photo_url ? (
             <Image
-              source={{ uri: item.pet_photo }}
+              source={{ uri: photo_url }}
               style={styles.avatar}
               onError={() =>
-                console.warn("Error cargando imagen:", item.pet_photo)
+                console.warn("Error cargando imagen:", photo_url)
               }
             />
           ) : (
             <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
           )}
-
           <View style={styles.info}>
-            <Text style={styles.name}>{item.pet_name}</Text>
-
-            <Text style={styles.meta}>
-              {`Paseo ${item.walk_type}  |  ${first_day.start_time}  |  ${first_day.start_date}`}
-            </Text>
-
-            <Text style={[styles.meta, styles.client_email]}>
-              {item.client_email}
-            </Text>
-
-            <Text style={[styles.meta, styles.status_text]}>
-              {`Estado: ${item.status}`}
-            </Text>
+            <Text style={styles.name}>{pet_name}</Text>
+            <Text style={styles.meta}>{`Paseo ${selected_tab}  |  ${time}  |  ${date}`}</Text>
+            <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
           </View>
-
           <Feather name="chevron-right" size={20} color="#999" />
         </View>
       </TouchableOpacity>
@@ -173,23 +125,23 @@ export default function AvailableWalksScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.header_title}>Paseos disponibles</Text>
+        <Text style={styles.headerTitle}>Paseos disponibles</Text>
       </View>
 
-      <View style={styles.tab_container}>
-        {(["Fijo", "Esporádico"] as const).map((tab) => (
+      <View style={styles.tabContainer}>
+        {["Fijo", "Esporádico"].map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[
-              styles.tab_button,
-              selected_tab === tab && styles.tab_button_active,
+              styles.tabButton,
+              selected_tab === tab && styles.tabButtonActive,
             ]}
-            onPress={() => set_selected_tab(tab)}
+            onPress={() => set_selected_tab(tab as "Fijo" | "Esporádico")}
           >
             <Text
               style={[
-                styles.tab_text,
-                selected_tab === tab && styles.tab_text_active,
+                styles.tabText,
+                selected_tab === tab && styles.tabTextActive,
               ]}
             >
               Paseos {tab}
@@ -199,7 +151,7 @@ export default function AvailableWalksScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator style={styles.activity_indicator} />
+        <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={walks_to_show}
@@ -208,7 +160,7 @@ export default function AvailableWalksScreen() {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <Text style={styles.empty_text}>
+            <Text style={styles.emptyText}>
               No hay paseos {selected_tab.toLowerCase()} disponibles
             </Text>
           }
@@ -224,24 +176,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 40,
+    paddingTop: 40,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
-  header_title: {
+  headerTitle: {
     fontSize: 18,
     fontWeight: "600",
     textAlign: "center",
     flex: 0.9,
     color: "#111",
   },
-
-  tab_container: {
+  tabContainer: {
     flexDirection: "row",
     justifyContent: "center",
     marginVertical: 12,
   },
-  tab_button: {
+  tabButton: {
     flex: 1,
     paddingVertical: 8,
     marginHorizontal: 8,
@@ -250,24 +201,22 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     alignItems: "center",
   },
-  tab_button_active: {
+  tabButtonActive: {
     backgroundColor: "#3b82f6",
     borderColor: "#3b82f6",
   },
-  tab_text: { fontSize: 14, color: "#555" },
-  tab_text_active: { color: "#fff", fontWeight: "600" },
-
+  tabText: { fontSize: 14, color: "#555" },
+  tabTextActive: { color: "#fff", fontWeight: "600" },
   list: {
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 24,
   },
-  empty_text: {
+  emptyText: {
     textAlign: "center",
     marginTop: 40,
     color: "#666",
   },
-
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -278,7 +227,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  card_header: {
+  cardHeader: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -300,15 +249,5 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 4,
     fontSize: 14,
-  },
-  client_email: {
-    marginTop: 6,
-    fontSize: 12,
-  },
-  status_text: {
-    marginTop: 4,
-  },
-  activity_indicator: {
-    marginTop: 20,
   },
 });

@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
-  Linking,
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { get_token } from "../../../utils/token_service";
@@ -37,48 +36,21 @@ export default function PetProfileScreen() {
   const [scheduled_walk_id, set_scheduled_walk_id] = useState<number | null>(
     null
   );
+
   const [confirming, set_confirming] = useState<"schedule" | "cancel" | null>(
     null
   );
-
-  const handleRedirectWhatsapp = async () => {
-    if (!pet?.owner?.user_id) {
-      Alert.alert("Error", "No se encontró información del dueño.");
-      return;
-    }
-
-    try {
-      const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/contact/${pet.owner.user_id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`HTTP ${res.status}: ${text}`);
-      }
-      const json = await res.json();
-      if (json.error) {
-        throw new Error(
-          json.msg || "No se pudo generar redirección de WhatsApp"
-        );
-      }
-      const { whatsapp_link } = json.data;
-      await Linking.openURL(whatsapp_link);
-    } catch (err: any) {
-      Alert.alert("Error", err.message);
-    }
-  };
 
   useEffect(() => {
     (async () => {
       try {
         const token = await get_token();
-        const res_pet = await fetch(`${API_BASE_URL}/pet/${petId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res_pet.ok) {
-          throw new Error("Mascota no encontrada");
-        }
+        const res_pet = await fetch(
+          `${API_BASE_URL}/pet/${petId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const { data: pet_data } = await res_pet.json();
         set_pet(pet_data);
 
@@ -110,7 +82,7 @@ export default function PetProfileScreen() {
       });
       const json = await res.json();
       if (!res.ok || json.error)
-        throw new Error(json.msg || "Error al agendar paseo");
+        throw new Error(json.msg || "Error al agendar");
       Alert.alert("¡Listo!", "Paseo agendado", [
         { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
       ]);
@@ -121,29 +93,22 @@ export default function PetProfileScreen() {
 
   const handle_cancel = async () => {
     set_confirming(null);
-    if (scheduled_walk_id === null) {
-      Alert.alert("Error", "No hay paseo asignado que cancelar.");
-      return;
-    }
     try {
       const token = await get_token();
-      const res = await fetch(
-        `${API_BASE_URL}/walk/${scheduled_walk_id}/status`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ new_status: "cancelado" }),
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/walk/${scheduled_walk_id}/status`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ new_status: "cancelado" }),
+      });
       const json = await res.json();
-      if (!res.ok) {
+      if (!res.ok || json.error) {
         const msg =
           res.status === 403
             ? "Solo puedes cancelar un paseo con 30 minutos de antelación"
-            : json.msg || "Error al cancelar paseo";
+            : json.msg || "Error al cancelar";
         throw new Error(msg);
       }
       Alert.alert("Cancelado", "Paseo cancelado", [
@@ -178,10 +143,9 @@ export default function PetProfileScreen() {
         on_tab_change={set_active_tab}
         show_schedule_button={!scheduled_walk_id}
         show_cancel_button={!!scheduled_walk_id}
+        show_message_button={true}
         on_schedule_press={() => set_confirming("schedule")}
         on_cancel_press={() => set_confirming("cancel")}
-        on_edit_press={undefined}
-        on_contact_press={handleRedirectWhatsapp}
         api_base_url={API_BASE_URL || ""}
       />
 
@@ -231,7 +195,6 @@ export default function PetProfileScreen() {
     </>
   );
 }
-
 const { width } = Dimensions.get("window");
 const BOX_WIDTH = width * 0.8;
 
@@ -271,6 +234,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 4,
   },
+
   cancel_btn: {
     backgroundColor: "#eee",
   },
