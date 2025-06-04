@@ -46,6 +46,10 @@ import walk_confirmation_screen from "../screens/main/client/walks/walk_confirma
 import settings_screen from "../components/shared/settings_screen";
 import walk_history_cliente_screen from "../screens/main/client/walks/walk_history_screen";
 
+import payments_screen_cliente from "../screens/main/client/payment/payments_screen";
+import payment_detail_screen_cliente from "../screens/main/client/payment/payment_detail_screen";
+import PaymentSuccessScreen from "../screens/main/client/payment/payment_success_screen";
+
 export type RootStackParamList = {
   Welcome: undefined;
   AuthIntro: undefined;
@@ -53,7 +57,7 @@ export type RootStackParamList = {
   Register: undefined;
   ForgotPassword: undefined;
   VerifyCode: { email: string; context: "register" | "reset" };
-  ResetPassword: { email: string; code: string };
+  ResetPassword: { email: string };
   DashboardAdmin: undefined;
   DashboardCliente: undefined;
   DashboardPaseador: undefined;
@@ -93,6 +97,12 @@ export type RootStackParamList = {
   settings_walker: undefined;
   settings_admin: undefined;
   settings_cliente: undefined;
+
+  PaymentsScreenCliente: undefined;
+  PaymentDetailScreenCliente: { paymentId: number };
+  PaymentSuccessScreen: undefined;
+
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -194,6 +204,16 @@ export default function stack_navigator() {
         component={settings_screen}
         options={{ headerShown: true, title: "Ajustes" }}
       />
+
+      <Stack.Screen name="PaymentsScreenCliente" 
+        component={payments_screen_cliente} 
+      />
+      <Stack.Screen name="PaymentDetailScreenCliente" 
+        component={payment_detail_screen_cliente} 
+      />
+
+      <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen} />
+
     </Stack.Navigator>
   );
 }

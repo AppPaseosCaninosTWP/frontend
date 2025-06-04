@@ -54,10 +54,10 @@ export default function DashboardClienteScreen() {
             pet.zone === 'norte'
               ? 'norte'
               : pet.zone === 'centro'
-              ? 'centro'
-              : pet.zone === 'sur'
-              ? 'sur'
-              : 'centro',
+                ? 'centro'
+                : pet.zone === 'sur'
+                  ? 'sur'
+                  : 'centro',
         }));
         set_user_pets(mappedPets);
       } catch (error) {
@@ -70,62 +70,62 @@ export default function DashboardClienteScreen() {
     fetch_pets();
   }, []);
 
-const menu_options: menu_option[] = [
-  {
-    label: 'Dashboard',
-    icon: <Feather name="layout" size={20} color="#000c14" />,
-    on_press: () => navigation.navigate('DashboardCliente'),
-  },
-  { label: '__separator__', icon: null, on_press: () => {} },
-  {
-    label: 'Mascotas',
-    icon: <Ionicons name="paw" size={20} color="#000c14" />,
-    on_press: () => Alert.alert('Mascotas'),
-  },
-  ...user_pets.map((pet) => ({
-    label: String(pet.name),
-    icon: (
-      <Image
-        source={{ uri: `${API_UPLOADS_URL}/api/uploads/${pet.photo}` }}
-        style={{ width: 20, height: 20, borderRadius: 10 }}
-      />
-    ),
-    on_press: () => navigation.navigate('PetProfileClienteScreen', { petId: pet.pet_id }),
-  })),
-  { label: '__separator__', icon: null, on_press: () => {} },
-  {
-    label: 'Contactos',
-    icon: <Ionicons name="search" size={20} color="#000c14" />,
-    on_press: () => Alert.alert('Contactos'),
-  },
-  {
-    label: 'Calendario',
-    icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-    on_press: () => Alert.alert('Calendario'),
-  },
-  {
-    label: 'Cuenta',
-    icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-    on_press: () => Alert.alert('Cuenta'),
-  },
-  {
-    label: 'Ajustes',
-    icon: <Feather name="settings" size={20} color="#000c14" />,
-    on_press: () => Alert.alert('Ajustes'),
-  },
-  {
-    label: 'Cerrar sesión',
-    icon: <Feather name="log-out" size={20} color="#000c14" />,
-    on_press: async () => {
-      await SecureStore.deleteItemAsync("token");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Welcome" }],
-      });
+  const menu_options: menu_option[] = [
+    {
+      label: 'Dashboard',
+      icon: <Feather name="layout" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('DashboardCliente'),
     },
-  },
-];
-;
+    { label: '__separator__', icon: null, on_press: () => { } },
+    {
+      label: 'Mascotas',
+      icon: <Ionicons name="paw" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Mascotas'),
+    },
+    ...user_pets.map((pet) => ({
+      label: String(pet.name),
+      icon: (
+        <Image
+          source={{ uri: `${API_UPLOADS_URL}/api/uploads/${pet.photo}` }}
+          style={{ width: 20, height: 20, borderRadius: 10 }}
+        />
+      ),
+      on_press: () => navigation.navigate('PetProfileClienteScreen', { petId: pet.pet_id }),
+    })),
+    { label: '__separator__', icon: null, on_press: () => { } },
+    {
+      label: 'Contactos',
+      icon: <Ionicons name="search" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Contactos'),
+    },
+    {
+      label: 'Calendario',
+      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Calendario'),
+    },
+    {
+      label: 'Cuenta',
+      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Cuenta'),
+    },
+    {
+      label: 'Ajustes',
+      icon: <Feather name="settings" size={20} color="#000c14" />,
+      on_press: () => Alert.alert('Ajustes'),
+    },
+    {
+      label: 'Cerrar sesión',
+      icon: <Feather name="log-out" size={20} color="#000c14" />,
+      on_press: async () => {
+        await SecureStore.deleteItemAsync("token");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Welcome" }],
+        });
+      },
+    },
+  ];
+  ;
 
   if (is_loading) {
     return (
@@ -188,7 +188,7 @@ const menu_options: menu_option[] = [
               style={{
                 width: CARD_WIDTH,
               }}
-  >
+            >
 
               <TouchableOpacity
                 onPress={() => navigation.navigate("PetProfileClienteScreen", { petId: pet.pet_id })}
@@ -211,7 +211,7 @@ const menu_options: menu_option[] = [
                       style={styles.pet_image}
                       onError={() => console.log("Error al cargar imagen:", pet.photo)}
 
-                      
+
                     />
                   ) : (
                     <Feather name="image" size={60} color="#fff" />
@@ -221,7 +221,7 @@ const menu_options: menu_option[] = [
             </View>
           ))}
 
-          <View style={{ width: CARD_WIDTH,}}>
+          <View style={{ width: CARD_WIDTH, }}>
             <TouchableOpacity
               onPress={() => navigation.navigate("StepBreedScreen")}
               style={styles.card_add}
@@ -260,15 +260,19 @@ const menu_options: menu_option[] = [
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate('PaymentsScreenCliente')}
+        >
           <Image
-            source={require('../../../assets/admin/admin_photo1.png')}
+            source={require('../../../assets/plate_icon.png')}
             style={styles.icon}
           />
-          <Text style={styles.card_title}>Tarjeta de Salud</Text>
+          <Text style={styles.card_title}>Pagos</Text>
         </TouchableOpacity>
 
-       <TouchableOpacity
+
+        <TouchableOpacity
           style={styles.card}
           onPress={() => navigation.navigate("WalkHistoryClienteScreen")}
         >
@@ -381,49 +385,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#007BFF',
   },
   grid: {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'space-between',
-  marginBottom: 40,
-},
-card: {
-  width: '48%',
-  backgroundColor: '#e3f2fd',
-  borderRadius: 16,
-  paddingVertical: 32, // antes: 24
-  paddingHorizontal: 12,
-  alignItems: 'center',
-  marginBottom: 12,
-},
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 40,
+  },
+  card: {
+    width: '48%',
+    backgroundColor: '#e3f2fd',
+    borderRadius: 16,
+    paddingVertical: 32, // antes: 24
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
 
-card_title: {
-  fontSize: 14,
-  fontWeight: '600',
-  textAlign: 'center',
-  color: '#111',
-  marginTop: 12,
-  marginBottom: 6,
-},
-card_text: {
-  fontSize: 12,
-  textAlign: 'center',
-  color: '#666',
-},
-icon: {
-  width: 130,
-  height: 130,
-  marginBottom: 12,
-  borderRadius: 16,
-},
-card_add: {
-  borderRadius: 20,
-  height: 120,
-  padding: 16,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#E3F2FD',
-  width: '100%',
-},
-
+  card_title: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: '#111',
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  card_text: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: '#666',
+  },
+  icon: {
+    width: 130,
+    height: 130,
+    marginBottom: 12,
+    borderRadius: 16,
+  },
+  card_add: {
+    borderRadius: 20,
+    height: 120,
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E3F2FD',
+    width: '100%',
+  },
 
 });
