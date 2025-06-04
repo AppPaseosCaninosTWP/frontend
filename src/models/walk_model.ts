@@ -1,15 +1,24 @@
 export interface walk_model {
-  sector: string;
-  photo_url?: string; 
   walk_id: number;
   status: 'pendiente' | 'confirmado' | 'cancelado' | string;
   walk_type: string;
-  duration: number;
-  date: string;
-  time: string;
+  duration?: number;
+  date?: string;
+  time?: string;
+
   pet_id?: number;
   pet_name?: string;
   pet_photo?: string;
+  sector?: string;
+  photo_url?: string;
+
+  walker?: {
+    email: string;
+  };
+  client?: {
+    email: string;
+  };
+  comments?: string;
 }
 
 
