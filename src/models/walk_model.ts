@@ -1,4 +1,6 @@
 export interface walk_model {
+  sector: string;
+  photo_url?: string; 
   walk_id: number;
   status: 'pendiente' | 'confirmado' | 'cancelado' | string;
   walk_type: string;
@@ -8,7 +10,6 @@ export interface walk_model {
   pet_id?: number;
   pet_name?: string;
   pet_photo?: string;
-  photo_url?: string; 
 }
 
 

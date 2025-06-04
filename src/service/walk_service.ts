@@ -25,7 +25,8 @@ export async function create_walk(data: create_walk_payload): Promise<{ walk_id:
 
   return json; 
 }
-export async function get_all_walks() {
+
+export async function get_all_walks(): Promise<walk_model[]> {
   const token = await get_token();
 
   const response = await fetch(`${api_base_url}/walk?ts=${Date.now()}`, {
@@ -43,5 +44,25 @@ export async function get_all_walks() {
     throw new Error(json.msg || "Error al obtener paseos");
   }
 
-  return json.data || [];
+  const data = json.data || [];
+
+  const mapped: walk_model[] = data.map((w: any) => {
+    const pet = w.pets?.[0] ?? {};
+    const day = w.days?.[0] ?? {};
+    return {
+      walk_id: w.walk_id,
+      walk_type: w.walk_type,
+      status: w.status,
+      duration: day.duration,
+      date: day.start_date,
+      time: day.start_time,
+      pet_id: pet.pet_id,
+      pet_name: pet.name,
+      pet_photo: pet.photo,
+      photo_url: pet.photo ? `${uploads_url}/${pet.photo}` : undefined,
+      sector: pet.zone ?? "desconocido",
+    };
+  });
+
+  return mapped;
 }
