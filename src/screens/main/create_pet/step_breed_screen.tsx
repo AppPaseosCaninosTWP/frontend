@@ -36,18 +36,26 @@ export default function Step_breed_screen() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list_container}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.breed_card,
-              selected_breed === item.name && styles.breed_card_selected,
-            ]}
-            onPress={() => set_selected_breed(item.name)}
-          >
-            <Image source={item.image} style={styles.breed_image} />
-            <Text style={styles.breed_name}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+  const is_selected = selected_breed === item.name;
+  return (
+    <TouchableOpacity
+      style={[
+        styles.breed_card,
+        is_selected && styles.breed_card_selected,
+      ]}
+      onPress={() => set_selected_breed(item.name)}
+    >
+      <View style={styles.image_wrapper}>
+        <Image source={item.image} style={styles.breed_image} resizeMode="contain" />
+      </View>
+      <Text style={[styles.breed_name, is_selected && styles.breed_name_selected]}>
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
+}}
+
       />
 
       <View style={styles.actions}>
@@ -65,32 +73,54 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   list_container: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
     paddingBottom: 20,
   },
   row: {
     justifyContent: 'space-between',
+    marginBottom: 12,
   },
   breed_card: {
     width: '48%',
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 15,
     alignItems: 'center',
-    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   breed_card_selected: {
-    borderWidth: 2,
     borderColor: '#007BFF',
+    borderWidth: 2,
   },
-  breed_image: {
+  image_wrapper: {
     width: 60,
     height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 8,
+  },
+  breed_image: {
+    width: 120,
+    height: 120,
   },
   breed_name: {
     fontSize: 14,
     fontWeight: '500',
+    color: '#333',
+    textAlign: 'center',
+    maxWidth: 120,
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  breed_name_selected: {
+    color: '#007BFF',
   },
   actions: {
     alignItems: 'center',
@@ -98,5 +128,3 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 });
-
-

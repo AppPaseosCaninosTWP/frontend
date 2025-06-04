@@ -1,27 +1,35 @@
+const default_image = require('../assets/breeds/default.png');
+
 export const breeds = [
-    {
-      name: 'Mixed Breed',
-      image: require('../assets/breeds/mixed_breed.png'),
-    },
-    {
-      name: 'Afghan Hound',
-      image: require('../assets/breeds/afghan_hound.png'),
-    },
-    {
-      name: 'Golden Retriever',
-      image: require('../assets/breeds/golden.png'),
-    },
-    {
-      name: 'Akita',
-      image: require('../assets/breeds/akita.png'),
-    },
-    {
-      name: 'Border Collie',
-      image: require('../assets/breeds/border_collie.png'),
-    },
-    {
-      name: 'Dalmatian',
-      image: require('../assets/breeds/dalmatian.png'),
-    },
-  ];
-  
+  { name: 'Mestizo', image: require('../assets/breeds/mixed_breed.png') },
+  { name: 'Labrador Retriever', image: default_image },
+  { name: 'Golden Retriever', image: require('../assets/breeds/golden.png') },
+  { name: 'Pastor Alemán', image: default_image },
+  { name: 'Bulldog Francés', image: default_image },
+  { name: 'Chihuahua', image: default_image },
+  { name: 'Poodle', image: default_image },
+  { name: 'Rottweiler', image: default_image },
+  { name: 'Beagle', image: default_image },
+  { name: 'Shih Tzu', image: default_image },
+  { name: 'Border Collie', image: require('../assets/breeds/border_collie.png') },
+  { name: 'Husky Siberiano', image: default_image },
+  { name: 'Dálmata', image: require('../assets/breeds/dalmatian.png') },
+  { name: 'Akita', image: require('../assets/breeds/akita.png') },
+  { name: 'Cocker Spaniel', image: default_image },
+  { name: 'Gran Danés', image: default_image },
+  { name: 'Doberman', image: default_image },
+  { name: 'Boston Terrier', image: default_image },
+  { name: 'Pug', image: default_image },
+  { name: 'Maltés', image: default_image },
+  { name: 'Bóxer', image: default_image },
+  { name: 'Basset Hound', image: default_image },
+  { name: 'San Bernardo', image: default_image },
+  { name: 'Pinscher Miniatura', image: default_image },
+  { name: 'Caniche Toy', image: default_image },
+  { name: 'Galgo Español', image: default_image },
+  { name: 'Shar Pei', image: default_image },
+  { name: 'Bulldog Inglés', image: default_image },
+  { name: 'Setter Irlandés', image: default_image },
+  { name: 'Weimaraner', image: default_image },
+  { name: 'Lhasa Apso', image: default_image },
+];
