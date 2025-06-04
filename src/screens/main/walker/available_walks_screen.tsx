@@ -90,7 +90,7 @@ export default function AvailableWalksScreen() {
           navigation.navigate("PetProfileScreen", {
             walkId: item.walk_id,
             petId: item.pet_id!,
-            duration: item.duration,
+            duration: item.duration ?? 0,
           });
         }}
       >
