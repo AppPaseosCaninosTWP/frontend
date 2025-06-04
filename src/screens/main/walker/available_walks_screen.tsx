@@ -15,84 +15,92 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { get_token } from "../../../utils/token_service";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
-import { useRoute } from "@react-navigation/native";
+import type { walk_model } from "../../../models/walk_model";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-
-interface BackendWalk {
-  walk_id: number;
-  pet_id: number;
-  pet_name: string;
-  sector: string;
-  walk_type: string;
-  date: string;
-  time: string;
-  duration: number;
-  pet_photo_url: string | null;
-}
 
 export default function AvailableWalksScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [allWalks, setAllWalks] = useState<BackendWalk[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<"Fijo" | "Esporádico">("Fijo");
+  const [all_walks, set_all_walks] = useState<walk_model[]>([]);
+  const [loading, set_loading] = useState(false);
+  const [selected_tab, set_selected_tab] = useState<"Fijo" | "Esporádico">("Fijo");
 
   useEffect(() => {
-    fetchWalks();
+    fetch_walks();
   }, []);
 
-  const fetchWalks = async () => {
-    setLoading(true);
+  const fetch_walks = async () => {
+    set_loading(true);
     try {
       const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk/available`, {
+      const res = await fetch(`${API_BASE_URL}/walk`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const { data, error, msg } = await res.json();
       if (error) throw new Error(msg);
-      console.log("fetchWalks data:", data);
-      setAllWalks(data);
+
+      const mapped: walk_model[] = data
+        .filter((w: any) => w.status === "pendiente")
+        .map((w: any) => {
+          const pet = w.pets?.[0] ?? {};
+          const day = w.days?.[0] ?? {};
+          return {
+            walk_id: w.walk_id,
+            walk_type: w.walk_type,
+            status: w.status,
+            pet_id: pet.pet_id,
+            pet_name: pet.name,
+            photo_url: pet.photo ? `${API_BASE_URL}/uploads/${pet.photo}` : undefined,
+            sector: pet.zone ?? "desconocido",
+            date: day.start_date,
+            time: day.start_time,
+            duration: day.duration,
+          };
+        });
+
+      set_all_walks(mapped);
     } catch (err: any) {
       Alert.alert("Error al cargar paseos", err.message);
     } finally {
-      setLoading(false);
+      set_loading(false);
     }
   };
+
   const normalize = (s: string) =>
     s
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\u0300-\u036f/g, "")
       .toLowerCase();
 
-  const walksToShow = allWalks.filter(
-    (w) => normalize(w.walk_type) === normalize(selectedTab)
+  const walks_to_show = all_walks.filter(
+    (w) =>
+      w.status === "pendiente" &&
+      normalize(w.walk_type) === normalize(selected_tab)
   );
 
-  const renderItem = ({ item }: { item: BackendWalk }) => {
-    console.log("🏷  renderItem, pet_id =", item.pet_id);
-    const { pet_name, pet_photo_url, date, time, sector } = item;
+  const render_item = ({ item }: { item: walk_model }) => {
+    const { pet_name, photo_url, date, time, sector } = item;
 
     return (
       <TouchableOpacity
         style={styles.card}
         onPress={() => {
-          console.log("PetProfileScreen con petId =", item.pet_id);
           navigation.navigate("PetProfileScreen", {
             walkId: item.walk_id,
-            petId: item.pet_id,
+            petId: item.pet_id!,
             duration: item.duration,
           });
         }}
       >
         <View style={styles.cardHeader}>
-          {item.pet_photo_url ? (
+          {photo_url ? (
             <Image
-              source={{ uri: item.pet_photo_url }}
+              source={{ uri: photo_url }}
               style={styles.avatar}
               onError={() =>
-                console.warn("Error cargando imagen:", item.pet_photo_url)
+                console.warn("Error cargando imagen:", photo_url)
               }
             />
           ) : (
@@ -100,29 +108,15 @@ export default function AvailableWalksScreen() {
           )}
           <View style={styles.info}>
             <Text style={styles.name}>{pet_name}</Text>
-
-            {selectedTab === "Fijo" ? (
-              <>
-                <Text
-                  style={styles.meta}
-                >{`Paseo Fijo  |  ${time}  |  ${date}`}</Text>
-                <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
-              </>
-            ) : (
-              <>
-                <Text
-                  style={styles.meta}
-                >{`Paseo Esporádico  |  ${time}  |  ${date}`}</Text>
-                <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
-              </>
-            )}
+            <Text style={styles.meta}>{`Paseo ${selected_tab}  |  ${time}  |  ${date}`}</Text>
+            <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
           </View>
-
           <Feather name="chevron-right" size={20} color="#999" />
         </View>
       </TouchableOpacity>
     );
   };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -135,19 +129,19 @@ export default function AvailableWalksScreen() {
       </View>
 
       <View style={styles.tabContainer}>
-        {(["Fijo", "Esporádico"] as const).map((tab) => (
+        {["Fijo", "Esporádico"].map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[
               styles.tabButton,
-              selectedTab === tab && styles.tabButtonActive,
+              selected_tab === tab && styles.tabButtonActive,
             ]}
-            onPress={() => setSelectedTab(tab)}
+            onPress={() => set_selected_tab(tab as "Fijo" | "Esporádico")}
           >
             <Text
               style={[
                 styles.tabText,
-                selectedTab === tab && styles.tabTextActive,
+                selected_tab === tab && styles.tabTextActive,
               ]}
             >
               Paseos {tab}
@@ -160,14 +154,14 @@ export default function AvailableWalksScreen() {
         <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (
         <FlatList
-          data={walksToShow}
+          data={walks_to_show}
           keyExtractor={(w) => w.walk_id.toString()}
-          renderItem={renderItem}
+          renderItem={render_item}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
-              No hay paseos {selectedTab.toLowerCase()} disponibles
+              No hay paseos {selected_tab.toLowerCase()} disponibles
             </Text>
           }
         />
@@ -182,7 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 40,
+    paddingTop: 40,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
@@ -193,7 +187,6 @@ const styles = StyleSheet.create({
     flex: 0.9,
     color: "#111",
   },
-
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -214,7 +207,6 @@ const styles = StyleSheet.create({
   },
   tabText: { fontSize: 14, color: "#555" },
   tabTextActive: { color: "#fff", fontWeight: "600" },
-
   list: {
     paddingHorizontal: 16,
     paddingTop: 20,
@@ -225,7 +217,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: "#666",
   },
-
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
