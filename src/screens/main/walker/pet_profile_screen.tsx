@@ -46,7 +46,7 @@ export default function PetProfileScreen() {
       try {
         const token = await get_token();
         const res_pet = await fetch(
-          `${API_BASE_URL}/pet/get_pet_by_id/${petId}`,
+          `${API_BASE_URL}/pet/${petId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -72,13 +72,13 @@ export default function PetProfileScreen() {
     set_confirming(null);
     try {
       const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk/accept`, {
-        method: "POST",
+      const res = await fetch(`${API_BASE_URL}/walk/${walkId}/status`, {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ walkId }),
+        body: JSON.stringify({ new_status: "confirmado" }),
       });
       const json = await res.json();
       if (!res.ok || json.error)
@@ -95,16 +95,16 @@ export default function PetProfileScreen() {
     set_confirming(null);
     try {
       const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk/cancel`, {
-        method: "POST",
+      const res = await fetch(`${API_BASE_URL}/walk/${scheduled_walk_id}/status`, {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ walkId: scheduled_walk_id }),
+        body: JSON.stringify({ new_status: "cancelado" }),
       });
       const json = await res.json();
-      if (!res.ok) {
+      if (!res.ok || json.error) {
         const msg =
           res.status === 403
             ? "Solo puedes cancelar un paseo con 30 minutos de antelación"
@@ -143,6 +143,7 @@ export default function PetProfileScreen() {
         on_tab_change={set_active_tab}
         show_schedule_button={!scheduled_walk_id}
         show_cancel_button={!!scheduled_walk_id}
+        show_message_button={true}
         on_schedule_press={() => set_confirming("schedule")}
         on_cancel_press={() => set_confirming("cancel")}
         api_base_url={API_BASE_URL || ""}
