@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   StyleSheet,
-  ImageSourcePropType,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
 } from 'react-native';
 import NotificationCenter from './notification_center';
-import { get_user } from '../../utils/token_service';
+import { use_auth } from '../../hooks/use_auth';
 
 interface header_props {
   role_id: number;
-  name?: string;
-  profile_image?: ImageSourcePropType;
   on_search_press?: () => void;
   on_menu_press?: () => void;
 }
@@ -36,37 +30,24 @@ const get_role_label = (role_id: number): string => {
 
 export default function Header({
   role_id,
-  name,
-  profile_image,
   on_search_press,
   on_menu_press,
 }: header_props) {
-  const label = name ?? get_role_label(role_id);
-  const handle_search = on_search_press ?? (() => {});
-  const [user_id, set_user_id] = useState<number | null>(null);
+  const { user } = use_auth();
 
-  useEffect(() => {
-    (async () => {
-      const u = await get_user();
-      set_user_id(u?.id ?? null);
-    })();
-  }, []);
+  const label = user?.name ?? get_role_label(role_id);
+  const user_id = user?.id ?? null;
+
+  const handle_search = on_search_press ?? (() => {});
 
   return (
     <View style={styles.container}>
       <View style={styles.user_info}>
-        <Image
-          source={profile_image ?? require('../../assets/user_icon.png')}
-          style={styles.profile_image}
-        />
         <Text style={styles.greeting}>Hola, {label}</Text>
       </View>
 
       <View style={styles.actions}>
-
-        {user_id != null && (
-          <NotificationCenter userId={user_id} />
-        )}
+        {user_id != null && <NotificationCenter userId={user_id} />}
 
         {on_menu_press && (
           <TouchableOpacity onPress={on_menu_press} style={styles.icon_btn}>
@@ -81,15 +62,7 @@ export default function Header({
   );
 }
 
-const styles = StyleSheet.create<{
-  container: ViewStyle;
-  user_info: ViewStyle;
-  profile_image: ImageStyle;
-  greeting: TextStyle;
-  actions: ViewStyle;
-  icon_btn: ViewStyle;
-  icon: ImageStyle;
-}>({
+const styles = StyleSheet.create({
   container: {
     width: '100%',
     paddingHorizontal: 20,
