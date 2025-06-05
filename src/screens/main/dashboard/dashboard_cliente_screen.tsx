@@ -25,6 +25,9 @@ import type { menu_option } from '../../../components/shared/side_menu';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as SecureStore from 'expo-secure-store';
+import { useContext } from 'react';
+import { AuthContext } from '../../../context/auth/auth_context';
+
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const API_UPLOADS_URL = process.env.EXPO_PUBLIC_URL;
@@ -33,6 +36,7 @@ const CARD_WIDTH = SCREEN_WIDTH - 40;
 
 export default function DashboardClienteScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { logout } = useContext(AuthContext);
   const [is_loading, set_is_loading] = useState(true);
   const [user_pets, set_user_pets] = useState<pet_model[]>([]);
   const [active_index, set_active_index] = useState(0);
@@ -117,13 +121,14 @@ export default function DashboardClienteScreen() {
       label: 'Cerrar sesión',
       icon: <Feather name="log-out" size={20} color="#000c14" />,
       on_press: async () => {
-        await SecureStore.deleteItemAsync("token");
+        await logout();
         navigation.reset({
           index: 0,
-          routes: [{ name: "Welcome" }],
+          routes: [{ name: 'Welcome' }], // asegúrate que 'Welcome' esté en el stack
         });
       },
     },
+
   ];
   ;
 
