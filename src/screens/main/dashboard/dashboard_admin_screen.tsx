@@ -50,56 +50,49 @@ export default function Dashboard_admin_screen() {
     );
   }
 
+  // Siempre usamos el ícono por defecto para el admin:
+  const profileImageSource = require('../../../assets/user_icon.png');
+
   const menu_options: menu_option[] = [
     {
       label: 'Dashboard',
-      icon: <Feather name="layout" size={20} color="#fff" />,
+      icon: <Feather name="layout" size={20} color="#000c14" />,
       on_press: () => navigation.navigate('DashboardAdmin'),
     },
     {
       label: 'Usuarios',
-      icon: <Ionicons name="people" size={20} color="#fff" />,
+      icon: <Ionicons name="people" size={20} color="#000c14" />,
       on_press: () => navigation.navigate('UserScreen'),
     },
     {
-      label: 'Calendario Global',
-      icon: <MaterialIcons name="calendar-today" size={20} color="#fff" />,
-      on_press: () => Alert.alert('Calendario'),
+      label: 'Paseos',
+      icon: <Ionicons name="walk" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('WalksScreen'),
     },
     {
-      label: 'Solicitudes',
-      icon: <MaterialIcons name="request-page" size={20} color="#fff" />,
-      on_press: () => navigation.navigate('RequestToChangeScreen'),
-   },
-   {
-      label: 'Registrar Paseador',
-      icon: <MaterialIcons name="person-add" size={20} color="#fff" />,
-      on_press: () => navigation.navigate('RegisterWalkerScreen'), 
-   },
-
-    {
       label: 'Pagos',
-      icon: <MaterialIcons name="payment" size={20} color="#fff" />,
+      icon: <MaterialIcons name="payment" size={20} color="#000c14" />,
       on_press: () => navigation.navigate('PaymentsScreen'),
     },
     {
-      label: 'Cuenta',
-      icon: <Ionicons name="person-circle" size={20} color="#fff" />,
-      on_press: () => Alert.alert('Cuenta'),
+      label: 'Solicitudes',
+      icon: <MaterialIcons name="request-page" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('RequestToChangeScreen'),
     },
     {
-      label: 'Calificaciones',
-      icon: <Ionicons name="star" size={20} color="#fff" />,
-      on_press: () => Alert.alert('Calificaciones'),
+      label: 'Registrar Paseador',
+      icon: <MaterialIcons name="person-add" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('RegisterWalkerScreen'),
     },
+    { label: "__separator__", icon: null, on_press: () => {} },
     {
       label: 'Ajustes',
-      icon: <Feather name="settings" size={20} color="#fff" />,
-      on_press: () => Alert.alert('Ajustes'),
+      icon: <Feather name="settings" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate('settings_admin'),
     },
     {
       label: 'Cerrar sesión',
-      icon: <MaterialIcons name="logout" size={20} color="#fff" />,
+      icon: <MaterialIcons name="logout" size={20} color="#000c14" />,
       on_press: async () => {
         await clear_session();
         navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
@@ -110,6 +103,8 @@ export default function Dashboard_admin_screen() {
   return (
     <ScreenWithMenu
       role_id={1}
+      name={user?.name ?? 'Administrador'}
+      profile_image={profileImageSource}
       menu_options={menu_options}
       on_search_press={() => navigation.navigate('UserScreen')}
     >
