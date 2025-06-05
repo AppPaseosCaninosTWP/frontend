@@ -124,7 +124,7 @@ export async function reset_password(
 export async function get_all_users(page: number = 1): Promise<user_model[]> {
   const token = await get_token();
   const response = await fetch(
-    `${api_base_url}/user/get_all_user?page=${page}`, {
+    `${api_base_url}/user?page=${page}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ export async function disable_enable_user(
   is_enable: boolean
 ): Promise<disable_enable_response> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/user/is_enable/${user_id}`, {
+  const response = await fetch(`${api_base_url}/user/${user_id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -162,9 +162,9 @@ export async function disable_enable_user(
   return json.data;
 }
 
-export async function get_profile_walker(): Promise<user_model> {
+export async function get_profile_walker(page:number = 1): Promise<user_model[]> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/walker_profile/get_profiles`, {
+  const response = await fetch(`${api_base_url}/walker_profile/get_profiles?page=${page}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -263,4 +263,21 @@ if (!res.ok || json.error) {
   throw new Error(json.msg || 'error_al_registrar_paseador');
 }
 return json.data;
+}
+
+export async function get_all_walks(page: number = 1): Promise<any[]> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walk/?page=${page}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_paseos');
+  }
+  return json.data;
 }
