@@ -59,36 +59,39 @@ export default function UserScreen() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      try {
-        let allUsers: BackendUser[] = [];
-        let page = 1;
-        while (true) {
-          const batch = await get_all_users(page);
-          if (!batch.length) break;
-          allUsers = allUsers.concat(batch);
-          page++;
-        }
-        setUsers(allUsers);
-
-       
-        const profiles = await get_profile_walker();
-       
-        if (Array.isArray(profiles)) {
-          setWalkerProfiles(profiles as WalkerProfile[]);
-        } else {
-          setWalkerProfiles([]);
-          console.warn('get_profile_walker() did not return an array:', profiles);
-        }
-      } catch (err) {
-        console.error('Error cargando datos:', err);
-      } finally {
-        setLoading(false);
+  async function loadData() {
+    setLoading(true);
+    try {
+      // ----------- Carga todos los usuarios paginados -----------
+      let allUsers: BackendUser[] = [];
+      let userPage = 1;
+      while (true) {
+        const batchUsers = await get_all_users(userPage);
+        if (!batchUsers.length) break;
+        allUsers = allUsers.concat(batchUsers);
+        userPage++;
       }
+      setUsers(allUsers);
+
+      // ----------- Carga todos los perfiles de paseadores paginados -----------
+      let allProfiles: WalkerProfile[] = [];
+      let walkerPage = 1;
+      while (true) {
+        const batchProfiles = await get_profile_walker(walkerPage);
+        if (!batchProfiles.length) break;
+        allProfiles = allProfiles.concat(batchProfiles as unknown as WalkerProfile[]);
+        walkerPage++;
+      }
+      setWalkerProfiles(allProfiles);
+    } catch (err) {
+      console.error('Error cargando datos:', err);
+    } finally {
+      setLoading(false);
     }
-    loadData();
-  }, []);
+  }
+  loadData();
+}, []);
+
 
   const filterByStatus = (enabled: boolean) =>
     filterStatus === 'all'

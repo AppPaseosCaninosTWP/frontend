@@ -19,6 +19,21 @@ export interface disable_enable_response {
   is_enable: boolean;
 }
 
+export interface WalkerProfile {
+  walker_id: number;
+  name: string;
+  email: string;
+  phone: string;
+  experience: number;
+  walker_type: string;
+  zone: string;
+  description: string;
+  balance: number;
+  on_review: boolean;
+  photo: string;       // nombre de archivo
+  photo_url: string;   // <-- Aquí agregamos photo_url, que vendrá como string desde el backend
+}
+
 export async function login_user(email: string, password: string): Promise<login_response> {
   const response = await fetch(`${api_base_url}/auth/login`, {
     method: 'POST',
@@ -124,7 +139,7 @@ export async function reset_password(
 export async function get_all_users(page: number = 1): Promise<user_model[]> {
   const token = await get_token();
   const response = await fetch(
-    `${api_base_url}/user/get_all_user?page=${page}`, {
+    `${api_base_url}/user?page=${page}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -145,7 +160,7 @@ export async function disable_enable_user(
   is_enable: boolean
 ): Promise<disable_enable_response> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/user/is_enable/${user_id}`, {
+  const response = await fetch(`${api_base_url}/user/${user_id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -162,9 +177,9 @@ export async function disable_enable_user(
   return json.data;
 }
 
-export async function get_profile_walker(): Promise<user_model> {
+export async function get_profile_walker(page:number = 1): Promise<user_model[]> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/walker_profile/get_profiles`, {
+  const response = await fetch(`${api_base_url}/walker_profile/get_profiles?page=${page}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -263,4 +278,72 @@ if (!res.ok || json.error) {
   throw new Error(json.msg || 'error_al_registrar_paseador');
 }
 return json.data;
+}
+
+export async function get_all_walks(page: number = 1): Promise<any[]> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walk/?page=${page}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_paseos');
+  }
+  return json.data;
+}
+
+export async function get_walk_details(walk_id: number): Promise<any> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walk/${walk_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_detalles_paseo');
+  }
+  return json.data;
+}
+
+export async function get_profile_walker_by_id(walker_id: number): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walker_profile/get_profile/${walker_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_perfil_paseador_por_id');
+  }
+  return json.data;
+}
+
+export async function get_user_by_id(user_id: number): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/user/${user_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_usuario_por_id');
+  }
+  return json.data;
 }
