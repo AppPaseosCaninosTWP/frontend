@@ -19,6 +19,21 @@ export interface disable_enable_response {
   is_enable: boolean;
 }
 
+export interface WalkerProfile {
+  walker_id: number;
+  name: string;
+  email: string;
+  phone: string;
+  experience: number;
+  walker_type: string;
+  zone: string;
+  description: string;
+  balance: number;
+  on_review: boolean;
+  photo: string;       // nombre de archivo
+  photo_url: string;   // <-- Aquí agregamos photo_url, que vendrá como string desde el backend
+}
+
 export async function login_user(email: string, password: string): Promise<login_response> {
   const response = await fetch(`${api_base_url}/auth/login`, {
     method: 'POST',
@@ -301,7 +316,7 @@ export async function get_walk_details(walk_id: number): Promise<any> {
 
 export async function get_profile_walker_by_id(walker_id: number): Promise<user_model> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/walker_profile/${walker_id}`, {
+  const response = await fetch(`${api_base_url}/walker_profile/get_profile/${walker_id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -312,6 +327,23 @@ export async function get_profile_walker_by_id(walker_id: number): Promise<user_
   const json = await response.json();
   if (!response.ok || json.error) {
     throw new Error(json.msg || 'error_obtener_perfil_paseador_por_id');
+  }
+  return json.data;
+}
+
+export async function get_user_by_id(user_id: number): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/user/${user_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_usuario_por_id');
   }
   return json.data;
 }
