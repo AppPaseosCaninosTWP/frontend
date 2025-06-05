@@ -1,26 +1,17 @@
-import { useEffect, useState } from 'react';
-import { get_user } from '../utils/token_service';
-import type { user_model } from '../models/user_model';
+import { useContext } from 'react';
+import { AuthContext } from '../context/auth/auth_context';
 
 export function use_auth() {
-  const [user, set_user] = useState<user_model | null>(null);
-  const [loading, set_loading] = useState(true);
+  const { user, status, auth, logout } = useContext(AuthContext);
 
-  useEffect(() => {
-    const load_user = async () => {
-      try {
-        const stored_user = await get_user();
-        set_user(stored_user || null);
-      } catch (error) {
-        console.error('Error loading user:', error);
-        set_user(null);
-      } finally {
-        set_loading(false);
-      }
-    };
+  const is_loading = status === 'checking';
+  const is_authenticated = status === 'authenticated';
 
-    load_user();
-  }, []);
-
-  return { user, loading };
+  return {
+    user,
+    is_loading,
+    is_authenticated,
+    auth,
+    logout,
+  };
 }
