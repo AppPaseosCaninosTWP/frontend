@@ -1,5 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { user_model } from '../models/user_model';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:7070';
+
 
 const token_key = 'jwt';
 const user_key = 'user';
@@ -47,4 +49,33 @@ export const clear_session = async (): Promise<void> => {
   await SecureStore.deleteItemAsync(user_key);
 };
 
+export const verify_token = async (token?: string): Promise<{ success: boolean; expired: boolean }> => {
+  try {
+    const jwt = token || (await get_token());
+
+    if (!jwt) {
+      return { success: false, expired: true };
+    }
+
+    const res = await fetch(`${API_URL}/api/auth/verify`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    if (!res.ok) {
+      return { success: false, expired: true };
+    }
+
+    const data = await res.json();
+    return {
+      success: data.success ?? false,
+      expired: data.expired ?? true,
+    };
+  } catch (error) {
+    console.error('Error verificando token:', error);
+    return { success: false, expired: true };
+  }
+};
 

@@ -17,12 +17,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { login_user } from '../../service/auth_service';
 import { save_session } from '../../utils/token_service';
+import { use_auth } from '../../hooks/use_auth';
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const fade_anim = useRef(new Animated.Value(0)).current;
   const translate_anim = useRef(new Animated.Value(30)).current;
-
+  const { auth } = use_auth();
   const [email, set_email] = useState('');
   const [password, set_password] = useState('');
   const [email_error, set_email_error] = useState('');
@@ -60,14 +61,17 @@ export default function LoginScreen() {
 
     try {
       const { token, user } = await login_user(email, password);
-      await save_session(token, user);
-      Alert.alert('Sesión iniciada', `Bienvenido, ${user.name}`);
-      navigation.replace('DashboardScreen');
+      await auth(token, user);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'DashboardScreen' }],
+      });
     } catch (err: any) {
       console.error('Error desde login_user:', err);
       Alert.alert('Error', err.message);
     }
   };
+
 
   useEffect(() => {
     Animated.parallel([
