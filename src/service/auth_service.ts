@@ -281,3 +281,20 @@ export async function get_all_walks(page: number = 1): Promise<any[]> {
   }
   return json.data;
 }
+
+export async function get_walk_details(walk_id: number): Promise<any> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walk/${walk_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_detalles_paseo');
+  }
+  return json.data;
+}
