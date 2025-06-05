@@ -298,3 +298,20 @@ export async function get_walk_details(walk_id: number): Promise<any> {
   }
   return json.data;
 }
+
+export async function get_profile_walker_by_id(walker_id: number): Promise<user_model> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walker_profile/${walker_id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_obtener_perfil_paseador_por_id');
+  }
+  return json.data;
+}
