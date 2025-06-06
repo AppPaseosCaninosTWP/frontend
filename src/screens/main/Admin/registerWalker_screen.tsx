@@ -17,7 +17,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker'; // npm install @react-native-picker/picker
 import HeaderAdmin from '../../../components/shared/header_admin';
-import { register_Walker } from '../../../service/auth_service';
+import { register_Walker } from '../../../service/walker_service';
 
 export default function RegisterWalkerScreen() {
   // ─── States para cada campo ─────────────────────────────────────────────────────────────────────────
