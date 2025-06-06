@@ -10,113 +10,56 @@ import {
   Dimensions,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { get_token, get_user } from "../../../utils/token_service";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "../../../navigation/stack_navigator";
 import { LinearGradient } from "expo-linear-gradient";
+
+import {
+  get_walker_balance,
+  get_payment_history,
+} from "../../../service/payment_service";
+import type {
+  BalanceResponse,
+  PaymentHistoryItem,
+} from "../../../models/payment_model";
+import type { RootStackParamList } from "../../../navigation/stack_navigator";
 
 const { width: screen_width } = Dimensions.get("window");
 const h_padding = 20;
 const card_width = screen_width - h_padding * 2;
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-
-interface BalanceResponse {
-  walker_id: number;
-  walker_name: string;
-  balance: number;
-  currency?: string;
-}
-
-interface PaymentHistoryItem {
-  payment_id: number;
-  amount: number;
-  date: string;
-  status: string; // pendiente o completado
-  client_email: string;
-}
 
 export default function PaymentsWalkerScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [loading, set_loading] = useState<boolean>(true);
 
+  const [loading, set_loading] = useState<boolean>(true);
   const [balance_info, set_balance_info] = useState<BalanceResponse | null>(
     null
   );
-
   const [payment_history, set_payment_history] = useState<PaymentHistoryItem[]>(
     []
   );
 
   useEffect(() => {
-    (async () => {
-      set_loading(true);
-      try {
-        const token = await get_token();
-        const user = await get_user();
-        const walker_id = user?.id;
-
-        if (!token || !walker_id) {
-          throw new Error("Sesión no válida");
-        }
-
-        const res_balance = await fetch(
-          `${API_BASE_URL}/walker_profile/get_profile/${walker_id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (!res_balance.ok) {
-          const text = await res_balance.text();
-          console.error("Error al cargar balance:", text);
-          throw new Error(`Balance HTTP ${res_balance.status}`);
-        }
-        const bal_json = await res_balance.json();
-        if (bal_json.error) {
-          throw new Error(bal_json.msg);
-        }
-        const walker_data = bal_json.data as any;
-        set_balance_info({
-          walker_id: walker_data.walker_id,
-          walker_name: walker_data.name,
-          balance: walker_data.balance,
-          currency: "CLP",
-        });
-
-        const res_history = await fetch(`${API_BASE_URL}/payment/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res_history.ok) {
-          const text = await res_history.text();
-          console.error("Error al cargar historial:", text);
-          throw new Error(`History HTTP ${res_history.status}`);
-        }
-        const hist_json = await res_history.json();
-        if (hist_json.error) {
-          throw new Error(hist_json.msg);
-        }
-
-        const raw_history: any[] = hist_json.data;
-        const mapped_history: PaymentHistoryItem[] = raw_history.map((p) => ({
-          payment_id: p.payment_id,
-          amount: Number(p.amount),
-          date: new Date(p.date).toLocaleDateString("es-CL", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          }),
-          status: p.status,
-          client_email: p.walk?.client?.email ?? "—",
-        }));
-        set_payment_history(mapped_history);
-      } catch (err: any) {
-        Alert.alert("Error", err.message);
-      } finally {
-        set_loading(false);
-      }
-    })();
+    fetch_data();
   }, []);
+
+  const fetch_data = async () => {
+    set_loading(true);
+    try {
+      const bal = await get_walker_balance();
+      set_balance_info(bal);
+
+      const history = await get_payment_history();
+      set_payment_history(history);
+    } catch (err: any) {
+      Alert.alert("Error", err.message);
+      set_balance_info(null);
+      set_payment_history([]);
+    } finally {
+      set_loading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -129,7 +72,7 @@ export default function PaymentsWalkerScreen() {
   const formatted_balance = balance_info
     ? balance_info.balance.toLocaleString("es-CL", {
         style: "currency",
-        currency: "CLP",
+        currency: balance_info.currency ?? "CLP",
         minimumFractionDigits: 2,
       })
     : "";
@@ -156,10 +99,12 @@ export default function PaymentsWalkerScreen() {
           />
 
           <View style={styles.text_container}>
-            <Text style={styles.amount}>CLP {item.amount.toFixed(2)}</Text>
+            <Text style={styles.amount}>{`CLP ${item.amount.toFixed(2)}`}</Text>
             <Text style={styles.details}>{item.date}</Text>
-            <Text style={styles.details}>Cliente: {item.client_email}</Text>
-            <Text style={styles.status}>Estado: {item.status}</Text>
+            <Text
+              style={styles.details}
+            >{`Cliente: ${item.client_email}`}</Text>
+            <Text style={styles.status}>{`Estado: ${item.status}`}</Text>
           </View>
         </LinearGradient>
       </TouchableOpacity>

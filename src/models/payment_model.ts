@@ -16,3 +16,18 @@ export type payment_model = {
     days?: day_model[];
   };
 };
+
+export interface BalanceResponse {
+  walker_id: number;
+  walker_name: string;
+  balance: number;
+  currency?: string;
+}
+
+export interface PaymentHistoryItem {
+  payment_id: number;
+  amount: number;
+  date: string;
+  status: string; //pendiente o completado
+  client_email: string;
+}
