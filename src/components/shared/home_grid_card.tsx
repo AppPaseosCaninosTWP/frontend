@@ -28,12 +28,19 @@ export default function HomeGridCard({
 const styles = StyleSheet.create({
   card: {
     width: "48%",
-    backgroundColor: "#A8F5FD",
+    backgroundColor: "#e3f2fd",
+    borderWidth: 1,
+    borderColor: "#bbdefb",
     borderRadius: 16,
     paddingVertical: 32,
     paddingHorizontal: 12,
     alignItems: "center",
     marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
   title: {
     fontSize: 16,

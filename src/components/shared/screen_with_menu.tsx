@@ -9,7 +9,6 @@ interface screen_with_menu_props {
   menu_options: menu_option[];
   children: ReactNode;
   on_search_press?: () => void;
-  // Agregamos esta prop opcional:
   external_name?: string;
 }
 
@@ -18,7 +17,7 @@ export default function Screen_with_menu({
   menu_options,
   children,
   on_search_press,
-  external_name, // la recibimos aquí
+  external_name,
 }: screen_with_menu_props) {
   const [menu_visible, set_menu_visible] = useState(false);
 
@@ -26,7 +25,7 @@ export default function Screen_with_menu({
     <View style={styles.wrapper}>
       <Header
         role_id={role_id}
-        external_name={external_name} // la pasamos a Header
+        external_name={external_name}
         on_search_press={on_search_press}
         on_menu_press={() => set_menu_visible(true)}
       />
