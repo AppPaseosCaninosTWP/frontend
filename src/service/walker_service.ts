@@ -51,3 +51,21 @@ export async function get_profile_walker_by_id(walker_id: number): Promise<user_
   }
   return json.data;
 }
+
+export async function get_profile_walker(page:number = 1): Promise<user_model[]> {
+  const token = await get_token();
+  const response = await fetch(`${api_base_url}/walker_profile/get_profiles?page=${page}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'error_perfil_paseador');
+  }
+
+  return json.data;
+}
