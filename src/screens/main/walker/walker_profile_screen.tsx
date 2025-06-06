@@ -11,24 +11,16 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { get_token, get_user } from "../../../utils/token_service";
 import * as ImagePicker from "expo-image-picker";
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+import {
+  get_walker_profile,
+  update_walker_profile,
+} from "../../../service/walker_service";
+import { get_token, get_user } from "../../../utils/token_service";
+import type { walker_model } from "../../../models/walker_model";
 
-interface WalkerProfile {
-  walker_id: number;
-  name: string;
-  email: string;
-  phone: string;
-  experience: number;
-  walker_type: string;
-  zone: string;
-  description: string;
-  balance: number;
-  on_review: boolean;
-  photo_url: string;
-}
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function EditWalkerProfileScreen() {
   const navigation = useNavigation();
@@ -52,7 +44,7 @@ export default function EditWalkerProfileScreen() {
   const [original_email, set_original_email] = useState("");
   const [original_phone, set_original_phone] = useState("");
   const [original_description, set_original_description] = useState("");
-  const [profile, set_profile] = useState<WalkerProfile | null>(null);
+  const [profile, set_profile] = useState<walker_model | null>(null);
 
   const validate_email = (value: string) => {
     const email_regex = /^\S+@\S+\.\S+$/;
@@ -66,7 +58,6 @@ export default function EditWalkerProfileScreen() {
 
   const validate_phone = (value: string) => {
     const only_digits = value.replace(/\D/g, "");
-
     if (only_digits.length !== 11) {
       set_phone_error("El teléfono debe incluir +56 y 9, más 8 dígitos.");
       return false;
@@ -90,18 +81,7 @@ export default function EditWalkerProfileScreen() {
       if (!token || !user?.id) throw new Error("Sesión no válida");
       set_user_id(user.id);
 
-      const res = await fetch(
-        `${API_BASE_URL}/walker_profile/get_profile/${user.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Error al cargar perfil:", text);
-        throw new Error(`Error ${res.status}`);
-      }
-      const { data } = await res.json();
+      const data = await get_walker_profile();
       set_profile(data);
 
       set_name(data.name);
@@ -119,14 +99,13 @@ export default function EditWalkerProfileScreen() {
       set_phone(fmt_phone);
       set_original_phone(fmt_phone);
 
-      set_description(data.description);
-      set_original_description(data.description);
+      set_description(data.description ?? "");
+      set_original_description(data.description ?? "");
 
       if (data.photo_url) {
         const remote_uri = data.photo_url.startsWith("http")
           ? data.photo_url
           : `${API_BASE_URL.replace(/\/$/, "")}/api/uploads/${data.photo_url}`;
-
         set_image(remote_uri);
       }
     } catch (err: any) {
@@ -206,24 +185,8 @@ export default function EditWalkerProfileScreen() {
         } as any);
       }
 
-      const res = await fetch(
-        `${API_BASE_URL.replace(
-          /\/$/,
-          ""
-        )}/walker_profile/update_walker_profile/${user_id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: form_data,
-        }
-      );
-      const payload = await res.json();
-      if (!res.ok) {
-        Alert.alert("Error al actualizar", payload.msg);
-        return;
-      }
+      await update_walker_profile(form_data);
+
       Alert.alert("Éxito", "Tus datos están pendientes de aprobación.", [
         {
           text: "OK",
@@ -234,7 +197,7 @@ export default function EditWalkerProfileScreen() {
         },
       ]);
     } catch (err: any) {
-      Alert.alert("Error", err.message);
+      Alert.alert("Error al actualizar", err.message);
     }
   };
 
