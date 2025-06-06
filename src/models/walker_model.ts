@@ -1,3 +1,4 @@
+// src/models/walker_model.ts
 export interface walker_model {
   walker_id: number;
   name: string;

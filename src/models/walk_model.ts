@@ -1,6 +1,7 @@
+// src/models/walk_model.ts
 export interface walk_model {
   walk_id: number;
-  status: 'pendiente' | 'confirmado' | 'cancelado' | string;
+  status: "pendiente" | "confirmado" | "cancelado" | string;
   walk_type: string;
   duration?: number;
   date?: string;
@@ -20,7 +21,6 @@ export interface walk_model {
   };
   comments?: string;
 }
-
 
 export interface create_walk_payload {
   walk_type_id: number;
