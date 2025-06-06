@@ -1,24 +1,24 @@
-import React, { ReactNode, useState } from 'react';
-import { View, ScrollView, StyleSheet, ImageSourcePropType } from 'react-native';
-import Header from '../../components/shared/header';
-import Side_menu, { menu_option } from '../../components/shared/side_menu';
+// src/components/shared/screen_with_menu.tsx
+import React, { ReactNode, useState } from "react";
+import { View, ScrollView, StyleSheet } from "react-native";
+import Header from "./header";
+import Side_menu, { menu_option } from "./side_menu";
 
 interface screen_with_menu_props {
   role_id: number;
   menu_options: menu_option[];
   children: ReactNode;
-  name?: string;
-  profile_image?: ImageSourcePropType;
   on_search_press?: () => void;
+  // Agregamos esta prop opcional:
+  external_name?: string;
 }
 
 export default function Screen_with_menu({
   role_id,
   menu_options,
   children,
-  name,
-  profile_image,
   on_search_press,
+  external_name, // la recibimos aquí
 }: screen_with_menu_props) {
   const [menu_visible, set_menu_visible] = useState(false);
 
@@ -26,8 +26,7 @@ export default function Screen_with_menu({
     <View style={styles.wrapper}>
       <Header
         role_id={role_id}
-        name={name}
-        profile_image={profile_image}
+        external_name={external_name} // la pasamos a Header
         on_search_press={on_search_press}
         on_menu_press={() => set_menu_visible(true)}
       />
@@ -50,6 +49,6 @@ export default function Screen_with_menu({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { flex: 1, backgroundColor: '#fff' },
+  wrapper: { flex: 1, backgroundColor: "#fff" },
   content: { flexGrow: 1, paddingTop: 20, paddingHorizontal: 20 },
 });
