@@ -17,7 +17,7 @@ import {
   see_Request_To_Change,
   approve_To_Change,
   reject_To_Change,
-} from '../../../service/auth_service';
+} from '../../../service/walker_service';
 
 interface ChangeRequest {
   walker_id: number;
