@@ -1,3 +1,5 @@
+// src/screens/walker/PlannerScreen.tsx
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -12,79 +14,40 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-import { get_token } from "../../../utils/token_service";
-import SideMenu, { menu_option } from "../../../components/shared/side_menu";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 
+import type { assigned_walk_model } from "../../../models/assigned_walk_model";
+import { get_assigned_walks } from "../../../service/planner_service";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_HORIZONTAL_PADDING = 20;
 const CARD_WIDTH = SCREEN_WIDTH - CARD_HORIZONTAL_PADDING * 2;
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-
-interface AssignedWalk {
-  walk_id: number;
-  pet_id: number;
-  pet_name: string;
-  pet_photo: string;
-  zone: string;
-  date: string;
-  time: string;
-  duration: number;
-}
 
 export default function PlannerScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [walks, setWalks] = useState<AssignedWalk[]>([]);
-  const [menuVisible, setMenuVisible] = useState(false);
+
+  const [loading, set_loading] = useState<boolean>(false);
+  const [walks, set_walks] = useState<assigned_walk_model[]>([]);
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
+      set_loading(true);
       try {
-        const token = await get_token();
-        if (!token) throw new Error("No auth token");
-        const res = await fetch(`${API_BASE_URL}/walk/assigned`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const { data, error, msg } = await res.json();
-        if (error) throw new Error(msg);
-        console.log("WALKS DATA:", data);
-        setWalks(data);
+        const assigned_walks = await get_assigned_walks();
+        set_walks(assigned_walks);
       } catch (err: any) {
-        Alert.alert("Error loading walks", err.message);
+        Alert.alert("Error cargando paseos", err.message);
       } finally {
-        setLoading(false);
+        set_loading(false);
       }
     })();
   }, []);
 
-  const menuOptions: menu_option[] = [
-    {
-      label: "Dashboard",
-      icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("DashboardPaseador"),
-    },
-    {
-      label: "Search Walks",
-      icon: <Feather name="search" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("AvailableWalksScreen"),
-    },
-    { label: "__separator__", icon: null, on_press: () => {} },
-    {
-      label: "Profile",
-      icon: <Feather name="user" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("WalkerProfileScreen"),
-    },
-  ];
-
-  const renderItem = ({ item }: { item: AssignedWalk }) => (
+  const render_item = ({ item }: { item: assigned_walk_model }) => (
     <TouchableOpacity
-      style={styles.cardWrapper}
+      style={styles.card_wrapper}
       onPress={() =>
         navigation.navigate("PetProfileScreen", {
           walkId: item.walk_id,
@@ -99,16 +62,18 @@ export default function PlannerScreen() {
         end={{ x: 1, y: 0 }}
         style={styles.card}
       >
-        <View style={styles.textContainer}>
-          <Text style={styles.petName}>{item.pet_name}</Text>
+        <View style={styles.text_container}>
+          <Text style={styles.pet_name}>{item.pet_name}</Text>
           <Text style={styles.details}>
             {item.zone} · {item.date} · {item.time}
           </Text>
         </View>
         {item.pet_photo ? (
           <Image
-            source={{ uri: `${API_BASE_URL}/uploads/${item.pet_photo}` }}
-            style={styles.petImage}
+            source={{
+              uri: `${process.env.EXPO_PUBLIC_API_URL}/uploads/${item.pet_photo}`,
+            }}
+            style={styles.pet_image}
           />
         ) : (
           <Feather
@@ -121,14 +86,16 @@ export default function PlannerScreen() {
       </LinearGradient>
     </TouchableOpacity>
   );
+
   return (
     <View style={styles.wrapper}>
-      <View style={styles.backHeader}>
+      <View style={styles.back_header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.screenTitle}>Agenda</Text>
+        <Text style={styles.screen_title}>Agenda</Text>
       </View>
+
       <Text style={styles.header}>
         Mis paseos: <Text style={styles.badge}>{walks.length}</Text>
       </Text>
@@ -139,15 +106,36 @@ export default function PlannerScreen() {
         <FlatList
           data={walks}
           keyExtractor={(w) => w.walk_id.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
+          renderItem={render_item}
+          contentContainerStyle={styles.list_content}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         />
       )}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 20,
+    paddingHorizontal: 20,
+  },
+  back_header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  screen_title: {
+    textAlign: "center",
+    flex: 1,
+    marginRight: 50,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+  },
   header: {
     marginTop: 16,
     fontSize: 18,
@@ -163,11 +151,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
-  listContent: {
+  list_content: {
     paddingHorizontal: CARD_HORIZONTAL_PADDING,
     paddingBottom: 40,
   },
-  cardWrapper: {
+  card_wrapper: {
     width: CARD_WIDTH,
     alignSelf: "center",
   },
@@ -178,10 +166,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  textContainer: {
+  text_container: {
     flex: 1,
   },
-  petName: {
+  pet_name: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "700",
@@ -191,30 +179,10 @@ const styles = StyleSheet.create({
     color: "#D0E7FF",
     fontSize: 14,
   },
-  petImage: {
+  pet_image: {
     width: 80,
     height: 80,
     borderRadius: 40,
     marginLeft: 12,
-  },
-  backHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
-  screenTitle: {
-    textAlign: "center",
-    flex: 1,
-    marginRight: 50,
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#111",
-  },
-  wrapper: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 20,
-    paddingHorizontal: 20,
   },
 });
