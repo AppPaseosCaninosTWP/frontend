@@ -35,3 +35,18 @@ export interface walker_profile_with_pending {
   };
   pending: pending_changes_model;
 }
+
+export interface WalkerProfile {
+  walker_id: number;
+  name: string;
+  email: string;
+  phone: string;
+  experience: number;
+  walker_type: string;
+  zone: string;
+  description: string;
+  balance: number;
+  on_review: boolean;
+  photo: string;       // nombre de archivo
+  photo_url: string;   // <-- Aquí agregamos photo_url, que vendrá como string desde el backend
+}
