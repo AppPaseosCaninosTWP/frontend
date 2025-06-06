@@ -29,7 +29,7 @@ export async function create_walk(
 export async function get_all_walks(): Promise<walk_model[]> {
   const token = await get_token();
   if (!token) {
-    throw new Error('Token no disponible');
+    throw new Error("Token no disponible");
   }
 
   let allWalks: walk_model[] = [];
@@ -71,7 +71,9 @@ export async function get_all_walks(): Promise<walk_model[]> {
         pet_id: pet.pet_id,
         pet_name: pet.name,
         pet_photo: pet.photo,
-        photo_url: pet.photo ? `${uploads_url}/${pet.photo}` : undefined,
+        photo_url: pet.photo
+          ? `${api_base_url}/uploads/${pet.photo}`
+          : undefined,
         sector: pet.zone ?? undefined,
       };
     });
@@ -106,16 +108,23 @@ export async function get_assigned_walks(): Promise<walk_model[]> {
 export async function get_walk_details(walk_id: number): Promise<any> {
   const token = await get_token();
   const response = await fetch(`${api_base_url}/walk/${walk_id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
 
   const json = await response.json();
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'error_obtener_detalles_paseo');
+    throw new Error(json.msg || "error_obtener_detalles_paseo");
   }
   return json.data;
+}
+
+export async function get_available_walks(): Promise<walk_model[]> {
+  // 1) Obtenemos todos los paseos mapeados
+  const all = await get_all_walks();
+  // 2) Devolvemos sólo aquellos con status "pendiente"
+  return all.filter((w) => w.status === "pendiente");
 }

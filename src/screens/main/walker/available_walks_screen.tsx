@@ -13,18 +13,18 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { get_token } from "../../../utils/token_service";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 import type { walk_model } from "../../../models/walk_model";
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+import { get_available_walks } from "../../../service/walk_service";
 
 export default function AvailableWalksScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [all_walks, set_all_walks] = useState<walk_model[]>([]);
   const [loading, set_loading] = useState(false);
-  const [selected_tab, set_selected_tab] = useState<"Fijo" | "Esporádico">("Fijo");
+  const [selected_tab, set_selected_tab] = useState<"Fijo" | "Esporádico">(
+    "Fijo"
+  );
 
   useEffect(() => {
     fetch_walks();
@@ -33,34 +33,8 @@ export default function AvailableWalksScreen() {
   const fetch_walks = async () => {
     set_loading(true);
     try {
-      const token = await get_token();
-      const res = await fetch(`${API_BASE_URL}/walk`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { data, error, msg } = await res.json();
-      if (error) throw new Error(msg);
-
-      const mapped: walk_model[] = data
-        .filter((w: any) => w.status === "pendiente")
-        .map((w: any) => {
-          const pet = w.pets?.[0] ?? {};
-          const day = w.days?.[0] ?? {};
-          return {
-            walk_id: w.walk_id,
-            walk_type: w.walk_type,
-            status: w.status,
-            pet_id: pet.pet_id,
-            pet_name: pet.name,
-            photo_url: pet.photo ? `${API_BASE_URL}/uploads/${pet.photo}` : undefined,
-            sector: pet.zone ?? "desconocido",
-            date: day.start_date,
-            time: day.start_time,
-            duration: day.duration,
-          };
-        });
-
-      set_all_walks(mapped);
+      const data = await get_available_walks();
+      set_all_walks(data);
     } catch (err: any) {
       Alert.alert("Error al cargar paseos", err.message);
     } finally {
@@ -99,16 +73,16 @@ export default function AvailableWalksScreen() {
             <Image
               source={{ uri: photo_url }}
               style={styles.avatar}
-              onError={() =>
-                console.warn("Error cargando imagen:", photo_url)
-              }
+              onError={() => console.warn("Error cargando imagen:", photo_url)}
             />
           ) : (
             <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
           )}
           <View style={styles.info}>
             <Text style={styles.name}>{pet_name}</Text>
-            <Text style={styles.meta}>{`Paseo ${selected_tab}  |  ${time}  |  ${date}`}</Text>
+            <Text style={styles.meta}>
+              {`Paseo ${selected_tab}  |  ${time}  |  ${date}`}
+            </Text>
             <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
           </View>
           <Feather name="chevron-right" size={20} color="#999" />
