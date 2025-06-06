@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,54 +9,50 @@ import {
   ActivityIndicator,
   Dimensions,
   Alert,
-} from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { get_token } from '../../../utils/token_service';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const { width: screen_width } = Dimensions.get('window');
+import { get_walk_history } from "../../../service/walk_service";
+import type { walk_model } from "../../../models/walk_model";
+
+const { width: screen_width } = Dimensions.get("window");
 const card_horizontal_padding = 20;
 const card_width = screen_width - 2 * card_horizontal_padding;
 
-const api_base_url = process.env.EXPO_PUBLIC_API_URL;
-
 export default function WalkHistoryScreen() {
   const navigation = useNavigation();
-
-  const [history, set_history] = useState<any[]>([]);
+  const [history, set_history] = useState<walk_model[]>([]);
   const [loading, set_loading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      set_loading(true);
-      try {
-        const token = await get_token();
-        const res = await fetch(`${api_base_url}/walk/history`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const json = await res.json();
-        console.log('HISTORY DATA FROM API:', json.data);
-        if (json.error) throw new Error(json.msg);
-        set_history(json.data);
-      } catch (e: any) {
-        console.warn(e);
-        set_history([]);
-      } finally {
-        set_loading(false);
-      }
-    })();
+    fetch_history();
   }, []);
 
-  const render_item = ({ item }: { item: any }) => (
+  const fetch_history = async () => {
+    set_loading(true);
+    try {
+      const data = await get_walk_history();
+      set_history(data);
+    } catch (e: any) {
+      console.warn(e);
+      set_history([]);
+      Alert.alert("Error al cargar historial", e.message);
+    } finally {
+      set_loading(false);
+    }
+  };
+
+  const render_item = ({ item }: { item: walk_model }) => (
     <TouchableOpacity
       style={styles.card_wrapper}
       onPress={() => {}}
       activeOpacity={0.8}
     >
       <LinearGradient
-        colors={['#4facfe', '#00f2fe']}
+        colors={["#4facfe", "#00f2fe"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.card}
@@ -71,20 +67,20 @@ export default function WalkHistoryScreen() {
         <View style={styles.text_container}>
           <Text style={styles.pet_name}>{item.pet_name}</Text>
           <Text style={styles.details}>
-            {item.time} · {item.zone} · {item.date}
+            {item.time} · {item.sector} · {item.date}
           </Text>
-          <Text style={styles.duration}>
-            Duración: {item.duration} min
-          </Text>
+          <Text style={styles.duration}>Duración: {item.duration} min</Text>
         </View>
 
-        {item.pet_photo ? (
-          <Image
-            source={{ uri: item.pet_photo }}
-            style={styles.pet_image}
-          />
+        {item.photo_url ? (
+          <Image source={{ uri: item.photo_url }} style={styles.pet_image} />
         ) : (
-          <Feather name="user" size={80} color="#fff" style={{ marginLeft: 12 }} />
+          <Feather
+            name="user"
+            size={80}
+            color="#fff"
+            style={{ marginLeft: 12 }}
+          />
         )}
       </LinearGradient>
     </TouchableOpacity>
@@ -93,7 +89,11 @@ export default function WalkHistoryScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator style={{ marginTop: 20 }} size="large" color="#007BFF" />
+        <ActivityIndicator
+          style={{ marginTop: 20 }}
+          size="large"
+          color="#007BFF"
+        />
       </View>
     );
   }
@@ -108,13 +108,12 @@ export default function WalkHistoryScreen() {
       </View>
 
       <Text style={styles.header}>
-        Paseos finalizados:{' '}
-        <Text style={styles.badge}>{history.length}</Text>
+        Paseos finalizados: <Text style={styles.badge}>{history.length}</Text>
       </Text>
 
       <FlatList
         data={history}
-        keyExtractor={w => w.walk_id.toString()}
+        keyExtractor={(w) => w.walk_id.toString()}
         renderItem={render_item}
         contentContainerStyle={styles.list_content}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
@@ -126,67 +125,67 @@ export default function WalkHistoryScreen() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 38,
     paddingHorizontal: card_horizontal_padding,
   },
   back_header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingBottom: 16,
   },
   screen_title: {
-    textAlign: 'center',
+    textAlign: "center",
     flex: 1,
     marginRight: 50,
     fontSize: 20,
-    fontWeight: '700',
-    color: '#111',
+    fontWeight: "700",
+    color: "#111",
   },
   header: {
     marginTop: 15,
     fontSize: 18,
-    fontWeight: '600',
-    color: '#111',
+    fontWeight: "600",
+    color: "#111",
     marginBottom: 12,
   },
   badge: {
-    backgroundColor: '#E6F4FF',
-    color: '#007BFF',
+    backgroundColor: "#E6F4FF",
+    color: "#007BFF",
     paddingHorizontal: 8,
     borderRadius: 12,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   list_content: {
     paddingBottom: 40,
   },
   card_wrapper: {
     width: card_width,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   card: {
     borderRadius: 20,
     height: 120,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   text_container: {
     flex: 1,
   },
   pet_name: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   details: {
-    color: '#D0E7FF',
+    color: "#D0E7FF",
     fontSize: 16,
   },
   duration: {
-    color: '#D0E7FF',
+    color: "#D0E7FF",
     fontSize: 16,
     marginTop: 4,
   },
@@ -198,7 +197,7 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

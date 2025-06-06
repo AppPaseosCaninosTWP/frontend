@@ -128,3 +128,42 @@ export async function get_available_walks(): Promise<walk_model[]> {
   // 2) Devolvemos sólo aquellos con status "pendiente"
   return all.filter((w) => w.status === "pendiente");
 }
+
+export async function get_walk_history(): Promise<walk_model[]> {
+  const token = await get_token();
+  if (!token) throw new Error("Token no disponible");
+
+  const response = await fetch(`${api_base_url}/walk/history`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || "Error al obtener historial de paseos");
+  }
+
+  const raw: any[] = Array.isArray(json.data) ? json.data : [];
+
+  const mapped: walk_model[] = raw.map((w) => {
+    const petPhotoUrl: string | undefined = w.pet_photo;
+
+    return {
+      walk_id: w.walk_id,
+      walk_type: w.walk_type,
+      status: w.status,
+      duration: w.duration,
+      date: w.date,
+      time: w.time,
+      pet_id: w.pet_id,
+      pet_name: w.pet_name,
+      photo_url: petPhotoUrl
+        ? petPhotoUrl.startsWith("http")
+          ? petPhotoUrl
+          : `${api_base_url}/uploads/${petPhotoUrl}`
+        : undefined,
+      sector: w.zone ?? "desconocido",
+    };
+  });
+  return mapped;
+}
