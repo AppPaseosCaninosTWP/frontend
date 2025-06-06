@@ -14,35 +14,11 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import HeaderAdmin from '../../../components/shared/header_admin';
-import {
-  get_all_users,
-  disable_enable_user,
-  get_profile_walker,
-} from '../../../service/auth_service';
+import { get_profile_walker} from '../../../service/walker_service';
+import { get_all_users,disable_enable_user } from '../../../service/user_service';
 import { API_UPLOADS_URL } from '../../../config/constants';
-
-interface BackendUser {
-  user_id: number;
-  name: string;
-  email: string;
-  phone: string;
-  is_enable: boolean;
-  role_id: number;
-}
-
-interface WalkerProfile {
-  walker_id: number;
-  name: string;
-  email: string;
-  phone: string;
-  experience: number;
-  walker_type: string;
-  zone: string;
-  description: string;
-  balance: number;
-  on_review: boolean;
-  photo: string;         
-}
+import { WalkerProfile } from '../../../models/walker_model';
+import { BackendUser } from '../../../models/user_model';
 
 type Tab = 'Clientes' | 'Paseadores';
 type StatusFilter = 'all' | 'enabled' | 'disabled';
