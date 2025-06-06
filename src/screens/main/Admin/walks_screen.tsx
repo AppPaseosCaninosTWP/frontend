@@ -1,4 +1,5 @@
 // src/screens/main/Admin/walks_screen.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -14,12 +15,10 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import HeaderAdmin from '../../../components/shared/header_admin';
-import {
-  get_user_by_id,
-  get_profile_walker_by_id,
-  WalkerProfile,
-} from '../../../service/auth_service';
-import { get_all_walks,get_walk_details } from '../../../service/walk_service';
+import { get_user_by_id } from '../../../service/user_service';
+import { get_profile_walker_by_id } from '../../../service/walker_service';
+import { WalkerProfile } from '../../../models/walker_model';
+import { get_all_walks, get_walk_details } from '../../../service/walk_service';
 import { API_UPLOADS_URL } from '../../../config/constants';
 
 // Importamos los tipos movidos a models/walk_model.ts
@@ -51,14 +50,13 @@ const FILTERS: Filter[] = [
  */
 interface Walk {
   id: string;
-  clientEmail: string;
-  walkerEmail: string | null;
-  petNames: string; // Coma separados si hay varias masc.
-  date: string;     // "DD.MM.YYYY"
+  clientName: string; // Nombre real del cliente (o email si hubo error)
+  petNames: string;   // Todos los nombres de mascotas, separados por coma
+  date: string;       // “DD.MM.YYYY”
   status: 'Pendiente' | 'Confirmado' | 'En curso' | 'Finalizado' | 'Cancelado';
-  startTime: string; // "HH:MM"
-  endTime: string;   // "HH:MM"
-  type: string;
+  startTime: string;  // Horario inicio “HH:MM”
+  endTime: string;    // Horario fin “HH:MM”
+  type: string;       // Tipo de paseo
 }
 
 function formatDDMMYYYY(date: Date): string {
@@ -70,16 +68,16 @@ function formatDDMMYYYY(date: Date): string {
 
 export default function WalksScreen() {
   const [walks, setWalks] = useState<Walk[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState<string>('');
   const [filter, setFilter] = useState<Filter>('Todos');
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState<boolean>(false);
 
   const [detailed, setDetailed] = useState<ModelDetailedWalk | null>(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState<boolean>(false);
 
-  // Para agrupar "Hoy", "Ayer" y "Otros días"
+  // Para agrupar: hoy, ayer, otros días
   const todayKey = formatDDMMYYYY(new Date());
   const yesterdayDate = new Date();
   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
@@ -89,73 +87,98 @@ export default function WalksScreen() {
     async function loadAllWalks() {
       setLoading(true);
       try {
-        // Obtenemos todos los paseos via servicio
+        // 1) Traigo todos los paseos resumidos (walk_model[])
         const allAPIWalks = (await get_all_walks()) as walk_model[];
 
-        // Mapear cada walk_model al tipo Walk para la UI
-        const mapped: Walk[] = allAPIWalks.map((w) => {
-          // 1) Fecha
-          let dateStr = '–';
-          if (w.date) {
-            const [year, month, dayNum] = w.date.split('-').map(Number);
-            dateStr = formatDDMMYYYY(new Date(year, month - 1, dayNum));
-          }
+        // 2) Hago Promise.all para obtener detalles de cada paseo
+        const mappedWalks: Walk[] = await Promise.all(
+          allAPIWalks.map(async (w) => {
+            // 2.a) Obtener detalle completo por ID
+            let detail: APIWalkFromDetail | null = null;
+            try {
+              detail = (await get_walk_details(w.walk_id)) as APIWalkFromDetail;
+            } catch (err) {
+              console.warn(`No se pudo cargar detalle del paseo ${w.walk_id}:`, err);
+            }
 
-          // 2) Hora inicio y hora fin
-          let startTime = w.time ?? '00:00';
-          let endTime = '00:00';
-          if (w.time && typeof w.duration === 'number') {
-            const [hh, mm] = w.time.split(':').map(Number);
-            const totalMin = hh * 60 + mm + w.duration;
-            const endH = String(Math.floor(totalMin / 60) % 24).padStart(2, '0');
-            const endM = String(totalMin % 60).padStart(2, '0');
-            endTime = `${endH}:${endM}`;
-          }
+            // 2.b) Sacar nombre real de cliente o fallback email
+            let clientName = '–';
+            if (detail && detail.client) {
+              clientName = detail.client.email;
+              try {
+                const clientObj = await get_user_by_id(detail.client.user_id);
+                if (clientObj.name && clientObj.name.trim().length > 0) {
+                  clientName = clientObj.name;
+                }
+              } catch {
+                // Si falla, dejamos el email
+              }
+            }
 
-          // 3) Estado traducido (capitalizar la primera letra)
-          let statusText: Walk['status'];
-          switch (w.status) {
-            case 'pendiente':
-              statusText = 'Pendiente';
-              break;
-            case 'confirmado':
-              statusText = 'Confirmado';
-              break;
-            case 'en curso':
-              statusText = 'En curso';
-              break;
-            case 'finalizado':
-              statusText = 'Finalizado';
-              break;
-            case 'cancelado':
-              statusText = 'Cancelado';
-              break;
-            default:
-              statusText = (w.status.charAt(0).toUpperCase() + w.status.slice(1)) as any;
-          }
+            // 2.c) Sacar todos los nombres de mascotas separados por coma
+            let petNames = '–';
+            if (detail && Array.isArray(detail.pets) && detail.pets.length > 0) {
+              petNames = detail.pets.map((p) => p.name).join(', ');
+            }
 
-          // 4) Construir cadena con todos los nombres de mascotas
-          //    (en walk_model se asume que pet_name ya puede tener una lista separada por comas)
-          const petNames = w.pet_name ? w.pet_name : '–';
+            // 2.d) Formatear fecha a DD.MM.YYYY
+            let dateStr = '–';
+            if (w.date) {
+              const [year, month, dayNum] = w.date.split('-').map(Number);
+              dateStr = formatDDMMYYYY(new Date(year, month - 1, dayNum));
+            }
 
-          // 5) Email del cliente (si se mapeó correctamente en get_all_walks)
-          //    Sino, aparece ‘–’
-          const clientEmail = w.client?.email ?? '–';
+            // 2.e) Calcular hora inicio y fin
+            let startTime = w.time ?? '00:00';
+            let endTime = '00:00';
+            if (w.time && typeof w.duration === 'number') {
+              const [hh, mm] = w.time.split(':').map(Number);
+              const totalMin = hh * 60 + mm + w.duration;
+              const endH = String(Math.floor(totalMin / 60) % 24).padStart(2, '0');
+              const endM = String(totalMin % 60).padStart(2, '0');
+              endTime = `${endH}:${endM}`;
+            }
 
-          return {
-            id: w.walk_id.toString(),
-            clientEmail,
-            walkerEmail: w.walker?.email ?? null,
-            petNames,
-            date: dateStr,
-            status: statusText,
-            startTime,
-            endTime,
-            type: w.walk_type,
-          };
-        });
+            // 2.f) Traducir estado a capitalizado
+            let statusText: Walk['status'];
+            switch (w.status) {
+              case 'pendiente':
+                statusText = 'Pendiente';
+                break;
+              case 'confirmado':
+                statusText = 'Confirmado';
+                break;
+              case 'en curso':
+                statusText = 'En curso';
+                break;
+              case 'finalizado':
+                statusText = 'Finalizado';
+                break;
+              case 'cancelado':
+                statusText = 'Cancelado';
+                break;
+              default:
+                statusText = (w.status.charAt(0).toUpperCase() + w.status.slice(1)) as any;
+            }
 
-        setWalks(mapped);
+            // 2.g) Tipo de paseo
+            const typeName = w.walk_type || '–';
+
+            // 3) Armar objeto de tipo Walk
+            return {
+              id: w.walk_id.toString(),
+              clientName,
+              petNames,
+              date: dateStr,
+              status: statusText,
+              startTime,
+              endTime,
+              type: typeName,
+            };
+          })
+        );
+
+        setWalks(mappedWalks);
       } catch (err) {
         console.error('Error cargando paseos:', err);
       } finally {
@@ -171,7 +194,7 @@ export default function WalksScreen() {
     try {
       const apiDetail = (await get_walk_details(Number(walkId))) as APIWalkFromDetail;
 
-      // 1) Obtener nombre del cliente (por defecto su email)
+      // Nombre real del cliente
       let clientName = apiDetail.client.email;
       try {
         const clientObj = await get_user_by_id(apiDetail.client.user_id);
@@ -179,10 +202,10 @@ export default function WalksScreen() {
           clientName = clientObj.name;
         }
       } catch {
-        // Si falla, dejamos el email
+        // fallback a email
       }
 
-      // 2) Paseador: nombre + avatar
+      // Paseador: nombre y avatar
       let walkerName = 'Sin asignar';
       let walkerAvatar = require('../../../assets/user_icon.png');
       if (apiDetail.walker && apiDetail.walker.user_id) {
@@ -201,11 +224,11 @@ export default function WalksScreen() {
             };
           }
         } catch {
-          // “Sin asignar” + icono por defecto
+          // deja “Sin asignar”
         }
       }
 
-      // 3) Fecha y horas del primer día
+      // Fecha y horas
       const day0 = apiDetail.days[0];
       const [year, month, dayNum] = day0.start_date.split('-').map(Number);
       const dateObj = new Date(year, month - 1, dayNum);
@@ -218,7 +241,7 @@ export default function WalksScreen() {
       const startTime = day0.start_time;
       const endTime = `${endH}:${endM}`;
 
-      // 4) Traducir estado al formato capitalizado
+      // Estado traducido
       let statusText: ModelDetailedWalk['status'];
       switch (apiDetail.status) {
         case 'pendiente':
@@ -237,28 +260,29 @@ export default function WalksScreen() {
           statusText = 'Cancelado';
           break;
         default:
-          statusText = (apiDetail.status.charAt(0).toUpperCase() + apiDetail.status.slice(1)) as any;
+          statusText = (apiDetail.status.charAt(0).toUpperCase() +
+            apiDetail.status.slice(1)) as any;
       }
 
-      // 5) Todos los nombres de mascotas (separados por coma)
+      // Todas las mascotas
       const petNames =
         Array.isArray(apiDetail.pets) && apiDetail.pets.length > 0
           ? apiDetail.pets.map((p) => p.name).join(', ')
           : '–';
 
-      // 6) Zona (tomada de la primera mascota)
+      // Zona (primera mascota)
       const zone =
         Array.isArray(apiDetail.pets) && apiDetail.pets.length > 0
           ? apiDetail.pets[0].zone
           : '–';
 
-      // 7) Tipo de paseo (puede venir como string u objeto con .name)
+      // Tipo paseo
       const typeName =
         typeof apiDetail.walk_type === 'string'
           ? apiDetail.walk_type
           : apiDetail.walk_type.name;
 
-      // 8) Notas o comentarios
+      // Notas
       const notes = apiDetail.comments || '–';
 
       const detail: ModelDetailedWalk = {
@@ -285,6 +309,7 @@ export default function WalksScreen() {
     }
   };
 
+  // Si sigue cargando toda la lista, muestro el loader
   if (loading) {
     return (
       <View style={styles.loading}>
@@ -293,7 +318,7 @@ export default function WalksScreen() {
     );
   }
 
-  // Agrupamos en secciones: Hoy, Ayer, Otros días
+  // Agrupo en secciones: Hoy, Ayer, Otros días
   const sections = [
     { title: 'Hoy', data: walks.filter((w) => w.date === todayKey) },
     { title: 'Ayer', data: walks.filter((w) => w.date === yesterdayKey) },
@@ -303,13 +328,14 @@ export default function WalksScreen() {
     },
   ];
 
-  // Aplicamos filtro de búsqueda y estado
+  // FILTRADO: buscar por cliente + estado
   const filteredSections = sections
     .map((sec) => ({
       title: sec.title,
       data: sec.data.filter((w) => {
-        const q = query.toLowerCase();
-        const matchesClient = w.clientEmail.toLowerCase().includes(q);
+        const q = query.trim().toLowerCase();
+        // ← Aquí aplicamos el safe-check gracias al “|| ''”
+        const matchesClient = (w.clientName || '').toLowerCase().includes(q);
         const matchesStatus = filter === 'Todos' || w.status === filter;
         return matchesClient && matchesStatus;
       }),
@@ -321,8 +347,7 @@ export default function WalksScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       <HeaderAdmin title="Paseos" />
 
-      {/* ----------------------- */}
-      {/* Barra de búsqueda + filtro */}
+      {/* ── BARRA DE BÚSQUEDA + BOTÓN FILTRO ── */}
       <View style={styles.searchRow}>
         <View style={styles.searchBox}>
           <Feather name="search" size={20} color="#888" />
@@ -341,7 +366,6 @@ export default function WalksScreen() {
           <Feather name="filter" size={20} color="#FFF" />
         </TouchableOpacity>
       </View>
-
       {showFilter && (
         <View style={styles.dropdown}>
           {FILTERS.map((f) => (
@@ -360,7 +384,7 @@ export default function WalksScreen() {
           ))}
         </View>
       )}
-      {/* ----------------------- */}
+      {/* ──────────────────────────────────────── */}
 
       <SectionList
         sections={filteredSections}
@@ -386,9 +410,9 @@ export default function WalksScreen() {
               </View>
 
               <View style={styles.infoCol}>
-                {/* ** Aquí mostramos el email/nombre del cliente ** */}
-                <Text style={styles.owner}>{item.clientEmail}</Text>
-                {/* ** Y debajo, todas las mascotas separadas por comas ** */}
+                {/* Nombre real del cliente */}
+                <Text style={styles.owner}>{item.clientName}</Text>
+                {/* Todas las mascotas separadas por coma */}
                 <Text style={styles.pet}>Mascotas · {item.petNames}</Text>
               </View>
 
@@ -413,8 +437,7 @@ export default function WalksScreen() {
         showsVerticalScrollIndicator={false}
       />
 
-      {/* ----------------------- */}
-      {/* Modal de detalle */}
+      {/* ── MODAL DE DETALLE ── */}
       <Modal
         visible={detailed !== null}
         transparent
@@ -428,7 +451,12 @@ export default function WalksScreen() {
           />
 
           {loadingDetail ? (
-            <View style={[styles.modalContent, { height: 200, justifyContent: 'center' }]}>
+            <View
+              style={[
+                styles.modalContent,
+                { height: 200, justifyContent: 'center' },
+              ]}
+            >
               <ActivityIndicator size="large" color="#0096FF" />
             </View>
           ) : (
@@ -445,7 +473,9 @@ export default function WalksScreen() {
                 {/* Fecha */}
                 <View style={styles.row}>
                   <Feather name="calendar" size={16} color="#666" />
-                  <Text style={[styles.value, { marginLeft: 8 }]}>{detailed.date}</Text>
+                  <Text style={[styles.value, { marginLeft: 8 }]}>
+                    {detailed.date}
+                  </Text>
                 </View>
 
                 {/* Horas */}
@@ -483,9 +513,14 @@ export default function WalksScreen() {
                 {/* Paseador: foto + nombre */}
                 <Text style={[styles.label, { marginTop: 8 }]}>Paseador</Text>
                 <View style={styles.walkerCard}>
-                  <Image source={detailed.walkerAvatar} style={styles.walkerAvatar} />
+                  <Image
+                    source={detailed.walkerAvatar}
+                    style={styles.walkerAvatar}
+                  />
                   <View style={{ marginLeft: 12, flex: 1 }}>
-                    <Text style={styles.walkerName}>{detailed.walkerName}</Text>
+                    <Text style={styles.walkerName}>
+                      {detailed.walkerName}
+                    </Text>
                   </View>
                 </View>
 
@@ -504,7 +539,7 @@ export default function WalksScreen() {
           )}
         </View>
       </Modal>
-      {/* ----------------------- */}
+      {/* ──────────────────────────── */}
     </View>
   );
 }
