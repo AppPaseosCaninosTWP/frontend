@@ -1,3 +1,6 @@
+//WALKER PROFILE SCREEN
+
+//Importaciones y dependencias
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -13,19 +16,25 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 
+//Servicios para obtener y actualizar el perfil del paseador
 import {
   get_walker_profile,
   update_walker_profile,
 } from "../../../service/walker_service";
 import { get_token, get_user } from "../../../utils/token_service";
+//Modelo
 import type { walker_model } from "../../../models/walker_model";
 
+//URL base de la API
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function EditWalkerProfileScreen() {
+  // Navegación
   const navigation = useNavigation();
+  //Estado para la imagen del perfil
   const [image, set_image] = useState<string | null>(null);
 
+  // Estados para los campos del formulario
   const [email, set_email] = useState("");
   const [phone, set_phone] = useState("");
   const [description, set_description] = useState("");
@@ -34,18 +43,23 @@ export default function EditWalkerProfileScreen() {
   const [walker_type, set_walker_type] = useState("");
   const [zone, set_zone] = useState("");
 
+  //Control de edición
   const [is_editing, set_is_editing] = useState(false);
   const [user_id, set_user_id] = useState<number | null>(null);
 
+  //Validación de campos
   const [email_error, set_email_error] = useState<string>("");
   const [phone_error, set_phone_error] = useState<string>("");
   const [has_errors, set_has_errors] = useState<boolean>(false);
 
+  // Estados para manejar el perfil original y los cambios
   const [original_email, set_original_email] = useState("");
   const [original_phone, set_original_phone] = useState("");
   const [original_description, set_original_description] = useState("");
+  //Datos completos del perfil del paseador traidos del backend
   const [profile, set_profile] = useState<walker_model | null>(null);
 
+  //Validar formato de email
   const validate_email = (value: string) => {
     const email_regex = /^\S+@\S+\.\S+$/;
     if (!email_regex.test(value.trim())) {
@@ -56,6 +70,7 @@ export default function EditWalkerProfileScreen() {
     return true;
   };
 
+  //Validar formato de teléfono
   const validate_phone = (value: string) => {
     const only_digits = value.replace(/\D/g, "");
     if (only_digits.length !== 11) {
@@ -66,6 +81,8 @@ export default function EditWalkerProfileScreen() {
     return true;
   };
 
+  // Efecto para verificar si hay errores en los campos
+  // Deshabilita el botón de guardar si hay errores
   useEffect(() => {
     if (email_error || phone_error) {
       set_has_errors(true);
@@ -74,16 +91,20 @@ export default function EditWalkerProfileScreen() {
     }
   }, [email_error, phone_error]);
 
+  //Funcion para cargar los datos del paseador
   const fetch_profile = async () => {
     try {
+      //Obtiene token y usuario
       const token = await get_token();
       const user = await get_user();
       if (!token || !user?.id) throw new Error("Sesión no válida");
       set_user_id(user.id);
 
+      //Llama al servicio para retornar walker_model
       const data = await get_walker_profile();
       set_profile(data);
 
+      //Inicializamos los campos del formulario con los datos del paseador
       set_name(data.name);
       set_experience(String(data.experience));
       set_walker_type(data.walker_type);
@@ -92,6 +113,7 @@ export default function EditWalkerProfileScreen() {
       set_email(data.email);
       set_original_email(data.email);
 
+      //Formateamos el teléfono
       let fmt_phone = data.phone;
       if (!fmt_phone.startsWith("+56 9")) {
         fmt_phone = `+56 9${fmt_phone.replace(/\D/g, "").slice(-8)}`;
@@ -102,6 +124,7 @@ export default function EditWalkerProfileScreen() {
       set_description(data.description ?? "");
       set_original_description(data.description ?? "");
 
+      //Cargamos foto si existe
       if (data.photo_url) {
         const remote_uri = data.photo_url.startsWith("http")
           ? data.photo_url
@@ -113,10 +136,12 @@ export default function EditWalkerProfileScreen() {
     }
   };
 
+  //Al montar la patalla se trae el perfil del paseador
   useEffect(() => {
     fetch_profile();
   }, []);
 
+  //Manejadores de cambio de texto
   const handle_email_change = (text: string) => {
     set_email(text);
     validate_email(text);
@@ -127,6 +152,7 @@ export default function EditWalkerProfileScreen() {
     validate_phone(text);
   };
 
+  //Seleccionar imagen desde la galería
   const pick_image = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -147,7 +173,9 @@ export default function EditWalkerProfileScreen() {
     }
   };
 
+  //Envia los datos al backend
   const handle_submit = async () => {
+    //Validaciones previas
     if (email_error || phone_error) {
       Alert.alert("Error", "Corrige los campos marcados antes de continuar.");
       return;
@@ -168,11 +196,13 @@ export default function EditWalkerProfileScreen() {
       const token = await get_token();
       if (!token || !user_id) throw new Error("Sesión no válida");
 
+      //FormData para enviar los datos
       const form_data = new FormData();
       form_data.append("email", email.trim());
       form_data.append("phone", phone.replace(/\D/g, ""));
       form_data.append("description", description.trim());
 
+      //Si se cambia la foto, se agrega al FormData
       if (image && profile && image !== profile.photo_url) {
         const uri_parts = image.split("/");
         const filename = uri_parts[uri_parts.length - 1];
@@ -185,6 +215,7 @@ export default function EditWalkerProfileScreen() {
         } as any);
       }
 
+      //Llama al servicio de actualizacion
       await update_walker_profile(form_data);
 
       Alert.alert("Éxito", "Tus datos están pendientes de aprobación.", [
@@ -201,6 +232,7 @@ export default function EditWalkerProfileScreen() {
     }
   };
 
+  //Cancela la edicion
   const handle_cancel = () => {
     set_email(original_email);
     set_phone(original_phone);
@@ -218,11 +250,13 @@ export default function EditWalkerProfileScreen() {
     }
   };
 
+  //Renderiza el formlario
   return (
     <ScrollView
       contentContainerStyle={styles.scroll_container}
       keyboardShouldPersistTaps="handled"
     >
+      //header con boton de retroceso y titulo
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -232,7 +266,7 @@ export default function EditWalkerProfileScreen() {
         </TouchableOpacity>
         <Text style={styles.title}>Perfil del paseador</Text>
       </View>
-
+      //Selector de imagen
       <View style={styles.image_picker}>
         <TouchableOpacity
           onPress={is_editing ? pick_image : undefined}
@@ -251,35 +285,32 @@ export default function EditWalkerProfileScreen() {
           )}
         </TouchableOpacity>
       </View>
-
+      //Campo de solo lectura //Datos que no se pueden editar segun la ERS
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={[styles.input, styles.disabled_input]}
         value={name}
         editable={false}
       />
-
       <Text style={styles.label}>Años de experiencia</Text>
       <TextInput
         style={[styles.input, styles.disabled_input]}
         value={experience}
         editable={false}
       />
-
       <Text style={styles.label}>Tipo de paseador</Text>
       <TextInput
         style={[styles.input, styles.disabled_input]}
         value={walker_type}
         editable={false}
       />
-
       <Text style={styles.label}>Zona</Text>
       <TextInput
         style={[styles.input, styles.disabled_input]}
         value={zone}
         editable={false}
       />
-
+      //Campos editables
       <Text style={styles.label}>Correo electrónico</Text>
       <TextInput
         style={[styles.input, !is_editing && styles.disabled_input]}
@@ -289,7 +320,6 @@ export default function EditWalkerProfileScreen() {
         keyboardType="email-address"
       />
       {!!email_error && <Text style={styles.error_text}>{email_error}</Text>}
-
       <Text style={styles.label}>Teléfono móvil</Text>
       <TextInput
         style={[styles.input, !is_editing && styles.disabled_input]}
@@ -299,7 +329,6 @@ export default function EditWalkerProfileScreen() {
         keyboardType="phone-pad"
       />
       {!!phone_error && <Text style={styles.error_text}>{phone_error}</Text>}
-
       <Text style={styles.label}>Descripción (máx 250 caracteres)</Text>
       <TextInput
         style={[
@@ -313,7 +342,7 @@ export default function EditWalkerProfileScreen() {
         multiline
         maxLength={250}
       />
-
+      // Botones de acción
       {!is_editing ? (
         <TouchableOpacity
           style={styles.edit_button}
@@ -342,6 +371,7 @@ export default function EditWalkerProfileScreen() {
   );
 }
 
+//Estilos
 const styles = StyleSheet.create({
   scroll_container: {
     paddingBottom: 40,
