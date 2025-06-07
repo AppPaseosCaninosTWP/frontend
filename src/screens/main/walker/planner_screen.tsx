@@ -1,5 +1,6 @@
-// src/screens/walker/PlannerScreen.tsx
+// PLANNER SCREEN
 
+//Importaciones y dependencias
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -18,19 +19,25 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 
+//Modelos y servicios
 import type { assigned_walk_model } from "../../../models/assigned_walk_model";
 import { get_assigned_walks } from "../../../service/planner_service";
+//Obtener el ancho de la pantalla para calcular el ancho de las tarjetas
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_HORIZONTAL_PADDING = 20;
 const CARD_WIDTH = SCREEN_WIDTH - CARD_HORIZONTAL_PADDING * 2;
 
 export default function PlannerScreen() {
+  // Navegación
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  // Estados para manejar la carga y los paseos asignados
   const [loading, set_loading] = useState<boolean>(false);
   const [walks, set_walks] = useState<assigned_walk_model[]>([]);
 
+  //Efecto que se ejecuta al montar la pantalla
+  //Llama al servicio para obtener los paseos asignados
   useEffect(() => {
     (async () => {
       set_loading(true);
@@ -45,6 +52,8 @@ export default function PlannerScreen() {
     })();
   }, []);
 
+  //Funcion que muestra cada paseo asignado en una tarjeta
+  //Al pulsar navega a PetProfileScreen con los parámetros walkId, petId, duration.
   const render_item = ({ item }: { item: assigned_walk_model }) => (
     <TouchableOpacity
       style={styles.card_wrapper}
@@ -62,12 +71,14 @@ export default function PlannerScreen() {
         end={{ x: 1, y: 0 }}
         style={styles.card}
       >
+        // Mostrar nombre de la mascota y detalles del paseo
         <View style={styles.text_container}>
           <Text style={styles.pet_name}>{item.pet_name}</Text>
           <Text style={styles.details}>
             {item.zone} · {item.date} · {item.time}
           </Text>
         </View>
+        //Imagen de la mascota o icono por defecto
         {item.pet_photo ? (
           <Image
             source={{
@@ -87,6 +98,7 @@ export default function PlannerScreen() {
     </TouchableOpacity>
   );
 
+  //Renderizado de la pantalla
   return (
     <View style={styles.wrapper}>
       <View style={styles.back_header}>
@@ -95,11 +107,11 @@ export default function PlannerScreen() {
         </TouchableOpacity>
         <Text style={styles.screen_title}>Agenda</Text>
       </View>
-
+      //Contador de paseos asignados
       <Text style={styles.header}>
         Mis paseos: <Text style={styles.badge}>{walks.length}</Text>
       </Text>
-
+      //Muestra un indicador de carga mientras se obtienen los paseos
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} size="large" />
       ) : (
@@ -115,6 +127,7 @@ export default function PlannerScreen() {
   );
 }
 
+//Estilos para la pantalla
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,

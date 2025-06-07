@@ -1,3 +1,6 @@
+//WALK HISTORY SCREEN
+
+//Importaciones y dependencias
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -15,18 +18,23 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+//Servicio y modelo
 import { get_walk_history } from "../../../service/walk_service";
 import type { walk_model } from "../../../models/walk_model";
 
+//Obtener el ancho de la pantalla para calcular el ancho de las tarjetas
 const { width: screen_width } = Dimensions.get("window");
 const card_horizontal_padding = 20;
 const card_width = screen_width - 2 * card_horizontal_padding;
 
 export default function WalkHistoryScreen() {
+  // Navegación
   const navigation = useNavigation();
+  // Estados para manejar la carga y el historial de paseos
   const [history, set_history] = useState<walk_model[]>([]);
   const [loading, set_loading] = useState(true);
 
+  //Al montar se llama a la API para obtener el historial de paseos
   useEffect(() => {
     fetch_history();
   }, []);
@@ -45,6 +53,7 @@ export default function WalkHistoryScreen() {
     }
   };
 
+  //Renderiza como se muestra cada paseo en una tarjeta
   const render_item = ({ item }: { item: walk_model }) => (
     <TouchableOpacity
       style={styles.card_wrapper}
@@ -57,13 +66,14 @@ export default function WalkHistoryScreen() {
         end={{ x: 1, y: 0 }}
         style={styles.card}
       >
+        // Icono de huella
         <MaterialCommunityIcons
           name="shoe-print"
           size={32}
           color="#fff"
           style={{ marginHorizontal: 12 }}
         />
-
+        //Texto con nombre del paseo, detalles y duración
         <View style={styles.text_container}>
           <Text style={styles.pet_name}>{item.pet_name}</Text>
           <Text style={styles.details}>
@@ -71,7 +81,7 @@ export default function WalkHistoryScreen() {
           </Text>
           <Text style={styles.duration}>Duración: {item.duration} min</Text>
         </View>
-
+        // Imagen de la mascota o icono de usuario si no hay foto
         {item.photo_url ? (
           <Image source={{ uri: item.photo_url }} style={styles.pet_image} />
         ) : (
@@ -86,6 +96,7 @@ export default function WalkHistoryScreen() {
     </TouchableOpacity>
   );
 
+  // Si está cargando, muestra un indicador de carga
   if (loading) {
     return (
       <View style={styles.center}>
@@ -98,6 +109,7 @@ export default function WalkHistoryScreen() {
     );
   }
 
+  //Renderizado principal de la pantalla
   return (
     <View style={styles.wrapper}>
       <View style={styles.back_header}>
@@ -106,11 +118,11 @@ export default function WalkHistoryScreen() {
         </TouchableOpacity>
         <Text style={styles.screen_title}>Historial</Text>
       </View>
-
+      //Contador de paseos finalizados
       <Text style={styles.header}>
         Paseos finalizados: <Text style={styles.badge}>{history.length}</Text>
       </Text>
-
+      //Lista de paseos
       <FlatList
         data={history}
         keyExtractor={(w) => w.walk_id.toString()}
