@@ -1,4 +1,6 @@
-// src/screens/walker/dashboard_paseador_screen.tsx
+// DASHBOARD PASEADOR SCREEN
+
+//importaciones y dependencias
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -14,29 +16,38 @@ import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 
+//Componentes
 import Screen_with_menu from "../../../components/shared/screen_with_menu";
 import BalanceCard from "../../../components/shared/balance_card";
 import WalkCarousel from "../../../components/shared/walk_carousel";
 import HomeGridCard from "../../../components/shared/home_grid_card";
 
+//Servicios para obtener datos backend
 import { get_assigned_walks } from "../../../service/walk_service";
 import { get_walker_profile } from "../../../service/walker_service";
+//Modelos
 import type { walk_model } from "../../../models/walk_model";
 import type { walker_model } from "../../../models/walker_model";
 
+//Obtiene el ancho de la pantalla para el carrusel
 const { width: screen_width } = Dimensions.get("window");
 
 export default function DashboardPaseadorScreen() {
+  //navegacion
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  //Estados
   const [assigned_walks, set_assigned_walks] = useState<walk_model[]>([]);
   const [loading, set_loading] = useState(false);
   const [walker_balance, set_walker_balance] = useState<number | null>(null);
   const [walker_profile, set_walker_profile] = useState<walker_model | null>(
     null
   );
+  //Reactiva la pantalla
   const is_focused = useIsFocused();
 
+  //Funcion carga paseos asignados desde el servicio
+  //Maneja loading y errores
   const fetch_assigned = async () => {
     set_loading(true);
     try {
@@ -49,6 +60,7 @@ export default function DashboardPaseadorScreen() {
     }
   };
 
+  //Funcion obtiene el perfil del paseador y su balance
   const fetch_profile_and_balance = async () => {
     try {
       const perfil = await get_walker_profile();
@@ -59,6 +71,8 @@ export default function DashboardPaseadorScreen() {
     }
   };
 
+  //La pantalla se reactiva cuando el usuario vuelve a la pantalla
+  //Garantiza datos siempre actualizados
   useEffect(() => {
     if (is_focused) {
       fetch_assigned();
@@ -66,6 +80,7 @@ export default function DashboardPaseadorScreen() {
     }
   }, [is_focused]);
 
+  //Define las opciones del menú lateral (etiqueta, icono y acción al presionar)
   const menu_options = [
     {
       label: "Menú Principal",
@@ -105,35 +120,25 @@ export default function DashboardPaseadorScreen() {
     },
   ];
 
-  const profile_image_url = walker_profile?.photo_url
-    ? walker_profile.photo_url.startsWith("http")
-      ? walker_profile.photo_url
-      : `${process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, "")}/uploads/${
-          walker_profile.photo_url
-        }`
-    : null;
-
   return (
+    //Screen_with_menu es un componente que envuelve UI y añade heaeder y side_menu
     <Screen_with_menu
       role_id={2}
       menu_options={menu_options}
-      on_search_press={() => {
-        /* si necesitas búsqueda */
-      }}
-      // aquí le pasamos el nombre del paseador al Header
       external_name={walker_profile?.name}
     >
+      //Tarjeta de balance del paseador
       <BalanceCard
         balance={walker_balance}
         on_press={() => navigation.navigate("payments_walker_screen")}
       />
-
+      //Titulo de prox paseo
       <Text style={styles.section_title}>
         Tu próximo paseo:{" "}
         <Text style={styles.badge}>{assigned_walks.length}</Text> paseo(s)
         asignado(s)
       </Text>
-
+      //Carrusel de paseos (o indicador cargando)
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (
@@ -142,7 +147,7 @@ export default function DashboardPaseadorScreen() {
           container_width={screen_width}
         />
       )}
-
+      //Casillas de acceso rápido
       <View style={styles.grid}>
         <HomeGridCard
           icon={<Feather name="map" size={40} color="#007BFF" />}
@@ -188,6 +193,7 @@ export default function DashboardPaseadorScreen() {
   );
 }
 
+//Estilos
 const styles = StyleSheet.create({
   section_title: {
     marginTop: 5,
