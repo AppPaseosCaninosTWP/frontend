@@ -71,14 +71,15 @@ export default function PlannerScreen() {
         end={{ x: 1, y: 0 }}
         style={styles.card}
       >
-        // Mostrar nombre de la mascota y detalles del paseo
+        {/*Mostrar nombre de la mascota y detalles*/}
         <View style={styles.text_container}>
           <Text style={styles.pet_name}>{item.pet_name}</Text>
           <Text style={styles.details}>
             {item.zone} · {item.date} · {item.time}
           </Text>
         </View>
-        //Imagen de la mascota o icono por defecto
+
+        {/*Imagen de la mascota o icono por defecto*/}
         {item.pet_photo ? (
           <Image
             source={{
@@ -107,11 +108,13 @@ export default function PlannerScreen() {
         </TouchableOpacity>
         <Text style={styles.screen_title}>Agenda</Text>
       </View>
-      //Contador de paseos asignados
+
+      {/*Contador de paseos asignados*/}
       <Text style={styles.header}>
         Mis paseos: <Text style={styles.badge}>{walks.length}</Text>
       </Text>
-      //Muestra un indicador de carga mientras se obtienen los paseos
+
+      {/*Muestra un indicador de carga mientras se obtienen los paseos*/}
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} size="large" />
       ) : (

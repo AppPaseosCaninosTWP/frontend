@@ -256,7 +256,7 @@ export default function EditWalkerProfileScreen() {
       contentContainerStyle={styles.scroll_container}
       keyboardShouldPersistTaps="handled"
     >
-      //header con boton de retroceso y titulo
+      {/*Header con boton de retroceso y titulo*/}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -266,7 +266,8 @@ export default function EditWalkerProfileScreen() {
         </TouchableOpacity>
         <Text style={styles.title}>Perfil del paseador</Text>
       </View>
-      //Selector de imagen
+
+      {/*Selector de imagen*/}
       <View style={styles.image_picker}>
         <TouchableOpacity
           onPress={is_editing ? pick_image : undefined}
@@ -285,7 +286,8 @@ export default function EditWalkerProfileScreen() {
           )}
         </TouchableOpacity>
       </View>
-      //Campo de solo lectura //Datos que no se pueden editar segun la ERS
+      {/*Campo de solo lectura*/}
+      {/*Datos que no se pueden editar segun la ERS*/}
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={[styles.input, styles.disabled_input]}
@@ -310,7 +312,7 @@ export default function EditWalkerProfileScreen() {
         value={zone}
         editable={false}
       />
-      //Campos editables
+      {/*Campos editables*/}
       <Text style={styles.label}>Correo electrónico</Text>
       <TextInput
         style={[styles.input, !is_editing && styles.disabled_input]}
@@ -342,7 +344,7 @@ export default function EditWalkerProfileScreen() {
         multiline
         maxLength={250}
       />
-      // Botones de acción
+      {/*Botones de accion*/}
       {!is_editing ? (
         <TouchableOpacity
           style={styles.edit_button}

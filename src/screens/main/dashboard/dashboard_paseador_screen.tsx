@@ -127,18 +127,20 @@ export default function DashboardPaseadorScreen() {
       menu_options={menu_options}
       external_name={walker_profile?.name}
     >
-      //Tarjeta de balance del paseador
+      {/*Tarjeta de balance del paseador*/}
       <BalanceCard
         balance={walker_balance}
         on_press={() => navigation.navigate("payments_walker_screen")}
       />
-      //Titulo de prox paseo
+
+      {/*Titulo de prox paseo*/}
       <Text style={styles.section_title}>
         Tu próximo paseo:{" "}
         <Text style={styles.badge}>{assigned_walks.length}</Text> paseo(s)
         asignado(s)
       </Text>
-      //Carrusel de paseos (o indicador cargando)
+
+      {/*Caarrusel de paseos (o indicar cargando)*/}
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (
@@ -147,7 +149,8 @@ export default function DashboardPaseadorScreen() {
           container_width={screen_width}
         />
       )}
-      //Casillas de acceso rápido
+
+      {/*Casillas de acceso rapido*/}
       <View style={styles.grid}>
         <HomeGridCard
           icon={<Feather name="map" size={40} color="#007BFF" />}

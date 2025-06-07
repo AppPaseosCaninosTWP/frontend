@@ -66,14 +66,14 @@ export default function WalkHistoryScreen() {
         end={{ x: 1, y: 0 }}
         style={styles.card}
       >
-        // Icono de huella
+        {/*Icono de huella*/}
         <MaterialCommunityIcons
           name="shoe-print"
           size={32}
           color="#fff"
           style={{ marginHorizontal: 12 }}
         />
-        //Texto con nombre del paseo, detalles y duración
+        {/*Texto con nombre del paseo, detalles y duracion*/}
         <View style={styles.text_container}>
           <Text style={styles.pet_name}>{item.pet_name}</Text>
           <Text style={styles.details}>
@@ -81,7 +81,7 @@ export default function WalkHistoryScreen() {
           </Text>
           <Text style={styles.duration}>Duración: {item.duration} min</Text>
         </View>
-        // Imagen de la mascota o icono de usuario si no hay foto
+        {/*Imagen de la mascota o icono de usuario si no hay foto*/}
         {item.photo_url ? (
           <Image source={{ uri: item.photo_url }} style={styles.pet_image} />
         ) : (
@@ -118,11 +118,12 @@ export default function WalkHistoryScreen() {
         </TouchableOpacity>
         <Text style={styles.screen_title}>Historial</Text>
       </View>
-      //Contador de paseos finalizados
+      {/*Contador de paseos finalizados*/}
       <Text style={styles.header}>
         Paseos finalizados: <Text style={styles.badge}>{history.length}</Text>
       </Text>
-      //Lista de paseos
+
+      {/*Lista de paseos*/}
       <FlatList
         data={history}
         keyExtractor={(w) => w.walk_id.toString()}

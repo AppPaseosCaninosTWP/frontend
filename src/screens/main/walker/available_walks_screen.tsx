@@ -86,7 +86,7 @@ export default function AvailableWalksScreen() {
         }}
       >
         <View style={styles.cardHeader}>
-          // Muestra la foto de la mascota o un icono si no hay foto
+          {/* Muestra la foto de la mascota o un icono si no hay foto */}
           {photo_url ? (
             <Image
               source={{ uri: photo_url }}
@@ -96,7 +96,7 @@ export default function AvailableWalksScreen() {
           ) : (
             <Feather name="user" size={48} color="#ccc" style={styles.avatar} />
           )}
-          //Datos de la mascota y paseo
+          {/* Datos de la mascota y paseo */}
           <View style={styles.info}>
             <Text style={styles.name}>{pet_name}</Text>
             <Text style={styles.meta}>
@@ -104,7 +104,7 @@ export default function AvailableWalksScreen() {
             </Text>
             <Text style={styles.meta}>{`Antofagasta ${sector}`}</Text>
           </View>
-          // Icono de flecha para indicar que se puede navegar
+          {/* Icono de flecha para indicar que se puede navegar */}
           <Feather name="chevron-right" size={20} color="#999" />
         </View>
       </TouchableOpacity>
@@ -113,16 +113,17 @@ export default function AvailableWalksScreen() {
 
   return (
     <View style={styles.container}>
-      //Configura la barra de estado
+      {/*Configura la barra de estado*/}
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      //Header con botón de retroceso y título
+
+      {/*Header con botón de retroceso y título*/}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Paseos disponibles</Text>
       </View>
-      //Boton para alternar entre tipos de paseos
+      {/*Boton para alternar entre tipos de paseos*/}
       <View style={styles.tabContainer}>
         {["Fijo", "Esporádico"].map((tab) => (
           <TouchableOpacity
@@ -144,7 +145,7 @@ export default function AvailableWalksScreen() {
           </TouchableOpacity>
         ))}
       </View>
-      //Lista de paseos filtrados por tipo seleccionado (o cargando)
+      {/*Lista de paseos filtrados por tipo seleccionado (o cargando)*/}
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (

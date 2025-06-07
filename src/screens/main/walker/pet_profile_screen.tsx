@@ -163,7 +163,7 @@ export default function PetProfileScreen() {
   //Renderizado final de pantalla
   return (
     <>
-      //Componente generico que muestra datos de la mascota
+      {/*Componente generico que muestra datos de la mascota*/}
       <PetProfileComponent
         pet={pet_data}
         duration={duration}
@@ -177,7 +177,8 @@ export default function PetProfileScreen() {
         on_contact_press={handle_contact}
         api_base_url={process.env.EXPO_PUBLIC_API_URL || ""}
       />
-      //Modal de confirmación para agendar o cancelar paseo
+
+      {/*Modal de confirmacion para agendar o cancelar paseo*/}
       <Modal
         transparent
         visible={confirming !== null}

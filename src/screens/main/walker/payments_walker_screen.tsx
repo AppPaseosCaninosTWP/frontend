@@ -94,7 +94,7 @@ export default function PaymentsWalkerScreen() {
   //Dependiendo del estado del pago, cambia el color del gradiente
   const render_history_item = ({ item }: { item: PaymentHistoryItem }) => {
     const colors: [string, string] =
-      item.status === "completado"
+      item.status === "pagado"
         ? ["#00bdff", "#54edfe"]
         : ["#fa709a", "#fee100"];
 
@@ -106,14 +106,14 @@ export default function PaymentsWalkerScreen() {
           end={{ x: 1, y: 0 }}
           style={styles.card}
         >
-          //Icono
+          {/*Icono*/}
           <Feather
             name="dollar-sign"
             size={28}
             color="#fff"
             style={{ marginHorizontal: 12 }}
           />
-          //Detalles del pago
+          {/*Detalles del pago*/}
           <View style={styles.text_container}>
             <Text style={styles.amount}>{`CLP ${item.amount.toFixed(2)}`}</Text>
             <Text style={styles.details}>{item.date}</Text>
@@ -129,23 +129,25 @@ export default function PaymentsWalkerScreen() {
 
   return (
     <View style={styles.wrapper}>
-      //Header con botón de retroceso y título
+      {/* Header con botón de retroceso y título */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Mi billetera</Text>
       </View>
-      //Tarjeta de balance disponible
+      {/*Tarjeta de balance disponible*/}
       <View style={styles.balance_card}>
         <Text style={styles.balance_label}>Saldo disponible</Text>
         <Text style={styles.balance_amount}>{formatted_balance}</Text>
       </View>
-      //Título de historial de pagos
+
+      {/*Titulo de historial de pagos*/}
       <Text style={styles.section_title}>
         Historial de pagos ({payment_history.length})
       </Text>
-      //Lista de historial de pagos
+
+      {/*Lista de historial de pagos*/}
       <FlatList
         data={payment_history}
         keyExtractor={(i) => i.payment_id.toString()}
