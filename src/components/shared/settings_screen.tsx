@@ -80,7 +80,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      //Notis
+      {/*Notis*/}
       <View style={styles.row}>
         <Feather name="bell" size={24} color="#333" />
         <Text style={styles.label}>Notifications</Text>
@@ -92,7 +92,8 @@ export default function SettingsScreen() {
           }}
         />
       </View>
-      //Priv
+
+      {/*Priv*/}
       <View style={styles.row}>
         <MaterialIcons name="lock-outline" size={24} color="#333" />
         <Text style={styles.label}>Privacidad</Text>
@@ -104,7 +105,7 @@ export default function SettingsScreen() {
           }}
         />
       </View>
-      //Pref
+      {/*Pref*/}
       <TouchableOpacity
         style={styles.row}
         onPress={() => Alert.alert("En mantenimiento XD")}
@@ -113,7 +114,8 @@ export default function SettingsScreen() {
         <Text style={styles.label}>Preferencia de paseos</Text>
         <Feather name="chevron-right" size={20} color="#999" />
       </TouchableOpacity>
-      //Contra
+
+      {/*Contra*/}
       <TouchableOpacity
         style={styles.row}
         onPress={() => Alert.alert("En mantenimiento XD")}
@@ -122,13 +124,15 @@ export default function SettingsScreen() {
         <Text style={styles.label}>Cambio de contraseña</Text>
         <Feather name="chevron-right" size={20} color="#999" />
       </TouchableOpacity>
-      //Lenguaje
+
+      {/*Lenguaje*/}
       <View style={styles.row}>
         <Feather name="globe" size={24} color="#333" />
         <Text style={styles.label}>Lenguaje</Text>
         <Text style={styles.value}>Español</Text>
       </View>
-      //Cerrar
+
+      {/*Cerrar*/}
       <TouchableOpacity
         style={styles.logout_button}
         onPress={() =>
