@@ -1,19 +1,15 @@
 const api_base_url = process.env.EXPO_PUBLIC_API_URL;
-import { user_model } from '../models/user_model';
 import { get_token } from '../utils/token_service';
+import {
+  login_response_model,
+  register_preliminary_response,
+} from '../models/auth_response_model';
+import { user_model } from '../models/user_model';
 
-export interface login_response {
-  token: string;
-  user: user_model;
-}
-
-export interface register_response {
-  email: string;
-  phone: string;
-  user_id: number;
-}
-
-export async function login_user(email: string, password: string): Promise<login_response> {
+/**
+ * Inicia sesión y devuelve token + usuario
+ */
+export async function login_user(email: string, password: string): Promise<login_response_model> {
   const response = await fetch(`${api_base_url}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -30,22 +26,28 @@ export async function login_user(email: string, password: string): Promise<login
   const token = json.data.token;
   const raw_user = json.data.user?.user ?? json.data.user;
 
-  const user = {
-    ...raw_user,
+  const user: user_model = {
+    user_id: raw_user.user_id,
+    name: raw_user.name,
+    email: raw_user.email,
+    phone: raw_user.phone,
+    role_id: raw_user.role_id,
+    is_enable: raw_user.is_enable,
     role_name: raw_user.role || raw_user.role_name,
-    name: raw_user.name || '',
   };
-
   return { token, user };
 }
 
+/**
+ * Registra al usuario y devuelve datos preliminares
+ */
 export async function register_user(
   name: string,
   email: string,
   phone: string,
   password: string,
   confirm_password: string
-): Promise<register_response> {
+): Promise<register_preliminary_response> {
   const response = await fetch(`${api_base_url}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -61,6 +63,9 @@ export async function register_user(
   return json.data;
 }
 
+/**
+ * Verifica el código ingresado para recuperación
+ */
 export async function verify_reset_code(email: string, code: string): Promise<void> {
   const token = await get_token();
 
@@ -79,13 +84,16 @@ export async function verify_reset_code(email: string, code: string): Promise<vo
   }
 }
 
+/**
+ * Solicita envío de código por email
+ */
 export async function send_code(email: string): Promise<void> {
+  const trimmed_email = email.trim();
+
   const response = await fetch(`${api_base_url}/auth/request_password_reset`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: trimmed_email }),
   });
 
   const json = await response.json();
@@ -94,6 +102,9 @@ export async function send_code(email: string): Promise<void> {
   }
 }
 
+/**
+ * Cambia la contraseña tras validar código
+ */
 export async function reset_password(
   email: string,
   code: string,
@@ -102,9 +113,7 @@ export async function reset_password(
 ): Promise<void> {
   const response = await fetch(`${api_base_url}/auth/reset_password`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, code, password, confirm_password }),
   });
 
@@ -113,3 +122,25 @@ export async function reset_password(
     throw new Error(json.msg || 'error_reset_password');
   }
 }
+
+/**
+ * Verifica el teléfono del usuario
+ * @param token Token de verificación pendiente
+ */
+export async function verify_phone(token: string, code: string): Promise<void> {
+  console.log('Enviando a /verify_phone:', { token, code }); // 👈 Asegúrate que esto sale
+  const response = await fetch(`${api_base_url}/auth/verify_phone`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      pending_verification_token: token,
+      code,
+    }),
+  });
+
+  const json = await response.json();
+  if (!response.ok || json.error) {
+    throw new Error(json.msg || 'Error al verificar teléfono');
+  }
+}
+
