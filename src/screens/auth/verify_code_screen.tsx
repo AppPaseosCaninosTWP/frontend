@@ -15,12 +15,18 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { verify_reset_code } from '../../service/auth_service';
+import { verify_reset_code, verify_phone } from '../../service/auth_service';
 
 export default function Verify_code_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
-  const { email, context } = route.params as { email: string; context: 'reset' | 'register' };
+
+  const { email, phone, context, token } = route.params as {
+    email: string;
+    phone?: string;
+    context: 'reset' | 'register';
+    token?: string;
+  };
 
   const fade_anim = useRef(new Animated.Value(0)).current;
   const translate_anim = useRef(new Animated.Value(30)).current;
@@ -44,34 +50,48 @@ export default function Verify_code_screen() {
     ]).start();
   }, []);
 
-  const handle_verify = async () => {
-    if (code.length === 0) {
-      Alert.alert('Campo vacío', 'Por favor ingrese el código.');
-      return;
+const handle_verify = async () => {
+  if (code.length === 0) {
+    Alert.alert('Campo vacío', 'Por favor ingrese el código.');
+    return;
+  }
+
+  const expected_length = context === 'reset' ? 6 : 4;
+
+  if (code.length !== expected_length) {
+    Alert.alert('Código inválido', `Debe tener ${expected_length} dígitos.`);
+    return;
+  }
+
+
+  try {
+    if (context === 'reset') {
+      await verify_reset_code(email.trim(), code);
+      Alert.alert('Código verificado', 'Ahora puedes cambiar tu contraseña.');
+      navigation.navigate('ResetPassword', { email: email.trim(), code });
     }
 
-    if (code.length !== 6) {
-      Alert.alert('Código inválido', 'Debe tener 6 dígitos.');
-      return;
-    }
-
-    try {
-      await verify_reset_code(email, code);
-
-      if (context === 'reset') {
-        Alert.alert('Código verificado', 'Ahora puedes cambiar tu contraseña.');
-        navigation.navigate('ResetPassword', { email, code });
-      } else if (context === 'register') {
-        Alert.alert('Correo validado', 'Ahora puedes iniciar sesión');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
+    if (context === 'register') {
+      if (!token) {
+        Alert.alert('Error', 'Falta el token de verificación');
+        return;
       }
-    } catch (err: any) {
-      Alert.alert('Error', err.message);
+
+      await verify_phone(token, code);
+      Alert.alert('Teléfono verificado', 'Tu cuenta ha sido creada con éxito.');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
     }
-  };
+  } catch (error) {
+    console.error('Error al verificar código:', error);
+    Alert.alert('Error', 'Código inválido o expirado. Inténtalo nuevamente.');
+  }
+};
+
+
+
 
   return (
     <LinearGradient colors={['#0096FF', '#E6F4FF']} style={styles.container}>
@@ -90,7 +110,9 @@ export default function Verify_code_screen() {
         <Text style={styles.title}>Verificar código</Text>
         <Text style={styles.subtitle}>
           Ingrese el código que enviamos a{' '}
-          <Text style={{ fontWeight: '600' }}>{email}</Text>
+          <Text style={{ fontWeight: '600' }}>
+            {context === 'register' && phone ? `+56 ${phone}` : email}
+          </Text>
         </Text>
 
         <TextInput
@@ -99,7 +121,7 @@ export default function Verify_code_screen() {
           value={code}
           onChangeText={set_code}
           keyboardType="numeric"
-          maxLength={6}
+          maxLength={context === 'reset' ? 6 : 4}
         />
 
         <TouchableOpacity style={styles.send_button} onPress={handle_verify}>
@@ -180,4 +202,3 @@ const styles = StyleSheet.create({
   },
 });
 
-  

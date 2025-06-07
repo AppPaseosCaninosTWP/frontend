@@ -23,7 +23,7 @@ export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const fade_anim = useRef(new Animated.Value(0)).current;
   const translate_anim = useRef(new Animated.Value(30)).current;
-  const { auth } = use_auth();
+  const { login } = use_auth();
   const [email, set_email] = useState('');
   const [password, set_password] = useState('');
   const [email_error, set_email_error] = useState('');
@@ -55,19 +55,18 @@ export default function LoginScreen() {
     validate_password(password);
 
     if (email_error || password_error) {
-      Alert.alert('Error al iniciar sesión', 'Por favor complete todos los campos correctamente');
+      Alert.alert('Error al iniciar sesión', 'Por favor complete todos los campos correctamente.');
       return;
     }
 
     try {
-      const { token, user } = await login_user(email, password);
-      await auth(token, user);
+      await login(email, password);
       navigation.reset({
         index: 0,
         routes: [{ name: 'DashboardScreen' }],
       });
     } catch (err: any) {
-      console.error('Error desde login_user:', err);
+      console.error('Error en login:', err);
       Alert.alert('Error', err.message);
     }
   };

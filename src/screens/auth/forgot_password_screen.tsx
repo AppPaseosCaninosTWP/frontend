@@ -56,22 +56,33 @@ import {
       ]).start();
     }, []);
   
-    const handle_reset = async () => {
-      validateEmail(email);
+const handle_reset = async () => {
+  const trimmed_email = email.trim();
+  const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (emailError) {
-        Alert.alert('Por favor, corrija el error antes de continuar', emailError);
-        return;
-      }
+  if (!trimmed_email) {
+    setEmailError('El correo electrónico es obligatorio');
+    Alert.alert('Error', 'El correo electrónico es obligatorio');
+    return;
+  }
 
-      try {
-        await send_code(email);
-        Alert.alert('Correo enviado', 'Revisa tu bandeja de entrada para el código.');
-        navigation.navigate('VerifyCode', { email, context: 'reset' });
-      } catch (err: any) {
-        Alert.alert('Error', err.message);
-      }
-    };
+  if (!email_regex.test(trimmed_email)) {
+    setEmailError('Ingrese un correo electrónico válido');
+    Alert.alert('Error', 'Ingrese un correo electrónico válido');
+    return;
+  }
+
+  setEmailError('');
+
+  try {
+    await send_code(trimmed_email);
+    Alert.alert('Correo enviado', 'Revisa tu bandeja de entrada para el código.');
+    navigation.navigate('VerifyCode', { email: trimmed_email, context: 'reset' });
+  } catch (err: any) {
+    Alert.alert('Error', err.message);
+  }
+};
+
 
     return (
       <LinearGradient colors={['#0096FF', '#E6F4FF']} style={styles.container}>

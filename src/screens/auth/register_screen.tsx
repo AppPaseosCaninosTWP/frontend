@@ -83,32 +83,94 @@ export default function Register_screen() {
     }
   };
 
-  const handle_register = async () => {
-    validate_email(email);
-    validate_phone(phone);
-    validate_password(password);
-    validate_confirm_password(confirm_password);
+const handle_register = async () => {
+  const trimmed_name = name.trim();
+  const trimmed_email = email.trim();
+  const trimmed_phone = phone.trim();
+  const trimmed_password = password.trim();
+  const trimmed_confirm_password = confirm_password.trim();
 
-    set_password_touched(true);
-    set_confirm_password_touched(true);
+  const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phone_regex = /^\d{9}$/;
 
-    if (email_error || phone_error || password_error || confirm_password_error) {
-      Alert.alert('Error', 'Por favor corrija los errores antes de continuar.');
-      return;
-    }
+  let local_email_error = '';
+  let local_phone_error = '';
+  let local_password_error = '';
+  let local_confirm_password_error = '';
 
-    try {
-      const user = await register_user(name, email, phone, password, confirm_password);
-      await send_code(user.email);
-      navigation.navigate('VerifyCode', {
-        email: user.email,
-        context: 'register',
-      });
-    } catch (err: any) {
-      console.error('Error al registrarse:', err);
-      Alert.alert('Error', err.message);
-    }
-  };
+  if (!trimmed_email) {
+    local_email_error = 'El correo electrónico es obligatorio';
+  } else if (!email_regex.test(trimmed_email)) {
+    local_email_error = 'Ingrese un correo electrónico válido';
+  }
+
+  if (!trimmed_phone) {
+    local_phone_error = 'El número de teléfono es obligatorio';
+  } else if (!phone_regex.test(trimmed_phone)) {
+    local_phone_error = 'El número debe tener exactamente 9 dígitos';
+  }
+
+  if (!trimmed_password) {
+    local_password_error = 'La contraseña es obligatoria';
+  } else if (trimmed_password.length < 8 || trimmed_password.length > 15) {
+    local_password_error = 'La contraseña debe tener entre 8 y 15 caracteres';
+  }
+
+  if (!trimmed_confirm_password) {
+    local_confirm_password_error = 'La confirmación de contraseña es obligatoria';
+  } else if (trimmed_confirm_password !== trimmed_password) {
+    local_confirm_password_error = 'Las contraseñas no coinciden';
+  }
+
+  set_email_error(local_email_error);
+  set_phone_error(local_phone_error);
+  set_password_error(local_password_error);
+  set_confirm_password_error(local_confirm_password_error);
+
+  set_password_touched(true);
+  set_confirm_password_touched(true);
+
+  if (
+    local_email_error ||
+    local_phone_error ||
+    local_password_error ||
+    local_confirm_password_error
+  ) {
+    Alert.alert('Error', 'Por favor corrija los errores antes de continuar.');
+    return;
+  }
+
+try {
+  const user = await register_user(
+    trimmed_name,
+    trimmed_email,
+    trimmed_phone,
+    trimmed_password,
+    trimmed_confirm_password
+  );
+
+  if (!user?.email) {
+    throw new Error('Error inesperado: El email no fue devuelto por el servidor');
+  }
+
+  navigation.navigate('VerifyCode', {
+    email: user.email,
+    phone: user.phone,
+    context: 'register',
+    token: user.pending_verification_token, // 👈 necesario
+  });
+
+
+
+
+} catch (err: any) {
+  console.error('Error al registrarse:', err);
+  Alert.alert('Error', err.message);
+}
+
+};
+
+
 
   useEffect(() => {
     Animated.parallel([
