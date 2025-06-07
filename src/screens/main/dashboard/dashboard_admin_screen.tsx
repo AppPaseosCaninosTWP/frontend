@@ -103,8 +103,6 @@ export default function Dashboard_admin_screen() {
   return (
     <ScreenWithMenu
       role_id={1}
-      name={user?.name ?? 'Administrador'}
-      profile_image={profileImageSource}
       menu_options={menu_options}
       on_search_press={() => navigation.navigate('UserScreen')}
     >
@@ -158,17 +156,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    backgroundColor: '#fff',
+    width: "100%",
+    backgroundColor: "#e3f2fd",
+    borderWidth: 1,
+    borderColor: "#bbdefb",
     borderRadius: 16,
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    paddingVertical: 32,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    marginBottom: 16,
+    elevation: 2,
   },
   card_image: {
     width: 100,
@@ -178,7 +179,10 @@ const styles = StyleSheet.create({
   },
   card_title: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    textAlign: "center",
+    color: "#111",
+    marginTop: 12,
+    marginBottom: 6,
   },
 });
