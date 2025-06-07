@@ -3,9 +3,9 @@ import type { pet_model } from "../models/pet_model";
 
 const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 
-export async function get_user_pets(): Promise<pet_model[]> {
+export async function get_user_pets(page: number = 1): Promise<pet_model[]> {
   const token = await get_token();
-  const response = await fetch(`${api_base_url}/pet`, {
+  const response = await fetch(`${api_base_url}/pet/?page=${page}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
