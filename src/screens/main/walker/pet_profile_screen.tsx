@@ -1,3 +1,6 @@
+//PET PROFILE SCREEN
+
+//Importaciones y dependencias
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,23 +11,28 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
-  Linking,
+  Linking, //Whatsapp
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+//Componente
 import PetProfileComponent from "../../../components/shared/pet_profile_component";
+//Modelo
 import type { pet_model } from "../../../models/pet_model";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
+//Servicios
 import {
   get_pet_by_id,
   get_assigned_walk_for_pet,
   update_walk_status,
 } from "../../../service/pet_service";
 
+//Obtener el ancho de la pantalla para calcular el ancho del modal
 const { width } = Dimensions.get("window");
 const BOX_WIDTH = width * 0.8;
 
+//Definición de tipos para la ruta y navegación
 type PetProfileRoute = RouteProp<RootStackParamList, "PetProfileScreen">;
 type Navigation = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,10 +40,12 @@ type Navigation = NativeStackNavigationProp<
 >;
 
 export default function PetProfileScreen() {
+  //Obtener parámetros (petId, duration, walkId) de la ruta
   const { params } = useRoute<PetProfileRoute>();
   const navigation = useNavigation<Navigation>();
   const { petId, duration, walkId } = params;
 
+  //Estados para manejar los datos de la mascota, carga, pestaña activa, ID del paseo agendado y confirmación
   const [pet_data, set_pet_data] = useState<
     (pet_model & { owner: any }) | null
   >(null);
@@ -50,13 +60,16 @@ export default function PetProfileScreen() {
     null
   );
 
+  //Efecto al montar o cambiar el petId
   useEffect(() => {
     (async () => {
       set_loading(true);
       try {
+        //Obtiene datos de la mascota por su ID
         const pet_info = await get_pet_by_id(petId);
         set_pet_data(pet_info);
 
+        //Verifica si hay un paseo asignado para esta mascota
         const assigned_walk = await get_assigned_walk_for_pet(petId);
         if (assigned_walk) {
           set_scheduled_walk_id(assigned_walk.walk_id);
@@ -69,16 +82,19 @@ export default function PetProfileScreen() {
     })();
   }, [petId]);
 
+  //Funcion para enviar mensaje por WhatsApp
   const handle_contact = () => {
     if (!pet_data?.owner?.phone) {
       Alert.alert("Error", "Número de teléfono no disponible");
       return;
     }
 
+    //Elimina caracteres no numéricos del número de teléfono
     const phone_number = pet_data.owner.phone.replace(/[^0-9+]/g, "");
     const url_app = `whatsapp://send?phone=${phone_number}`;
     const url_web = `https://api.whatsapp.com/send?phone=${phone_number}`;
 
+    //Intenta abrir WhatsApp, si no está instalado, abre WhatsApp Web
     Linking.canOpenURL(url_app)
       .then((supported) => {
         if (supported) {
@@ -89,12 +105,14 @@ export default function PetProfileScreen() {
       })
       .catch((err) => {
         console.error("Error al abrir WhatsApp:", err);
+        //Si hay error, intenta abrir WhatsApp Web
         Linking.openURL(url_web).catch(() => {
           Alert.alert("Error", "No se pudo abrir WhatsApp ni WhatsApp Web");
         });
       });
   };
 
+  //Funcion para agendar y cancelar paseo
   const handle_schedule = async () => {
     set_confirming(null);
     if (!walkId) return;
@@ -124,6 +142,7 @@ export default function PetProfileScreen() {
     }
   };
 
+  //Si está cargando, muestra un indicador de carga
   if (loading) {
     return (
       <View style={styles.center}>
@@ -131,6 +150,8 @@ export default function PetProfileScreen() {
       </View>
     );
   }
+
+  //Renderizado si no hay datos de mascota
   if (!pet_data) {
     return (
       <View style={styles.center}>
@@ -139,8 +160,10 @@ export default function PetProfileScreen() {
     );
   }
 
+  //Renderizado final de pantalla
   return (
     <>
+      //Componente generico que muestra datos de la mascota
       <PetProfileComponent
         pet={pet_data}
         duration={duration}
@@ -154,7 +177,7 @@ export default function PetProfileScreen() {
         on_contact_press={handle_contact}
         api_base_url={process.env.EXPO_PUBLIC_API_URL || ""}
       />
-
+      //Modal de confirmación para agendar o cancelar paseo
       <Modal
         transparent
         visible={confirming !== null}
@@ -202,6 +225,7 @@ export default function PetProfileScreen() {
   );
 }
 
+//Estilos para la pantalla
 const styles = StyleSheet.create({
   center: {
     flex: 1,

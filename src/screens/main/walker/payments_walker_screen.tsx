@@ -1,3 +1,6 @@
+//PAYMENTS WALKER SCREEN
+
+//Importaciones y dependencias
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -14,24 +17,30 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
 
+//Servicios
 import {
   get_walker_balance,
   get_payment_history,
 } from "../../../service/payment_service";
+
+//Modelos
 import type {
   BalanceResponse,
   PaymentHistoryItem,
 } from "../../../models/payment_model";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 
+//Obtener el ancho de la pantalla para calcular el ancho de las tarjetas
 const { width: screen_width } = Dimensions.get("window");
 const h_padding = 20;
 const card_width = screen_width - h_padding * 2;
 
 export default function PaymentsWalkerScreen() {
+  // Navegacion
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  //Estado de carga, balance y historial de pagos
   const [loading, set_loading] = useState<boolean>(true);
   const [balance_info, set_balance_info] = useState<BalanceResponse | null>(
     null
@@ -40,10 +49,13 @@ export default function PaymentsWalkerScreen() {
     []
   );
 
+  //Al montar la pantalla, se llama a la función para obtener los datos
   useEffect(() => {
     fetch_data();
   }, []);
 
+  // Llama al servicio para obtener el balance y el historial de pagos
+  // Actualiza los estados correspondientes y maneja errores
   const fetch_data = async () => {
     set_loading(true);
     try {
@@ -60,7 +72,7 @@ export default function PaymentsWalkerScreen() {
       set_loading(false);
     }
   };
-
+  // Si esta cargando, muestra un indicador de carga
   if (loading) {
     return (
       <View style={styles.center}>
@@ -69,6 +81,7 @@ export default function PaymentsWalkerScreen() {
     );
   }
 
+  //Una vez cargados los datos, formatea el balance para mostrarlo
   const formatted_balance = balance_info
     ? balance_info.balance.toLocaleString("es-CL", {
         style: "currency",
@@ -77,6 +90,8 @@ export default function PaymentsWalkerScreen() {
       })
     : "";
 
+  //Renderiza cada item del historial de pagos
+  //Dependiendo del estado del pago, cambia el color del gradiente
   const render_history_item = ({ item }: { item: PaymentHistoryItem }) => {
     const colors: [string, string] =
       item.status === "completado"
@@ -91,13 +106,14 @@ export default function PaymentsWalkerScreen() {
           end={{ x: 1, y: 0 }}
           style={styles.card}
         >
+          //Icono
           <Feather
             name="dollar-sign"
             size={28}
             color="#fff"
             style={{ marginHorizontal: 12 }}
           />
-
+          //Detalles del pago
           <View style={styles.text_container}>
             <Text style={styles.amount}>{`CLP ${item.amount.toFixed(2)}`}</Text>
             <Text style={styles.details}>{item.date}</Text>
@@ -113,22 +129,23 @@ export default function PaymentsWalkerScreen() {
 
   return (
     <View style={styles.wrapper}>
+      //Header con botón de retroceso y título
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Mi billetera</Text>
       </View>
-
+      //Tarjeta de balance disponible
       <View style={styles.balance_card}>
         <Text style={styles.balance_label}>Saldo disponible</Text>
         <Text style={styles.balance_amount}>{formatted_balance}</Text>
       </View>
-
+      //Título de historial de pagos
       <Text style={styles.section_title}>
         Historial de pagos ({payment_history.length})
       </Text>
-
+      //Lista de historial de pagos
       <FlatList
         data={payment_history}
         keyExtractor={(i) => i.payment_id.toString()}
@@ -140,6 +157,7 @@ export default function PaymentsWalkerScreen() {
   );
 }
 
+//Estilos de la pantalla
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
