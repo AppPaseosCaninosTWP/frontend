@@ -7,12 +7,14 @@ import {
   clear_session,
   verify_token
 } from '../../utils/token_service';
+import { login_user } from '../../service/auth_service';
 
 type AuthContextProps = {
   user: user_model | null;
   status: 'checking' | 'authenticated' | 'not-authenticated';
   auth: (token: string, user: user_model) => Promise<void>;
   logout: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
 };
 
 export const AuthContext = createContext({} as AuthContextProps);
@@ -69,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const response = await verify_token(token);
-      if (!response.success || response.expired) {
+      if (!response?.success || response?.expired) {
         await clear_session();
         return dispatch({ type: 'not-authenticated' });
       }
@@ -86,6 +88,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     dispatch({ type: 'auth', payload: { user } });
   };
 
+  const login = async (email: string, password: string) => {
+    const { token, user } = await login_user(email, password);
+    await save_session(token, user);
+    dispatch({ type: 'auth', payload: { user } });
+  };
+
   const logout = async () => {
     await clear_session();
     dispatch({ type: 'not-authenticated' });
@@ -97,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ...state,
         auth,
         logout,
+        login,
       }}
     >
       {children}

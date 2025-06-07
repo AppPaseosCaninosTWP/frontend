@@ -56,8 +56,13 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  VerifyCode: { email: string; context: "register" | "reset" };
-  ResetPassword: { email: string };
+VerifyCode: {
+  email: string;
+  phone?: string;
+  context: 'reset' | 'register';
+  token?: string;
+};
+  ResetPassword: { email: string  ; code: string };
   DashboardAdmin: undefined;
   DashboardCliente: undefined;
   DashboardPaseador: undefined;
