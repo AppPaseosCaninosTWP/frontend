@@ -1,4 +1,6 @@
-// src/models/walk_model.ts
+//WALK MODEL
+
+//Representa un paseo con datos básicos y opcionales (para listadps y carruseles)
 export interface walk_model {
   walk_id: number;
   status: "pendiente" | "confirmado" | "cancelado" | string;
@@ -6,22 +8,19 @@ export interface walk_model {
   duration?: number;
   date?: string;
   time?: string;
-
   pet_id?: number;
   pet_name?: string;
   pet_photo?: string;
   sector?: string;
   photo_url?: string;
-
-  walker?: {
-    email: string;
-  };
-  client?: {
-    email: string;
-  };
+  //Info opcional (solo email)
+  walker?: { email: string };
+  //Info opcional (solo email)
+  client?: { email: string };
   comments?: string;
 }
 
+//Payload esperado al crear un nuevo paseo
 export interface create_walk_payload {
   walk_type_id: number;
   pet_ids: number[];
@@ -31,6 +30,7 @@ export interface create_walk_payload {
   days: string[];
 }
 
+//Estructura cruda de la API para listado de paseos
 export interface APIWalkFromList {
   walk_id: number;
   walk_type: string;
@@ -42,14 +42,17 @@ export interface APIWalkFromList {
     start_time: string;
     duration: number;
   }[];
-  pets: {
-    pet_id: number;
-    name: string;
-    photo: string;
-    zone: string;
-  }[] | null;
+  pets:
+    | {
+        pet_id: number;
+        name: string;
+        photo: string;
+        zone: string;
+      }[]
+    | null;
 }
 
+//Estructura cruda de la API para detalles de un paseo
 export interface APIWalkFromDetail {
   walk_id: number;
   walk_type:
@@ -65,19 +68,19 @@ export interface APIWalkFromDetail {
     email: string;
     phone: string;
   };
-  walker:
+  walker: {
+    user_id: number;
+    email: string;
+    phone: string;
+  } | null;
+  pets:
     | {
-        user_id: number;
-        email: string;
-        phone: string;
-      }
+        pet_id: number;
+        name: string;
+        photo: string;
+        zone: string;
+      }[]
     | null;
-  pets: {
-    pet_id: number;
-    name: string;
-    photo: string;
-    zone: string;
-  }[] | null;
   days: {
     start_date: string;
     start_time: string;
@@ -85,6 +88,7 @@ export interface APIWalkFromDetail {
   }[];
 }
 
+//Modelo para los detalles de un paseo
 export interface DetailedWalk {
   id: string;
   clientName: string;
@@ -93,7 +97,7 @@ export interface DetailedWalk {
   petNames: string;
   zone: string;
   date: string;
-  status: 'Pendiente' | 'Confirmado' | 'En curso' | 'Finalizado' | 'Cancelado';
+  status: "Pendiente" | "Confirmado" | "En curso" | "Finalizado" | "Cancelado";
   startTime: string;
   endTime: string;
   type: string;
