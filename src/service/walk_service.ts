@@ -1,15 +1,22 @@
-// src/service/walk_service.ts
+//WALK SERVICE
+
+//Importa la funcion para obtener el token de autenticación
 import { get_token } from "../utils/token_service";
+//Importa los tipos de datos necesarios para las funciones
 import type { create_walk_payload, walk_model } from "../models/walk_model";
 
+//URL base de la API y URL de uploads
 const api_base_url = process.env.EXPO_PUBLIC_API_URL;
 const uploads_url = process.env.EXPO_PUBLIC_URL + "/uploads";
 
+//Crea un nuevo paseo en el backend
 export async function create_walk(
   data: create_walk_payload
 ): Promise<{ walk_id: number }> {
+  //Obtiene el token de autenticación
   const token = await get_token();
 
+  //Hace peticion POST al endpoint de creación de paseos (backend)
   const response = await fetch(`${api_base_url}/walk`, {
     method: "POST",
     headers: {
@@ -19,13 +26,17 @@ export async function create_walk(
     body: JSON.stringify(data),
   });
 
+  //Parsea la respuesta JSON
   const json = await response.json();
+  //Si hay error se lanza una excepción
   if (!response.ok || json.error) {
     throw new Error(json.msg || "Error al crear paseo");
   }
+  //Retorna la respuesta del servidor
   return json;
 }
 
+//Obtiene todos los paseos del backend paginando los resultados
 export async function get_all_walks(): Promise<walk_model[]> {
   const token = await get_token();
   if (!token) {
@@ -35,6 +46,7 @@ export async function get_all_walks(): Promise<walk_model[]> {
   let allWalks: walk_model[] = [];
   let page = 1;
 
+  //Bucle que itera paginas hasta que la API devuelva una página vacía
   while (true) {
     const url = `${api_base_url}/walk?page=${page}&ts=${Date.now()}`;
     const response = await fetch(url, {
@@ -47,16 +59,19 @@ export async function get_all_walks(): Promise<walk_model[]> {
       },
     });
 
+    //Pasea la respuesta JSON con su error correspondiente
     const json = await response.json();
     if (!response.ok || json.error) {
       throw new Error(json.msg || `Error al obtener paseos (página ${page})`);
     }
 
     const data = Array.isArray(json.data) ? json.data : [];
+    //Si la página está vacía, se sale del bucle
     if (data.length === 0) {
       break;
     }
 
+    //Mapea cada objeto de paseo a un modelo walk_model
     const mapped: walk_model[] = data.map((w: any) => {
       const pet = Array.isArray(w.pets) && w.pets.length > 0 ? w.pets[0] : {};
       const day = Array.isArray(w.days) && w.days.length > 0 ? w.days[0] : {};
@@ -85,6 +100,7 @@ export async function get_all_walks(): Promise<walk_model[]> {
   return allWalks;
 }
 
+//Obtiene unicamente los paseos asignados al paseador actual
 export async function get_assigned_walks(): Promise<walk_model[]> {
   const token = await get_token();
 
@@ -102,9 +118,11 @@ export async function get_assigned_walks(): Promise<walk_model[]> {
   if (!response.ok || json.error) {
     throw new Error(json.msg || "Error al obtener paseos asignados");
   }
+  //La API devuelve directamente un array de paseos
   return json.data as walk_model[];
 }
 
+//Obtiene los detalles de un paseo específico por su ID
 export async function get_walk_details(walk_id: number): Promise<any> {
   const token = await get_token();
   const response = await fetch(`${api_base_url}/walk/${walk_id}`, {
@@ -122,13 +140,14 @@ export async function get_walk_details(walk_id: number): Promise<any> {
   return json.data;
 }
 
+//Filtra y devuelve solo los paseos con estado "pendiente" (para el paseador)
 export async function get_available_walks(): Promise<walk_model[]> {
-  // 1) Obtenemos todos los paseos mapeados
+  //Obtiene todos los paseos mapeados
   const all = await get_all_walks();
-  // 2) Devolvemos sólo aquellos con status "pendiente"
   return all.filter((w) => w.status === "pendiente");
 }
 
+//Obtiene el historial de paseos finalizados del paseador
 export async function get_walk_history(): Promise<walk_model[]> {
   const token = await get_token();
   if (!token) throw new Error("Token no disponible");
@@ -143,6 +162,7 @@ export async function get_walk_history(): Promise<walk_model[]> {
     throw new Error(json.msg || "Error al obtener historial de paseos");
   }
 
+  //Normaliza la respuesta para obtener un array de paseos
   const raw: any[] = Array.isArray(json.data) ? json.data : [];
 
   const mapped: walk_model[] = raw.map((w) => {
