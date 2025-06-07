@@ -9,6 +9,7 @@ export type payment_model = {
   amount: number;
   status: string;
   created_at: string;
+  walk_id: number;
   walk?: {
     walker: any;
     pet_name?: string;
