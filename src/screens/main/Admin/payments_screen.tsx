@@ -22,6 +22,7 @@ import { get_profile_walker_by_id } from '../../../service/walker_service';
 import type { payment_model } from '../../../models/payment_model';
 import type { APIWalkFromDetail } from '../../../models/walk_model';
 import type { WalkerProfile } from '../../../models/walker_model';
+import type { PaymentUI } from '../../../models/payment_model';
 import { API_UPLOADS_URL } from '../../../config/constants';
 
 type Filter = 'all' | 'paid' | 'pending';
@@ -39,21 +40,6 @@ function formatDDMMYYYY(date: Date): string {
   return `${dd}.${mm}.${yyyy}`;
 }
 
-interface PaymentUI {
-  id: string;
-  clientName: string;
-  petNames: string;
-  date: string;
-  paymentStatus: 'Pagado' | 'Pendiente';
-  zone: string;
-  fee: string;
-  startTime: string;
-  endTime: string;
-  type: string;
-  walkerName: string;
-  walkerAvatar: any;
-}
-
 export default function Payments_screen() {
   const [payments, setPayments] = useState<PaymentUI[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +48,6 @@ export default function Payments_screen() {
   const [filter, setFilter] = useState<Filter>('all');
   const [selected, setSelected] = useState<PaymentUI | null>(null);
 
-  // Agrupación por fecha del paseo
   const todayKey = formatDDMMYYYY(new Date());
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -72,33 +57,32 @@ export default function Payments_screen() {
     async function loadPayments() {
       setLoading(true);
       try {
-        // 1) Traemos todos los pagos de la API
         const raw: payment_model[] = await get_all_payments();
-
         const mapped: PaymentUI[] = [];
+
         for (const p of raw) {
-          // 2) Obtenemos detalle del paseo asociado
           let walkDetail: APIWalkFromDetail;
           try {
             walkDetail = await get_walk_details(p.walk_id);
           } catch {
-            continue; // si falla, saltar este pago
+            continue;
           }
 
-          // 3) Nombre del cliente (APIWalkFromDetail.client → user_id)
+          // 1) Cliente
           let clientName = walkDetail.client.email;
           try {
             const usr = await get_user_by_id(walkDetail.client.user_id);
             if (usr.name?.trim()) clientName = usr.name;
-          } catch { /* quedará el email */ }
+          } catch {}
 
-          // 4) Mascotas y zona
-          const petNames = Array.isArray(walkDetail.pets) && walkDetail.pets.length > 0
-            ? walkDetail.pets.map(pet => pet.name).join(', ')
-            : '–';
+          // 2) Mascotas y zona
+          const petNames =
+            Array.isArray(walkDetail.pets) && walkDetail.pets.length > 0
+              ? walkDetail.pets.map(pet => pet.name).join(', ')
+              : '–';
           const zone = walkDetail.pets?.[0]?.zone || '–';
 
-          // 5) Fecha, hora inicio y fin
+          // 3) Fecha y horas
           const day0 = walkDetail.days[0];
           const [y, m, d] = day0.start_date.split('-').map(Number);
           const date = formatDDMMYYYY(new Date(y, m - 1, d));
@@ -109,30 +93,39 @@ export default function Payments_screen() {
           const endM = String(totalMin % 60).padStart(2, '0');
           const endTime = `${endH}:${endM}`;
 
-          // 6) Tipo de paseo
+          // 4) Tipo de paseo
           const type =
             typeof walkDetail.walk_type === 'string'
               ? walkDetail.walk_type
               : walkDetail.walk_type.name;
 
-          // 7) Estado de pago (payment_model.status)
-          const paymentStatus = p.status === 'completed' || p.status === 'pagado'
-            ? 'Pagado'
-            : 'Pendiente';
+          // 5) Estado de pago
+          const paymentStatus =
+            p.status === 'completed' || p.status === 'pagado'
+              ? 'Pagado'
+              : 'Pendiente';
 
-          // 8) Monto formateado en CLP
+          // 6) Monto y comisión
           const fee = p.amount.toLocaleString('es-CL', {
             style: 'currency',
             currency: 'CLP',
             minimumFractionDigits: 0,
           });
+          const rawCommission = Math.round(p.amount * 0.10);
+          const commission = rawCommission.toLocaleString('es-CL', {
+            style: 'currency',
+            currency: 'CLP',
+            minimumFractionDigits: 0,
+          });
 
-          // 9) Paseador: perfil + avatar
+          // 7) Paseador
           let walkerName = 'Sin asignar';
           let walkerAvatar = require('../../../assets/user_icon.png');
           if (walkDetail.walker) {
             try {
-              const prof = await get_profile_walker_by_id(walkDetail.walker.user_id) as unknown as WalkerProfile;
+              const prof = (await get_profile_walker_by_id(
+                walkDetail.walker.user_id
+              )) as unknown as WalkerProfile;
               if (prof.name?.trim()) walkerName = prof.name;
               if (prof.photo?.startsWith('http')) {
                 walkerAvatar = { uri: prof.photo };
@@ -141,7 +134,7 @@ export default function Payments_screen() {
                   uri: `${API_UPLOADS_URL}/api/uploads/${prof.photo}`,
                 };
               }
-            } catch { /* queda por defecto */ }
+            } catch {}
           }
 
           mapped.push({
@@ -152,6 +145,7 @@ export default function Payments_screen() {
             paymentStatus,
             zone,
             fee,
+            commission,
             startTime,
             endTime,
             type,
@@ -185,7 +179,9 @@ export default function Payments_screen() {
     { title: 'Ayer', data: payments.filter(p => p.date === yesterdayKey) },
     {
       title: 'Otros días',
-      data: payments.filter(p => p.date !== todayKey && p.date !== yesterdayKey),
+      data: payments.filter(
+        p => p.date !== todayKey && p.date !== yesterdayKey
+      ),
     },
   ];
   const filtered = sections
@@ -288,7 +284,7 @@ export default function Payments_screen() {
         showsVerticalScrollIndicator={false}
       />
 
-      {/* Modal detalle de pago */}
+      {/* Modal detalle */}
       <Modal
         visible={!!selected}
         transparent
@@ -308,6 +304,7 @@ export default function Payments_screen() {
                 Mascotas · {selected.petNames}
               </Text>
               <Text style={styles.modalSub}>Zona: {selected.zone}</Text>
+
               <View style={styles.modalRow}>
                 <View style={styles.modalCol}>
                   <Text style={styles.label}>Fecha</Text>
@@ -320,6 +317,7 @@ export default function Payments_screen() {
                   </Text>
                 </View>
               </View>
+
               <View style={styles.modalRow}>
                 <View style={styles.modalCol}>
                   <Text style={styles.label}>Tipo</Text>
@@ -330,6 +328,15 @@ export default function Payments_screen() {
                   <Text style={styles.value}>{selected.fee}</Text>
                 </View>
               </View>
+
+              {/* Comisión 10% */}
+              <View style={styles.modalRow}>
+                <View style={styles.modalCol}>
+                  <Text style={styles.label}>Comisión (10%)</Text>
+                  <Text style={styles.value}>{selected.commission}</Text>
+                </View>
+              </View>
+
               <Text style={[styles.label, { marginTop: 12 }]}>Paseador</Text>
               <View style={styles.walkerCard}>
                 <Image
@@ -338,6 +345,7 @@ export default function Payments_screen() {
                 />
                 <Text style={styles.walkerName}>{selected.walkerName}</Text>
               </View>
+
               <TouchableOpacity
                 style={styles.closeBtn}
                 onPress={() => setSelected(null)}
