@@ -32,3 +32,19 @@ export interface PaymentHistoryItem {
   status: string; //pendiente o completado
   client_email: string;
 }
+
+export interface PaymentUI {
+  id: string;
+  clientName: string;
+  petNames: string;
+  date: string;
+  paymentStatus: 'Pagado' | 'Pendiente';
+  zone: string;
+  fee: string;
+  commission: string;
+  startTime: string;
+  endTime: string;
+  type: string;
+  walkerName: string;
+  walkerAvatar: any;
+}
