@@ -129,7 +129,7 @@ useFocusEffect(
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Ajustes'),
+      on_press: () => navigation.navigate('settings_cliente'),
     },
     {
       label: 'Cerrar sesión',

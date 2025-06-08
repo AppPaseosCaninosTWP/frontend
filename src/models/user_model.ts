@@ -1,6 +1,7 @@
 //user_model.ts
 
 export interface user_model {
+  id: any;
   user_id: number;
   name: string;
   email: string;

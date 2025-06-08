@@ -34,6 +34,7 @@ export async function login_user(email: string, password: string): Promise<login
     role_id: raw_user.role_id,
     is_enable: raw_user.is_enable,
     role_name: raw_user.role || raw_user.role_name,
+    id: undefined
   };
   return { token, user };
 }
