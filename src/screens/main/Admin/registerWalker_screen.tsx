@@ -102,11 +102,6 @@ export default function RegisterWalkerScreen() {
       newErrors.zone = 'Campo obligatorio';
     }
 
-    // Descripción: obligatorio
-    if (!description.trim()) {
-      newErrors.description = 'Campo obligatorio';
-    }
-
     // Foto: obligatorio
     if (!photoUri) {
       newErrors.photoUri = 'Debe seleccionar una foto';
@@ -196,9 +191,7 @@ export default function RegisterWalkerScreen() {
         break;
 
       case 'description':
-        if (!description.trim()) {
-          setErrors((prev) => ({ ...prev, description: 'Campo obligatorio' }));
-        } else {
+        if (description.trim()) {
           setErrors((prev) => ({ ...prev, description: undefined }));
         }
         break;
@@ -434,11 +427,12 @@ export default function RegisterWalkerScreen() {
               errors.description && styles.inputError,
             ]}
             value={description}
+            editable = {false}
             onChangeText={setDescription}
             multiline
             numberOfLines={4}
             onBlur={() => validateFieldOnBlur('description')}
-            placeholder="Escribe una breve descripción..."
+            placeholder="La descripción es ingresada por el paseador"
           />
           {errors.description && (
             <Text style={styles.errorText}>{errors.description}</Text>
