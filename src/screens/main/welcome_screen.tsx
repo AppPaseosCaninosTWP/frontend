@@ -34,7 +34,7 @@ export default function WelcomeScreen() {
 
   return (
     <LinearGradient colors={['#63B3ED', '#E0F2FE']} style={styles.background_gradient}>
-      <Text style={styles.welcome_title}>PTW</Text>
+      <Text style={styles.welcome_title}>Tu mascota en las mejores manos</Text>
       <Animated.Image
         source={require('../../assets/menu_dog.png')}
         style={[styles.dog_image, { transform: [{ translateY: dog_position }] }]}
@@ -53,10 +53,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   welcome_title: {
-    fontSize: 48,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
     letterSpacing: 4,
+    textAlign: 'center',
   },
   dog_image: {
     width: '200%',
