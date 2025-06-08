@@ -14,7 +14,7 @@ import { RootStackParamList } from '../../navigation/stack_navigator';
 
 const { height: window_height } = Dimensions.get('window');
 
-export default function Welcome_screen() {
+export default function WelcomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const dog_position = useRef(new Animated.Value(window_height)).current;
 

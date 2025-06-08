@@ -1,13 +1,11 @@
-
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { use_auth } from '../hooks/use_auth';
 import { ActivityIndicator, View } from 'react-native';
 
-
 // Auth Screens
-import welcome_screen from "../screens/main/welcome_screen";
+import WelcomeScreen from "../screens/main/welcome_screen";
 import auth_intro_screen from "../screens/auth/auth_intro_screen";
-import login_screen from "../screens/auth/login_screen";
+import LoginScreen from "../screens/auth/login_screen";
 import register_screen from "../screens/auth/register_screen";
 import forgot_password_screen from "../screens/auth/forgot_password_screen";
 import verify_code_screen from "../screens/auth/verify_code_screen";
@@ -135,69 +133,62 @@ export default function stack_navigator() {
 
   return (
     <Stack.Navigator initialRouteName={is_authenticated ? 'dashboard_screen' : 'welcome'} screenOptions={{ headerShown: false }}>
-      {/* Público: sin sesión */}
-      {!is_authenticated && (
-        <>
-          <Stack.Screen name="welcome" component={welcome_screen} />
-          <Stack.Screen name="auth_intro" component={auth_intro_screen} />
-          <Stack.Screen name="login" component={login_screen} />
-          <Stack.Screen name="register" component={register_screen} />
-          <Stack.Screen name="forgot_password" component={forgot_password_screen} />
-          <Stack.Screen name="verify_code" component={verify_code_screen} />
-          <Stack.Screen name="reset_password" component={reset_password_screen} />
-        </>
-      )}
+      {/* Siempre disponibles */}
+      <Stack.Screen name="welcome" component={WelcomeScreen} />
+      <Stack.Screen name="auth_intro" component={auth_intro_screen} />
+      <Stack.Screen name="login" component={LoginScreen} />
+      <Stack.Screen name="register" component={register_screen} />
+      <Stack.Screen name="forgot_password" component={forgot_password_screen} />
+      <Stack.Screen name="verify_code" component={verify_code_screen} />
+      <Stack.Screen name="reset_password" component={reset_password_screen} />
 
-      {/* Protegidas: con sesión */}
-      {is_authenticated && (
-        <>
-          <Stack.Screen name="dashboard_admin" component={dashboard_admin_screen} />
-          <Stack.Screen name="dashboard_cliente" component={dashboard_cliente_screen} />
-          <Stack.Screen name="dashboard_paseador" component={dashboard_paseador_screen} />
-          <Stack.Screen name="dashboard_screen" component={dashboard_screen} />
+      {/* Dashboards */}
+      <Stack.Screen name="dashboard_admin" component={dashboard_admin_screen} />
+      <Stack.Screen name="dashboard_cliente" component={dashboard_cliente_screen} />
+      <Stack.Screen name="dashboard_paseador" component={dashboard_paseador_screen} />
+      <Stack.Screen name="dashboard_screen" component={dashboard_screen} />
 
-          {/* Pet Creation */}
-          <Stack.Screen name="step_breed_screen" component={step_breed_screen} />
-          <Stack.Screen name="step_zona_screen" component={step_zona_screen} />
-          <Stack.Screen name="step_name_screen" component={step_name_screen} />
-          <Stack.Screen name="step_age_screen" component={step_age_screen} />
-          <Stack.Screen name="step_health_screen" component={step_health_screen} />
-          <Stack.Screen name="step_confirm_screen" component={step_confirm_screen} />
-          <Stack.Screen name="success_screen" component={success_screen} />
+      {/* Pet Creation */}
+      <Stack.Screen name="step_breed_screen" component={step_breed_screen} />
+      <Stack.Screen name="step_zona_screen" component={step_zona_screen} />
+      <Stack.Screen name="step_name_screen" component={step_name_screen} />
+      <Stack.Screen name="step_age_screen" component={step_age_screen} />
+      <Stack.Screen name="step_health_screen" component={step_health_screen} />
+      <Stack.Screen name="step_confirm_screen" component={step_confirm_screen} />
+      <Stack.Screen name="success_screen" component={success_screen} />
 
-          {/* Admin */}
-          <Stack.Screen name="user_screen" component={user_screen} />
-          <Stack.Screen name="walks_screen" component={walks_screen} />
-          <Stack.Screen name="payments_screen" component={payments_screen} />
-          <Stack.Screen name="request_to_change_screen" component={request_to_change_screen} />
-          <Stack.Screen name="register_walker_screen" component={register_walker_screen} />
+      {/* Admin */}
+      <Stack.Screen name="user_screen" component={user_screen} />
+      <Stack.Screen name="walks_screen" component={walks_screen} />
+      <Stack.Screen name="payments_screen" component={payments_screen} />
+      <Stack.Screen name="request_to_change_screen" component={request_to_change_screen} />
+      <Stack.Screen name="register_walker_screen" component={register_walker_screen} />
 
-          {/* Paseador */}
-          <Stack.Screen name="available_walks_screen" component={available_walks_screen} />
-          <Stack.Screen name="walk_history_screen" component={walk_history_screen} />
-          <Stack.Screen name="pet_profile_screen" component={pet_profile_screen} />
-          <Stack.Screen name="ratings_screen" component={ratings_screen} />
-          <Stack.Screen name="walker_profile_screen" component={walker_profile_screen} />
-          <Stack.Screen name="planner_screen" component={planner_screen} />
-          <Stack.Screen name="payments_walker_screen" component={payments_walker_screen} />
+      {/* Paseador */}
+      <Stack.Screen name="available_walks_screen" component={available_walks_screen} />
+      <Stack.Screen name="walk_history_screen" component={walk_history_screen} />
+      <Stack.Screen name="pet_profile_screen" component={pet_profile_screen} />
+      <Stack.Screen name="ratings_screen" component={ratings_screen} />
+      <Stack.Screen name="walker_profile_screen" component={walker_profile_screen} />
+      <Stack.Screen name="planner_screen" component={planner_screen} />
+      <Stack.Screen name="payments_walker_screen" component={payments_walker_screen} />
 
-          {/* Cliente */}
-          <Stack.Screen name="pet_profile_cliente_screen" component={pet_profile_cliente_screen} />
-          <Stack.Screen name="edit_pet_screen" component={edit_pet_screen} />
-          <Stack.Screen name="create_walk_screen" component={create_walk_screen} />
-          <Stack.Screen name="select_walk_type_screen" component={select_walk_type_screen} />
-          <Stack.Screen name="walk_confirmation_screen" component={walk_confirmation_screen} />
-          <Stack.Screen name="walk_history_cliente_screen" component={walk_history_cliente_screen} />
+      {/* Cliente */}
+      <Stack.Screen name="pet_profile_cliente_screen" component={pet_profile_cliente_screen} />
+      <Stack.Screen name="edit_pet_screen" component={edit_pet_screen} />
+      <Stack.Screen name="create_walk_screen" component={create_walk_screen} />
+      <Stack.Screen name="select_walk_type_screen" component={select_walk_type_screen} />
+      <Stack.Screen name="walk_confirmation_screen" component={walk_confirmation_screen} />
+      <Stack.Screen name="walk_history_cliente_screen" component={walk_history_cliente_screen} />
 
-          {/* Pagos Cliente */}
-          <Stack.Screen name="payments_screen_cliente" component={payments_screen_cliente} />
-          <Stack.Screen name="payment_detail_screen_cliente" component={payment_detail_screen_cliente} />
-          <Stack.Screen name="payment_success_screen" component={payment_success_screen} />
+      {/* Pagos Cliente */}
+      <Stack.Screen name="payments_screen_cliente" component={payments_screen_cliente} />
+      <Stack.Screen name="payment_detail_screen_cliente" component={payment_detail_screen_cliente} />
+      <Stack.Screen name="payment_success_screen" component={payment_success_screen} />
 
-          {/* Ajustes */}
-          <Stack.Screen name="settings_screen" component={settings_screen} options={{ headerShown: true, title: 'Ajustes' }} />
-        </>
-      )}
+      {/* Ajustes */}
+      <Stack.Screen name="settings_screen" component={settings_screen} options={{ headerShown: true, title: 'Ajustes' }} />
     </Stack.Navigator>
   );
 }
+

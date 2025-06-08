@@ -28,7 +28,7 @@ export default function SelectWalkTypeScreen() {
       <View style={styles.option_list}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("CreateWalkScreen", { type: "esporadico" })}
+          onPress={() => navigation.navigate("create_walk_screen", { type: "esporadico" })}
         >
           <Feather name="clock" size={32} color="#007AFF" style={styles.card_icon} />
           <Text style={styles.card_title}>Paseo Esporádico</Text>
@@ -37,7 +37,7 @@ export default function SelectWalkTypeScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("CreateWalkScreen", { type: "fijo" })}
+          onPress={() => navigation.navigate("create_walk_screen", { type: "fijo" })}
         >
           <MaterialCommunityIcons name="calendar-check-outline" size={32} color="#007AFF" style={styles.card_icon} />
           <Text style={styles.card_title}>Paseo Fijo</Text>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 24, // Para compensar el ícono de la izquierda
+    marginRight: 24,
   },
   header_title: {
     fontSize: 18,

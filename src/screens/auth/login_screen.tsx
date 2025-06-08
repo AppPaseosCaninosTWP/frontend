@@ -16,6 +16,9 @@ import { RootStackParamList } from '../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { use_auth } from '../../hooks/use_auth';
+import { get_user } from '../../utils/token_service';
+import { navigate_to_dashboard_by_role } from '../../utils/navigate_to_dashboard_by_role';
+
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -48,26 +51,47 @@ export default function LoginScreen() {
     }
   };
 
-  const handle_login = async () => {
-    validate_email(email);
-    validate_password(password);
+const handle_login = async () => {
+  const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email_error || password_error) {
-      Alert.alert('Error al iniciar sesión', 'Por favor complete todos los campos correctamente.');
-      return;
-    }
+  if (!email) {
+    set_email_error('El correo electrónico es obligatorio');
+  } else if (!email_regex.test(email)) {
+    set_email_error('Ingrese un correo electrónico válido');
+  } else {
+    set_email_error('');
+  }
 
-    try {
-      await login(email, password);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'dashboard_screen' }],
-      });
-    } catch (err: any) {
-      console.error('Error en login:', err);
-      Alert.alert('Error', err.message);
+  if (!password) {
+    set_password_error('La contraseña es obligatoria');
+  } else {
+    set_password_error('');
+  }
+
+  if (
+    !email ||
+    !password ||
+    !email_regex.test(email)
+  ) {
+    Alert.alert('Error al iniciar sesión', 'Por favor complete todos los campos correctamente.');
+    return;
+  }
+
+  try {
+    await login(email, password);
+    const user = await get_user();
+    if (user) {
+      navigate_to_dashboard_by_role(navigation, user.role_id);
+    } else {
+      Alert.alert('Error', 'No se pudo obtener la información del usuario.');
     }
-  };
+  } catch (err: any) {
+    console.error('Error en login:', err);
+    Alert.alert('Error', err.message || 'Ocurrió un error al iniciar sesión');
+  }
+};
+
+
 
 
   useEffect(() => {

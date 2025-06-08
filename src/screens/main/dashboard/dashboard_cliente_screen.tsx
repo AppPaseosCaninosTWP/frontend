@@ -44,48 +44,47 @@ export default function DashboardClienteScreen() {
   const [active_index, set_active_index] = useState(0);
 
   const fetch_user_pets = async (
-  set_user_pets: (pets: pet_model[]) => void,
-  set_is_loading: (loading: boolean) => void
-) => {
-  try {
-    set_is_loading(true);
-    const user = await get_user();
-    if (!user) {
-      Alert.alert('Error', 'No se pudo recuperar la sesión');
-      navigation.replace('login');
-      return;
+    set_user_pets: (pets: pet_model[]) => void,
+    set_is_loading: (loading: boolean) => void
+  ) => {
+    try {
+      set_is_loading(true);
+      const user = await get_user();
+      if (!user) {
+        Alert.alert('Error', 'No se pudo recuperar la sesión');
+        return;
+      }
+
+      const pets = await get_user_pets();
+      const valid_zones = ['norte', 'centro', 'sur'];
+
+      const mapped_pets = (pets || []).map((pet: any) => {
+        const normalized_zone = (pet.zone || '').toLowerCase().trim();
+        const final_zone = valid_zones.includes(normalized_zone) ? normalized_zone : 'centro';
+
+        return {
+          ...pet,
+          zone: final_zone,
+        };
+      });
+
+      set_user_pets(mapped_pets);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudieron cargar las mascotas');
+    } finally {
+      set_is_loading(false);
     }
+  };
 
-    const pets = await get_user_pets();
-    const valid_zones = ['norte', 'centro', 'sur'];
-
-    const mapped_pets = (pets || []).map((pet: any) => {
-      const normalized_zone = (pet.zone || '').toLowerCase().trim();
-      const final_zone = valid_zones.includes(normalized_zone) ? normalized_zone : 'centro';
-
-      return {
-        ...pet,
-        zone: final_zone,
-      };
-    });
-
-    set_user_pets(mapped_pets);
-  } catch (error) {
-    Alert.alert('Error', 'No se pudieron cargar las mascotas');
-  } finally {
-    set_is_loading(false);
-  }
-};
-
-useEffect(() => {
-  fetch_user_pets(set_user_pets, set_is_loading);
-}, []);
-
-useFocusEffect(
-  useCallback(() => {
+  useEffect(() => {
     fetch_user_pets(set_user_pets, set_is_loading);
-  }, [])
-);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetch_user_pets(set_user_pets, set_is_loading);
+    }, [])
+  );
 
 
   const menu_options: menu_option[] = [
@@ -133,18 +132,12 @@ useFocusEffect(
     },
     {
       label: 'Cerrar sesión',
-      icon: <Feather name="log-out" size={20} color="#000c14" />,
+      icon: <Feather name="log-out" size={20} color="#E53935" />,
       on_press: async () => {
         await logout();
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'welcome' }], // asegúrate que 'Welcome' esté en el stack
-        });
-      },
+      }
     },
-
   ];
-  ;
 
   if (is_loading) {
     return (

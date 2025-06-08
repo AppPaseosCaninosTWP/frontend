@@ -21,7 +21,7 @@ import { create_walk } from '../../../../service/walk_service';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-type WalkRouteProp = RouteProp<RootStackParamList, "CreateWalkScreen">;
+type WalkRouteProp = RouteProp<RootStackParamList, "create_walk_screen">;
 
 export default function CreateWalkScreen() {
   const navigation = useNavigation<any>();
@@ -104,7 +104,7 @@ export default function CreateWalkScreen() {
         days,
       });
 
-      navigation.navigate("WalkConfirmationScreen");
+      navigation.navigate("walk_confirmation_screen");
     } catch (err: any) {
       Alert.alert("Error", err.message);
     }

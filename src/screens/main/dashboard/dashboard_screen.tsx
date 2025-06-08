@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { get_user, clear_session } from '../../../utils/token_service';
 import type { user_model } from '../../../models/user_model';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
+import { navigate_to_dashboard_by_role } from '../../../utils/navigate_to_dashboard_by_role';
 
 export default function Dashboard_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -15,28 +16,14 @@ export default function Dashboard_screen() {
       try {
         const user = await get_user() as user_model;
 
-        if (!user) {
-          throw new Error('Sesión no encontrada');
-        }
+        if (!user) throw new Error('Sesión no encontrada');
 
-        switch (user.role_id) {
-          case 1:
-            navigation.replace('dashboard_admin');
-            break;
-          case 2:
-            navigation.replace('dashboard_paseador');
-            break;
-          case 3:
-            navigation.replace('dashboard_cliente');
-            break;
-          default:
-            throw new Error(`Rol no reconocido: ${user.role_id}`);
-        }
+        console.log('ROLE_ID DEL USUARIO:', user.role_id);
+        navigate_to_dashboard_by_role(navigation, user.role_id);
       } catch (err: any) {
         console.error('Error al cargar dashboard:', err.message);
         await clear_session();
         Alert.alert('Error', err.message || 'No se pudo cargar la sesión');
-        navigation.replace('login');
       } finally {
         set_is_loading(false);
       }
@@ -45,8 +32,15 @@ export default function Dashboard_screen() {
     init();
   }, []);
 
-  if (!is_loading) return null;
+  if (is_loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
+  }
 
+  return null;
 }
 
 const styles = StyleSheet.create({
