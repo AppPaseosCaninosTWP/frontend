@@ -10,7 +10,10 @@ export type walk_model = {
   pet_photo?: string;
   photo_url?: string;
   sector?: string;
-
+  payment_status?: string;
+  is_rated?: boolean;
+  receiver_id?: number
+  walker_id?: number;
   walker?: {
     user_id: number;
     name: string;
