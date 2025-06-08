@@ -31,7 +31,7 @@ export default function SettingsScreen() {
 
       if (!user) {
         Alert.alert("Sesión expirada", "Por favor inicia sesión de nuevo.");
-        navigation.replace("Login");
+        navigation.replace("login");
         return;
       }
 
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
 
     if (!user) {
       Alert.alert("Sesión expirada", "Por favor inicia sesión de nuevo.");
-      navigation.replace("Login");
+      navigation.replace("login");
       return;
     }
 
@@ -141,7 +141,7 @@ export default function SettingsScreen() {
             {
               text: "Log out",
               style: "destructive",
-              onPress: () => navigation.replace("Login"),
+              onPress: () => navigation.replace("login"),
             },
           ])
         }
