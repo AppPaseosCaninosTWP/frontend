@@ -17,7 +17,7 @@ export default function Step_zona_screen() {
 
   const handle_continue = () => {
     set_pet_data({ zone: selected_zone });
-    navigation.navigate('StepNameScreen');
+    navigation.navigate('step_name_screen');
   };
 
   return (

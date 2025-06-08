@@ -23,7 +23,7 @@ export default function Step_breed_screen() {
 
   const handle_continue = () => {
     set_pet_data({ breed: selected_breed });
-    navigation.navigate('StepZonaScreen');
+    navigation.navigate('step_zona_screen');
   };
 
   return (

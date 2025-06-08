@@ -52,7 +52,7 @@ export default function DashboardClienteScreen() {
     const user = await get_user();
     if (!user) {
       Alert.alert('Error', 'No se pudo recuperar la sesión');
-      navigation.replace('Login');
+      navigation.replace('login');
       return;
     }
 
@@ -92,7 +92,7 @@ useFocusEffect(
     {
       label: 'Dashboard',
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('DashboardCliente'),
+      on_press: () => navigation.navigate('dashboard_cliente'),
     },
     { label: '__separator__', icon: null, on_press: () => { } },
     {
@@ -108,7 +108,7 @@ useFocusEffect(
           style={{ width: 20, height: 20, borderRadius: 10 }}
         />
       ),
-      on_press: () => navigation.navigate('PetProfileClienteScreen', { petId: pet.pet_id }),
+      on_press: () => navigation.navigate('pet_profile_cliente_screen', { petId: pet.pet_id }),
     })),
     { label: '__separator__', icon: null, on_press: () => { } },
     {
@@ -129,7 +129,7 @@ useFocusEffect(
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('settings_cliente'),
+      on_press: () => navigation.navigate('settings_screen', { role: 'cliente' }),
     },
     {
       label: 'Cerrar sesión',
@@ -138,7 +138,7 @@ useFocusEffect(
         await logout();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Welcome' }], // asegúrate que 'Welcome' esté en el stack
+          routes: [{ name: 'welcome' }], // asegúrate que 'Welcome' esté en el stack
         });
       },
     },
@@ -171,7 +171,7 @@ useFocusEffect(
         </View>
         <View style={styles.bottom_button}>
           <SwipeButtonTWP
-            on_toggle={() => navigation.navigate('StepBreedScreen')}
+            on_toggle={() => navigation.navigate('step_breed_screen')}
             text="Desliza para continuar"
             width={300}
             height={80}
@@ -210,7 +210,7 @@ useFocusEffect(
             >
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("PetProfileClienteScreen", { petId: pet.pet_id })}
+                onPress={() => navigation.navigate("pet_profile_cliente_screen", { petId: pet.pet_id })}
               >
                 <LinearGradient
                   colors={["#4facfe", "#00f2fe"]}
@@ -242,7 +242,7 @@ useFocusEffect(
 
           <View style={{ width: CARD_WIDTH, }}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("StepBreedScreen")}
+              onPress={() => navigation.navigate("step_breed_screen")}
               style={styles.card_add}
             >
               <Feather name="plus-circle" size={36} color="#007BFF" />
@@ -269,7 +269,7 @@ useFocusEffect(
       <View style={styles.grid}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('SelectWalkTypeScreen')}
+          onPress={() => navigation.navigate('select_walk_type_screen')}
         >
           <Feather name="map" size={40} color="#007BFF" />
           <Text style={styles.card_title}>¿Un Paseo?</Text>
@@ -281,7 +281,7 @@ useFocusEffect(
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('PaymentsScreenCliente')}
+          onPress={() => navigation.navigate('payments_screen_cliente')}
         >
           <Image
             source={require('../../../assets/plate_icon.png')}
@@ -293,7 +293,7 @@ useFocusEffect(
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("WalkHistoryClienteScreen")}
+          onPress={() => navigation.navigate("walk_history_cliente_screen")}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}

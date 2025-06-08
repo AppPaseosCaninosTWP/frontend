@@ -15,8 +15,6 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { login_user } from '../../service/auth_service';
-import { save_session } from '../../utils/token_service';
 import { use_auth } from '../../hooks/use_auth';
 
 export default function LoginScreen() {
@@ -63,7 +61,7 @@ export default function LoginScreen() {
       await login(email, password);
       navigation.reset({
         index: 0,
-        routes: [{ name: 'DashboardScreen' }],
+        routes: [{ name: 'dashboard_screen' }],
       });
     } catch (err: any) {
       console.error('Error en login:', err);
@@ -127,7 +125,7 @@ export default function LoginScreen() {
         {password_error ? <Text style={styles.error_text}>{password_error}</Text> : null}
 
         <View style={{ width: '100%' }}>
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <TouchableOpacity onPress={() => navigation.navigate('forgot_password')}>
             <Text style={styles.forgot_password}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
         </View>
@@ -138,7 +136,7 @@ export default function LoginScreen() {
 
         <Text style={styles.footer_text}>
           ¿Necesita registrarse?{' '}
-          <Text style={styles.footer_link} onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.footer_link} onPress={() => navigation.navigate('register')}>
             ¡Regístrate aquí!
           </Text>
         </Text>

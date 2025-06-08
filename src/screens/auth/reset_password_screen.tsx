@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { reset_password } from '../../service/auth_service';
 
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ResetPassword'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'reset_password'>;
 
 export default function Reset_password_screen({ route, navigation }: Props) {
   const { email, code } = route.params;
@@ -46,32 +46,37 @@ export default function Reset_password_screen({ route, navigation }: Props) {
   }, []);
 
   const handle_reset = async () => {
-  if (password.length === 0 || confirm_password.length === 0) {
-    Alert.alert('Campo vacío', 'Por favor ingresa tu contraseña.');
-    return;
-  }
+    if (password.length === 0 || confirm_password.length === 0) {
+      Alert.alert('Campo vacío', 'Por favor ingresa tu contraseña.');
+      return;
+    }
 
-  if (password.length < 8 || password.length > 15) {
-    Alert.alert('Contraseña inválida', 'Debe tener entre 8 y 15 caracteres.');
-    return;
-  }
+    if (password.length < 8 || password.length > 15) {
+      Alert.alert('Contraseña inválida', 'Debe tener entre 8 y 15 caracteres.');
+      return;
+    }
 
-  if (password !== confirm_password) {
-    Alert.alert('Error', 'Las contraseñas no coinciden.');
-    return;
-  }
+    if (password !== confirm_password) {
+      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      return;
+    }
 
-  try {
-    await reset_password(email, code, password, confirm_password);
-    Alert.alert('Contraseña actualizada', 'Ahora puedes iniciar sesión.');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
-  } catch (err: any) {
-    Alert.alert('Error', err.message);
-  }
-};
+    if (password.trim().length === 0 || confirm_password.trim().length === 0) {
+      Alert.alert('Campo vacío', 'Por favor ingresa tu contraseña.');
+      return;
+    }
+
+    try {
+      await reset_password(email, code, password, confirm_password);
+      Alert.alert('Contraseña actualizada', 'Ahora puedes iniciar sesión.');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    } catch (err: any) {
+      Alert.alert('Error', err.message);
+    }
+  };
 
 
   return (
@@ -186,4 +191,3 @@ const styles = StyleSheet.create({
   },
 });
 
-  

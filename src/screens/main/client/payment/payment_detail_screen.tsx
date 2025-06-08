@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 
 type PaymentDetailRoute = RouteProp<
   RootStackParamList,
-  "PaymentDetailScreenCliente"
+  "payment_detail_screen_cliente"
 >;
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
@@ -50,7 +50,7 @@ export default function PaymentDetailScreen() {
     try {
       set_processing(true);
       await update_payment_status(paymentId, "pagado");
-      navigation.replace("PaymentSuccessScreen");
+      navigation.replace("payment_success_screen");
     } catch (err: any) {
       Alert.alert("Error", err.message || "No se pudo actualizar el pago");
     } finally {

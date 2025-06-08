@@ -69,12 +69,12 @@ export default function Auth_intro_screen() {
 
           <TouchableOpacity
             style={styles.login_button}
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate('login')}
           >
             <Text style={styles.login_text}>Iniciar sesión</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity onPress={() => navigation.navigate('register')}>
             <Text style={styles.register_text}>Registrarse</Text>
           </TouchableOpacity>
         </View>
@@ -178,10 +178,9 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-  
-  
 
 
-  
 
-  
+
+
+

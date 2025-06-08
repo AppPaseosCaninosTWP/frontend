@@ -85,12 +85,12 @@ export default function DashboardPaseadorScreen() {
     {
       label: "Menú Principal",
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("DashboardPaseador"),
+      on_press: () => navigation.navigate("dashboard_admin"),
     },
     {
       label: "Buscar Paseos",
       icon: <Ionicons name="search" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("AvailableWalksScreen"),
+      on_press: () => navigation.navigate("available_walks_screen"),
     },
     {
       label: "Calendario",
@@ -101,12 +101,12 @@ export default function DashboardPaseadorScreen() {
     {
       label: "Perfil",
       icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("WalkerProfileScreen"),
+      on_press: () => navigation.navigate("walker_profile_screen"),
     },
     {
       label: "Calificaciones",
       icon: <Ionicons name="star" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("RatingsScreen"),
+      on_press: () => navigation.navigate("ratings_screen"),
     },
     {
       label: "Billetera",
@@ -116,7 +116,7 @@ export default function DashboardPaseadorScreen() {
     {
       label: "Ajustes",
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("settings_walker"),
+      on_press: () => navigation.navigate('settings_screen', { role: 'walker' }),
     },
   ];
 
@@ -153,7 +153,7 @@ export default function DashboardPaseadorScreen() {
           icon={<Feather name="map" size={40} color="#007BFF" />}
           title="Buscar paseo"
           description="Explora paseos publicados por clientes y acepta los que se adapten a tu zona y disponibilidad."
-          on_press={() => navigation.navigate("AvailableWalksScreen")}
+          on_press={() => navigation.navigate("available_walks_screen")}
         />
 
         <HomeGridCard
@@ -164,7 +164,7 @@ export default function DashboardPaseadorScreen() {
             />
           }
           title="Mi agenda"
-          on_press={() => navigation.navigate("PlannerScreen")}
+          on_press={() => navigation.navigate("planner_screen")}
         />
 
         <HomeGridCard
@@ -175,7 +175,7 @@ export default function DashboardPaseadorScreen() {
             />
           }
           title="Historial"
-          on_press={() => navigation.navigate("WalkHistoryScreen")}
+          on_press={() => navigation.navigate("walk_history_screen")}
         />
 
         <HomeGridCard
@@ -186,7 +186,7 @@ export default function DashboardPaseadorScreen() {
             />
           }
           title="Calificaciones"
-          on_press={() => navigation.navigate("RatingsScreen")}
+          on_press={() => navigation.navigate("ratings_screen")}
         />
       </View>
     </Screen_with_menu>

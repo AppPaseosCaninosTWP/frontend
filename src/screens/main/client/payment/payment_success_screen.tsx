@@ -26,7 +26,7 @@ export default function PaymentSuccessScreen() {
     }).start(() => {
       navigation.reset({
         index: 0,
-        routes: [{ name: "DashboardCliente" }],
+        routes: [{ name: "dashboard_cliente" }],
       });
     });
   }, []);
@@ -61,7 +61,7 @@ export default function PaymentSuccessScreen() {
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("DashboardCliente")}
+        onPress={() => navigation.navigate("dashboard_cliente")}
         style={styles.button}
       >
         <Text style={styles.button_text}>Ir ahora</Text>

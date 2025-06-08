@@ -50,45 +50,51 @@ export default function Verify_code_screen() {
     ]).start();
   }, []);
 
-const handle_verify = async () => {
-  if (code.length === 0) {
-    Alert.alert('Campo vacío', 'Por favor ingrese el código.');
-    return;
-  }
-
-  const expected_length = context === 'reset' ? 6 : 4;
-
-  if (code.length !== expected_length) {
-    Alert.alert('Código inválido', `Debe tener ${expected_length} dígitos.`);
-    return;
-  }
-
-
-  try {
-    if (context === 'reset') {
-      await verify_reset_code(email.trim(), code);
-      Alert.alert('Código verificado', 'Ahora puedes cambiar tu contraseña.');
-      navigation.navigate('ResetPassword', { email: email.trim(), code });
+  const handle_verify = async () => {
+    if (code.length === 0) {
+      Alert.alert('Campo vacío', 'Por favor ingrese el código.');
+      return;
     }
 
-    if (context === 'register') {
-      if (!token) {
-        Alert.alert('Error', 'Falta el token de verificación');
-        return;
+    const expected_length = context === 'reset' ? 6 : 4;
+
+    if (code.length !== expected_length) {
+      Alert.alert('Código inválido', `Debe tener ${expected_length} dígitos.`);
+      return;
+    }
+
+    if (!/^\d+$/.test(code)) {
+      Alert.alert('Código inválido', 'El código debe contener solo números.');
+      return;
+    }
+
+
+
+    try {
+      if (context === 'reset') {
+        await verify_reset_code(email.trim(), code);
+        Alert.alert('Código verificado', 'Ahora puedes cambiar tu contraseña.');
+        navigation.navigate('reset_password', { email: email.trim(), code });
       }
 
-      await verify_phone(token, code);
-      Alert.alert('Teléfono verificado', 'Tu cuenta ha sido creada con éxito.');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
+      if (context === 'register') {
+        if (!token) {
+          Alert.alert('Error', 'Falta el token de verificación');
+          return;
+        }
+
+        await verify_phone(token, code);
+        Alert.alert('Teléfono verificado', 'Tu cuenta ha sido creada con éxito.');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'login' }],
+        });
+      }
+    } catch (error) {
+      console.error('Error al verificar código:', error);
+      Alert.alert('Error', 'Código inválido o expirado. Inténtalo nuevamente.');
     }
-  } catch (error) {
-    console.error('Error al verificar código:', error);
-    Alert.alert('Error', 'Código inválido o expirado. Inténtalo nuevamente.');
-  }
-};
+  };
 
 
 

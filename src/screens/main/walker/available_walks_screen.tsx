@@ -78,7 +78,7 @@ export default function AvailableWalksScreen() {
       <TouchableOpacity
         style={styles.card}
         onPress={() => {
-          navigation.navigate("PetProfileScreen", {
+          navigation.navigate("pet_profile_screen", {
             walkId: item.walk_id,
             petId: item.pet_id!,
             duration: item.duration ?? 0,

@@ -26,7 +26,7 @@ export default function Welcome_screen() {
     }).start();
 
     const timeout = setTimeout(() => {
-      navigation.replace('AuthIntro');
+      navigation.replace('auth_intro');
     }, 2000);
 
     return () => clearTimeout(timeout);

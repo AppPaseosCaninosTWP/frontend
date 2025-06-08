@@ -7,7 +7,7 @@ import type { RootStackParamList } from "../../../navigation/stack_navigator";
 import type { pet_model } from "../../../models/pet_model";
 import { get_pet_by_id } from "../../../service/pet_service";
 
-type PetProfileRoute = RouteProp<RootStackParamList, "PetProfileClienteScreen">;
+type PetProfileRoute = RouteProp<RootStackParamList, "pet_profile_cliente_screen">;
 
 interface pet_with_owner extends pet_model {
   owner: any;
@@ -68,7 +68,7 @@ export default function PetProfileClienteScreen() {
         active_tab={active_tab}
         on_tab_change={set_active_tab}
         api_base_url={process.env.EXPO_PUBLIC_API_URL || ""}
-        on_edit_press={() => navigation.navigate("EditPetScreen", { petId: pet.pet_id })}
+        on_edit_press={() => navigation.navigate("edit_pet_screen", { petId: pet.pet_id })}
       />
     </>
   );

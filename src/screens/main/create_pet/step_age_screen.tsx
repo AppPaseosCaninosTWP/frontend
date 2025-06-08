@@ -52,7 +52,7 @@ export default function Step_age_screen() {
       description: description.trim(),
     });
 
-    navigation.navigate('StepHealthScreen');
+    navigation.navigate('step_health_screen');
     console.log('Edad guardada:', age);
     console.log('Descripción guardada:', description);
   };
