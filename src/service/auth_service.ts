@@ -129,7 +129,7 @@ export async function reset_password(
  * @param token Token de verificación pendiente
  */
 export async function verify_phone(token: string, code: string): Promise<void> {
-  console.log('Enviando a /verify_phone:', { token, code }); // 👈 Asegúrate que esto sale
+  console.log('Enviando a /verify_phone:', { token, code });
   const response = await fetch(`${api_base_url}/auth/verify_phone`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
