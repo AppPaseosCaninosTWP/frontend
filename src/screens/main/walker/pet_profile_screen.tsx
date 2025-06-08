@@ -33,10 +33,10 @@ const { width } = Dimensions.get("window");
 const BOX_WIDTH = width * 0.8;
 
 //Definición de tipos para la ruta y navegación
-type PetProfileRoute = RouteProp<RootStackParamList, "PetProfileScreen">;
+type PetProfileRoute = RouteProp<RootStackParamList, "pet_profile_screen">;
 type Navigation = NativeStackNavigationProp<
   RootStackParamList,
-  "PetProfileScreen"
+  "pet_profile_screen"
 >;
 
 export default function PetProfileScreen() {
@@ -119,7 +119,7 @@ export default function PetProfileScreen() {
     try {
       await update_walk_status(walkId, "confirmado");
       Alert.alert("¡Listo!", "Paseo agendado", [
-        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
+        { text: "OK", onPress: () => navigation.navigate("dashboard_paseador") },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -132,7 +132,7 @@ export default function PetProfileScreen() {
     try {
       await update_walk_status(scheduled_walk_id, "cancelado");
       Alert.alert("Cancelado", "Paseo cancelado", [
-        { text: "OK", onPress: () => navigation.navigate("DashboardPaseador") },
+        { text: "OK", onPress: () => navigation.navigate("dashboard_paseador") },
       ]);
     } catch (err: any) {
       const msg = err.message.includes("403")

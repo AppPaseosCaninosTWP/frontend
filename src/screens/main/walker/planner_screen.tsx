@@ -58,7 +58,7 @@ export default function PlannerScreen() {
     <TouchableOpacity
       style={styles.card_wrapper}
       onPress={() =>
-        navigation.navigate("PetProfileScreen", {
+        navigation.navigate("pet_profile_screen", {
           walkId: item.walk_id,
           petId: item.pet_id,
           duration: item.duration,

@@ -1,24 +1,22 @@
-//WALK MODEL
-
-//Representa un paseo con datos básicos y opcionales (para listadps y carruseles)
-export interface walk_model {
+export type walk_model = {
   walk_id: number;
-  status: "pendiente" | "confirmado" | "cancelado" | string;
   walk_type: string;
-  duration?: number;
-  date?: string;
-  time?: string;
-  pet_id?: number;
-  pet_name?: string;
+  status: string;
+  duration: number;
+  date: string;
+  time: string;
+  pet_id: number;
+  pet_name: string;
   pet_photo?: string;
-  sector?: string;
   photo_url?: string;
-  //Info opcional (solo email)
-  walker?: { email: string };
-  //Info opcional (solo email)
-  client?: { email: string };
-  comments?: string;
-}
+  sector?: string;
+
+  walker?: {
+    user_id: number;
+    name: string;
+    phone: string;
+  };
+};
 
 //Payload esperado al crear un nuevo paseo
 export interface create_walk_payload {

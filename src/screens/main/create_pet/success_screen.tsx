@@ -23,7 +23,7 @@ export default function Success_screen() {
         onPress={() =>
           navigation.reset({
             index: 0,
-            routes: [{ name: 'DashboardCliente' }],
+            routes: [{ name: 'dashboard_cliente' }],
           })
         }
         style={styles.primary_button}

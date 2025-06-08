@@ -31,7 +31,7 @@ export default function Dashboard_admin_screen() {
         Alert.alert('Acceso denegado', 'Debes iniciar sesión como administrador.');
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Login' }],
+          routes: [{ name: 'login' }],
         });
         return;
       }
@@ -57,45 +57,45 @@ export default function Dashboard_admin_screen() {
     {
       label: 'Dashboard',
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('DashboardAdmin'),
+      on_press: () => navigation.navigate('dashboard_admin'),
     },
     {
       label: 'Usuarios',
       icon: <Ionicons name="people" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('UserScreen'),
+      on_press: () => navigation.navigate('user_screen'),
     },
     {
       label: 'Paseos',
       icon: <Ionicons name="walk" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('WalksScreen'),
+      on_press: () => navigation.navigate('walks_screen'),
     },
     {
       label: 'Pagos',
       icon: <MaterialIcons name="payment" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('PaymentsScreen'),
+      on_press: () => navigation.navigate('payments_screen'),
     },
     {
       label: 'Solicitudes',
       icon: <MaterialIcons name="request-page" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('RequestToChangeScreen'),
+      on_press: () => navigation.navigate('request_to_change_screen'),
     },
     {
       label: 'Registrar Paseador',
       icon: <MaterialIcons name="person-add" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('RegisterWalkerScreen'),
+      on_press: () => navigation.navigate('register_walker_screen'),
     },
     { label: "__separator__", icon: null, on_press: () => {} },
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('settings_admin'),
+      on_press: () => navigation.navigate('settings_screen', { role: 'admin' }),
     },
     {
       label: 'Cerrar sesión',
       icon: <MaterialIcons name="logout" size={20} color="#000c14" />,
       on_press: async () => {
         await clear_session();
-        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        navigation.reset({ index: 0, routes: [{ name: 'login' }] });
       },
     },
   ];
@@ -104,12 +104,12 @@ export default function Dashboard_admin_screen() {
     <ScreenWithMenu
       role_id={1}
       menu_options={menu_options}
-      on_search_press={() => navigation.navigate('UserScreen')}
+      on_search_press={() => navigation.navigate('user_screen')}
     >
       <View style={styles.card_container}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('UserScreen')}
+          onPress={() => navigation.navigate('user_screen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo1.png')}
@@ -120,7 +120,7 @@ export default function Dashboard_admin_screen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('WalksScreen')}
+          onPress={() => navigation.navigate('user_screen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
@@ -131,7 +131,7 @@ export default function Dashboard_admin_screen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('PaymentsScreen')}
+          onPress={() => navigation.navigate('payments_screen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo3.png')}

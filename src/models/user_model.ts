@@ -1,15 +1,16 @@
 //user_model.ts
 
 export interface user_model {
-  id: number;
+  id: any;
   user_id: number;
   name: string;
   email: string;
   phone: string;
   role_id: number;
+  is_enable: boolean;
   role_name?: string;
-  is_enable: boolean; 
 }
+
 
 export interface BackendUser {
   user_id: number;

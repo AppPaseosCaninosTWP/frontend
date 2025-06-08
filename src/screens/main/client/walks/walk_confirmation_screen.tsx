@@ -16,7 +16,7 @@ export default function WalkConfirmationScreen() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("DashboardCliente")}
+        onPress={() => navigation.navigate("dashboard_cliente")}
       >
         <Text style={styles.button_text}>Volver al Inicio</Text>
       </TouchableOpacity>

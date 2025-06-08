@@ -63,7 +63,7 @@ export default function PaymentsScreen() {
                         key={p.payment_id}
                         style={styles.card}
                         onPress={() =>
-                            navigation.navigate("PaymentDetailScreenCliente", {
+                            navigation.navigate("payment_detail_screen_cliente", {
                                 paymentId: p.payment_id,
                             })
                         }

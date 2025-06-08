@@ -47,7 +47,7 @@ export default function Step_name_screen() {
     }
 
     set_pet_data({ name: name.trim(), photo });
-    navigation.navigate('StepAgeScreen');
+    navigation.navigate('step_age_screen');
   };
 
   return (

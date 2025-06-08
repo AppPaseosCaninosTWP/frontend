@@ -19,7 +19,7 @@ import { get_pet_by_id, update_pet } from "../../../service/pet_service";
 import { colors, spacing, font_sizes } from "../../../config/theme";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-type PetEditRoute = RouteProp<RootStackParamList, "EditPetScreen">;
+type PetEditRoute = RouteProp<RootStackParamList, "edit_pet_screen">;
 
 export default function EditPetScreen() {
   const { params } = useRoute<PetEditRoute>();

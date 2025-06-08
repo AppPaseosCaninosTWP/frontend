@@ -26,7 +26,7 @@ export default function Step_confirm_screen() {
     try {
       await create_pet(pet_data);
       reset_pet_data();
-      navigation.replace('SuccessScreen');
+      navigation.replace('success_screen');
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Error al registrar mascota');
     } finally {

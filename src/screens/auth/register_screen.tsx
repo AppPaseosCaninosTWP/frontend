@@ -15,7 +15,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/stack_navigator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { register_user, send_code } from '../../service/auth_service';
+import { register_user } from '../../service/auth_service';
 
 export default function Register_screen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -84,31 +84,98 @@ export default function Register_screen() {
   };
 
   const handle_register = async () => {
-    validate_email(email);
-    validate_phone(phone);
-    validate_password(password);
-    validate_confirm_password(confirm_password);
+    const trimmed_name = name.trim();
+    const trimmed_email = email.trim();
+    const trimmed_phone = phone.trim();
+    const trimmed_password = password.trim();
+    const trimmed_confirm_password = confirm_password.trim();
+
+    const email_regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phone_regex = /^\d{9}$/;
+
+    let local_email_error = '';
+    let local_phone_error = '';
+    let local_password_error = '';
+    let local_confirm_password_error = '';
+
+    if (!trimmed_email) {
+      local_email_error = 'El correo electrónico es obligatorio';
+    } else if (!email_regex.test(trimmed_email)) {
+      local_email_error = 'Ingrese un correo electrónico válido';
+    }
+
+    if (!trimmed_name) {
+      Alert.alert('Error', 'El nombre es obligatorio');
+      return;
+    }
+
+    if (!trimmed_phone) {
+      local_phone_error = 'El número de teléfono es obligatorio';
+    } else if (!phone_regex.test(trimmed_phone)) {
+      local_phone_error = 'El número debe tener exactamente 9 dígitos';
+    }
+
+    if (!trimmed_password) {
+      local_password_error = 'La contraseña es obligatoria';
+    } else if (trimmed_password.length < 8 || trimmed_password.length > 15) {
+      local_password_error = 'La contraseña debe tener entre 8 y 15 caracteres';
+    }
+
+    if (!trimmed_confirm_password) {
+      local_confirm_password_error = 'La confirmación de contraseña es obligatoria';
+    } else if (trimmed_confirm_password !== trimmed_password) {
+      local_confirm_password_error = 'Las contraseñas no coinciden';
+    }
+
+    set_email_error(local_email_error);
+    set_phone_error(local_phone_error);
+    set_password_error(local_password_error);
+    set_confirm_password_error(local_confirm_password_error);
 
     set_password_touched(true);
     set_confirm_password_touched(true);
 
-    if (email_error || phone_error || password_error || confirm_password_error) {
+    if (
+      local_email_error ||
+      local_phone_error ||
+      local_password_error ||
+      local_confirm_password_error
+    ) {
       Alert.alert('Error', 'Por favor corrija los errores antes de continuar.');
       return;
     }
 
     try {
-      const user = await register_user(name, email, phone, password, confirm_password);
-      await send_code(user.email);
-      navigation.navigate('VerifyCode', {
+      const user = await register_user(
+        trimmed_name,
+        trimmed_email,
+        trimmed_phone,
+        trimmed_password,
+        trimmed_confirm_password
+      );
+
+      if (!user?.email) {
+        throw new Error('Error inesperado: El email no fue devuelto por el servidor');
+      }
+
+      navigation.navigate('verify_code', {
         email: user.email,
+        phone: user.phone,
         context: 'register',
+        token: user.pending_verification_token, // 👈 necesario
       });
+
+
+
+
     } catch (err: any) {
       console.error('Error al registrarse:', err);
       Alert.alert('Error', err.message);
     }
+
   };
+
+
 
   useEffect(() => {
     Animated.parallel([
@@ -205,7 +272,7 @@ export default function Register_screen() {
 
         <Text style={styles.footer_text}>
           ¿Ya tienes una cuenta?{' '}
-          <Text style={styles.footer_link} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.footer_link} onPress={() => navigation.navigate('login')}>
             ¡Inicia sesión aquí!
           </Text>
         </Text>
@@ -315,4 +382,3 @@ const styles = StyleSheet.create({
   footer_link: { color: '#007BFF', fontWeight: '600' },
   prefix_text: { fontSize: 16, color: '#1B1B1B' },
 });
-  

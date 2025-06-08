@@ -27,6 +27,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as SecureStore from 'expo-secure-store';
 import { useContext } from 'react';
 import { AuthContext } from '../../../context/auth/auth_context';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -41,44 +43,55 @@ export default function DashboardClienteScreen() {
   const [user_pets, set_user_pets] = useState<pet_model[]>([]);
   const [active_index, set_active_index] = useState(0);
 
-  useEffect(() => {
-    const fetch_pets = async () => {
-      try {
-        const user = await get_user();
-        if (!user) {
-          Alert.alert('Error', 'No se pudo recuperar la sesión');
-          navigation.replace('Login');
-          return;
-        }
-
-        const pets = await get_user_pets();
-        const mappedPets = (pets || []).map((pet: any) => ({
-          ...pet,
-          zone:
-            pet.zone === 'norte'
-              ? 'norte'
-              : pet.zone === 'centro'
-                ? 'centro'
-                : pet.zone === 'sur'
-                  ? 'sur'
-                  : 'centro',
-        }));
-        set_user_pets(mappedPets);
-      } catch (error) {
-        Alert.alert('Error', 'No se pudieron cargar las mascotas');
-      } finally {
-        set_is_loading(false);
+  const fetch_user_pets = async (
+    set_user_pets: (pets: pet_model[]) => void,
+    set_is_loading: (loading: boolean) => void
+  ) => {
+    try {
+      set_is_loading(true);
+      const user = await get_user();
+      if (!user) {
+        Alert.alert('Error', 'No se pudo recuperar la sesión');
+        return;
       }
-    };
 
-    fetch_pets();
+      const pets = await get_user_pets();
+      const valid_zones = ['norte', 'centro', 'sur'];
+
+      const mapped_pets = (pets || []).map((pet: any) => {
+        const normalized_zone = (pet.zone || '').toLowerCase().trim();
+        const final_zone = valid_zones.includes(normalized_zone) ? normalized_zone : 'centro';
+
+        return {
+          ...pet,
+          zone: final_zone,
+        };
+      });
+
+      set_user_pets(mapped_pets);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudieron cargar las mascotas');
+    } finally {
+      set_is_loading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetch_user_pets(set_user_pets, set_is_loading);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetch_user_pets(set_user_pets, set_is_loading);
+    }, [])
+  );
+
 
   const menu_options: menu_option[] = [
     {
       label: 'Dashboard',
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('DashboardCliente'),
+      on_press: () => navigation.navigate('dashboard_cliente'),
     },
     { label: '__separator__', icon: null, on_press: () => { } },
     {
@@ -94,7 +107,7 @@ export default function DashboardClienteScreen() {
           style={{ width: 20, height: 20, borderRadius: 10 }}
         />
       ),
-      on_press: () => navigation.navigate('PetProfileClienteScreen', { petId: pet.pet_id }),
+      on_press: () => navigation.navigate('pet_profile_cliente_screen', { petId: pet.pet_id }),
     })),
     { label: '__separator__', icon: null, on_press: () => { } },
     {
@@ -115,22 +128,16 @@ export default function DashboardClienteScreen() {
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Ajustes'),
+      on_press: () => navigation.navigate('settings_screen', { role: 'cliente' }),
     },
     {
       label: 'Cerrar sesión',
-      icon: <Feather name="log-out" size={20} color="#000c14" />,
+      icon: <Feather name="log-out" size={20} color="#E53935" />,
       on_press: async () => {
         await logout();
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Welcome' }], // asegúrate que 'Welcome' esté en el stack
-        });
-      },
+      }
     },
-
   ];
-  ;
 
   if (is_loading) {
     return (
@@ -157,7 +164,7 @@ export default function DashboardClienteScreen() {
         </View>
         <View style={styles.bottom_button}>
           <SwipeButtonTWP
-            on_toggle={() => navigation.navigate('StepBreedScreen')}
+            on_toggle={() => navigation.navigate('step_breed_screen')}
             text="Desliza para continuar"
             width={300}
             height={80}
@@ -196,7 +203,7 @@ export default function DashboardClienteScreen() {
             >
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("PetProfileClienteScreen", { petId: pet.pet_id })}
+                onPress={() => navigation.navigate("pet_profile_cliente_screen", { petId: pet.pet_id })}
               >
                 <LinearGradient
                   colors={["#4facfe", "#00f2fe"]}
@@ -228,7 +235,7 @@ export default function DashboardClienteScreen() {
 
           <View style={{ width: CARD_WIDTH, }}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("StepBreedScreen")}
+              onPress={() => navigation.navigate("step_breed_screen")}
               style={styles.card_add}
             >
               <Feather name="plus-circle" size={36} color="#007BFF" />
@@ -255,7 +262,7 @@ export default function DashboardClienteScreen() {
       <View style={styles.grid}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('SelectWalkTypeScreen')}
+          onPress={() => navigation.navigate('select_walk_type_screen')}
         >
           <Feather name="map" size={40} color="#007BFF" />
           <Text style={styles.card_title}>¿Un Paseo?</Text>
@@ -267,7 +274,7 @@ export default function DashboardClienteScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('PaymentsScreenCliente')}
+          onPress={() => navigation.navigate('payments_screen_cliente')}
         >
           <Image
             source={require('../../../assets/plate_icon.png')}
@@ -279,7 +286,7 @@ export default function DashboardClienteScreen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("WalkHistoryClienteScreen")}
+          onPress={() => navigation.navigate("walk_history_cliente_screen")}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
