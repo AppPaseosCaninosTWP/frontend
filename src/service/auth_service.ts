@@ -10,34 +10,43 @@ import { user_model } from '../models/user_model';
  * Inicia sesión y devuelve token + usuario
  */
 export async function login_user(email: string, password: string): Promise<login_response_model> {
-  const response = await fetch(`${api_base_url}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ email, password }),
   });
 
   const json = await response.json();
-  console.log('respuesta_backend_login:', json);
-
   if (!response.ok || json.error) {
-    throw new Error(json.msg || 'error_login');
+    throw new Error(json.msg || "Error al iniciar sesión");
   }
 
-  const token = json.data.token;
-  const raw_user = json.data.user?.user ?? json.data.user;
+  const backend_user = json.data.user;
 
-  const user: user_model = {
-    user_id: raw_user.user_id,
-    name: raw_user.name,
-    email: raw_user.email,
-    phone: raw_user.phone,
-    role_id: raw_user.role_id,
-    is_enable: raw_user.is_enable,
-    role_name: raw_user.role || raw_user.role_name,
-    id: undefined
+  const adapted_user: user_model = {
+    id: backend_user.user_id,
+    user_id: backend_user.user_id,
+    name: backend_user.name,
+    email: backend_user.email,
+    phone: backend_user.phone,
+    is_enable: backend_user.is_enable ?? true, 
+    role_id:
+      backend_user.role === "admin"
+        ? 1
+        : backend_user.role === "walker"
+        ? 2
+        : 3,
+    role_name: backend_user.role,
   };
-  return { token, user };
+
+  return {
+    token: json.data.token,
+    user: adapted_user,
+  };
 }
+
 
 /**
  * Registra al usuario y devuelve datos preliminares
