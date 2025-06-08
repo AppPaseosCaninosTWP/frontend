@@ -6,6 +6,8 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Linking,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -26,6 +28,8 @@ interface Props {
   show_schedule_button?: boolean;
   show_cancel_button?: boolean;
   show_message_button?: boolean;
+  whatsapp_contact_link?: string;
+  current_user_id?: number;
   on_schedule_press?: () => void;
   on_cancel_press?: () => void;
   on_edit_press?: () => void;
@@ -33,6 +37,12 @@ interface Props {
   active_tab: "Acerca de" | "Salud" | "Contacto";
   on_tab_change: (tab: "Acerca de" | "Salud" | "Contacto") => void;
   api_base_url: string;
+  walker?: {
+    user_id: number;
+    name: string;
+    phone: string;
+    whatsapp_link: string;
+  };
 }
 
 const Pet_profile_component = ({
@@ -41,6 +51,8 @@ const Pet_profile_component = ({
   show_schedule_button = false,
   show_cancel_button = false,
   show_message_button = false,
+  whatsapp_contact_link,
+  current_user_id,
   on_schedule_press,
   on_cancel_press,
   on_edit_press,
@@ -48,6 +60,7 @@ const Pet_profile_component = ({
   active_tab,
   on_tab_change,
   api_base_url,
+  walker,
 }: Props) => {
   const navigation = useNavigation();
   const tab_labels = ["Acerca de", "Salud", "Contacto"] as const;
@@ -94,13 +107,12 @@ const Pet_profile_component = ({
             <View style={styles.profile_header}>
               <Image
                 source={
-                  pet.photo 
+                  pet.photo
                     ? {
-                        uri: `${api_base_url.replace(/\/$/, "")}/uploads/${
-                          pet.photo
+                      uri: `${api_base_url.replace(/\/$/, "")}/uploads/${pet.photo
                         }`,
-                      }
-                     : undefined
+                    }
+                    : undefined
                 }
                 style={styles.pet_image}
                 onError={() => console.warn("pet image error:", pet.photo)}
@@ -184,31 +196,56 @@ const Pet_profile_component = ({
               />
               <Text style={styles.section_title}>Contacto</Text>
             </View>
+
+            {/* Dueño */}
+            <Text style={[styles.label, { marginBottom: 4 }]}>Dueño de la mascota</Text>
             <View style={styles.contact_card}>
-              <Feather
-                name="user"
-                size={36}
-                color="#666"
-                style={{ marginRight: 12 }}
-              />
+              <Feather name="user" size={36} color="#666" style={{ marginRight: 12 }} />
               <View>
                 <Text style={styles.contact_name}>{pet.owner.name}</Text>
                 <Text style={styles.contact_info}>{pet.owner.phone}</Text>
                 <Text style={styles.contact_info}>{pet.owner.email}</Text>
               </View>
             </View>
-            {show_message_button && (
-              <TouchableOpacity
-              style={styles.message_button}
-              onPress={on_contact_press}
-            >
-              <Feather name="message-circle" size={18} color="#fff" />
-                <Text style={[styles.message_button_text, { marginLeft: 6 }]}>
-                Enviar WhatsApp
-              </Text>
-              </TouchableOpacity>
+
+            {/* Paseador */}
+            {walker && walker.user_id !== current_user_id && (
+              <>
+                <Text style={[styles.label, { marginTop: 20, marginBottom: 4 }]}>
+                  Paseador asignado
+                </Text>
+                <View style={styles.contact_card}>
+                  <Feather
+                    name="user-check"
+                    size={36}
+                    color="#666"
+                    style={{ marginRight: 12 }}
+                  />
+                  <View>
+                    <Text style={styles.contact_name}>{walker.name}</Text>
+                    <Text style={styles.contact_info}>{walker.phone}</Text>
+                    <Text style={styles.contact_info}>
+                      {walker.whatsapp_link.replace("https://wa.me/", "+")}
+                    </Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.message_button}
+                  onPress={() => {
+                    Linking.openURL(walker.whatsapp_link).catch(() => {
+                      Alert.alert("Error", "No se pudo abrir WhatsApp");
+                    });
+                  }}
+                >
+                  <Text style={[styles.message_button_text, { marginLeft: 6 }]}>
+                    Contactar a {walker.name} por WhatsApp
+                  </Text>
+                </TouchableOpacity>
+              </>
             )}
           </View>
+
         )}
       </ScrollView>
 
@@ -245,6 +282,13 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     backgroundColor: "#fff",
   },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+
   back_btn: {
     padding: 8,
     paddingVertical: 8,
@@ -345,10 +389,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
   },
-  label: {
-    fontSize: 14,
-    color: "#555",
-  },
   value: {
     fontSize: 14,
     fontWeight: "600",
@@ -391,6 +431,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
+    textAlign: "center",
+    flex: 1,
   },
   schedule_button: {
     backgroundColor: "#007BFF",
