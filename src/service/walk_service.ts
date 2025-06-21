@@ -93,10 +93,10 @@ export async function get_all_walks(): Promise<walk_model[]> {
         walker_id: w.walker_id,
         walker: w.walker
           ? {
-            user_id: w.walker.user_id,
-            name: w.walker.name,
-            phone: w.walker.phone,
-          }
+              user_id: w.walker.user_id,
+              name: w.walker.name,
+              phone: w.walker.phone,
+            }
           : undefined,
       };
     });
@@ -191,12 +191,20 @@ export async function get_walk_history(): Promise<walk_model[]> {
           : `${api_base_url}/uploads/${petPhotoUrl}`
         : undefined,
       sector: w.zone ?? "desconocido",
+
+      walker_id: w.walker_id,
+      is_rated: w.is_rated ?? false,
     };
   });
+
   return mapped;
 }
 
-export async function get_active_walks_by_pet(pet_id: number): Promise<walk_model[]> {
+export async function get_active_walks_by_pet(
+  pet_id: number
+): Promise<walk_model[]> {
   const all_walks = await get_all_walks();
-  return all_walks.filter(w => w.pet_id === pet_id && w.status === "confirmado");
+  return all_walks.filter(
+    (w) => w.pet_id === pet_id && w.status === "confirmado"
+  );
 }
