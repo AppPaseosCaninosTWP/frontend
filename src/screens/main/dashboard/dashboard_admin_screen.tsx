@@ -59,6 +59,7 @@ export default function Dashboard_admin_screen() {
       icon: <Feather name="layout" size={20} color="#000c14" />,
       on_press: () => navigation.navigate('dashboard_admin'),
     },
+    { label: '__separator__', icon: null, on_press: () => { } },
     {
       label: 'Usuarios',
       icon: <Ionicons name="people" size={20} color="#000c14" />,

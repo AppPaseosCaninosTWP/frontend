@@ -15,7 +15,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/stack_navigator';
-import { get_user } from '../../../utils/token_service';
+import { get_user, clear_session } from '../../../utils/token_service';
 import { get_user_pets } from '../../../service/pet_service';
 import type { pet_model } from '../../../models/pet_model';
 import SwipeButtonTWP from '../../../components/swipe_button';
@@ -29,6 +29,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../../../context/auth/auth_context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+
 
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -109,33 +110,30 @@ export default function DashboardClienteScreen() {
       ),
       on_press: () => navigation.navigate('pet_profile_cliente_screen', { petId: pet.pet_id }),
     })),
+    {
+      label: "Calificaciones",
+      icon: <Ionicons name="star" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate("ratings_screen"),
+    },
     { label: '__separator__', icon: null, on_press: () => { } },
+
     {
-      label: 'Contactos',
-      icon: <Ionicons name="search" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Contactos'),
-    },
-    {
-      label: 'Calendario',
-      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-      on_press: () => Alert.alert('Calendario'),
-    },
-    {
-      label: 'Cuenta',
+      label: 'Perfil',
       icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
       on_press: () => Alert.alert('Cuenta'),
     },
     {
       label: 'Ajustes',
       icon: <Feather name="settings" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate('settings_screen', { role: 'cliente' }),
+      on_press: () => navigation.navigate('settings_screen', { role: 'admin' }),
     },
     {
       label: 'Cerrar sesión',
-      icon: <Feather name="log-out" size={20} color="#E53935" />,
+      icon: <MaterialIcons name="logout" size={20} color="#000c14" />,
       on_press: async () => {
-        await logout();
-      }
+        await clear_session();
+        navigation.reset({ index: 0, routes: [{ name: 'login' }] });
+      },
     },
   ];
 

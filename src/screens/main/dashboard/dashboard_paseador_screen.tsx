@@ -16,6 +16,7 @@ import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../../navigation/stack_navigator";
 
+
 //Componentes
 import Screen_with_menu from "../../../components/shared/screen_with_menu";
 import BalanceCard from "../../../components/shared/balance_card";
@@ -25,6 +26,8 @@ import HomeGridCard from "../../../components/shared/home_grid_card";
 //Servicios para obtener datos backend
 import { get_assigned_walks } from "../../../service/walk_service";
 import { get_walker_profile } from "../../../service/walker_service";
+import { clear_session } from '../../../utils/token_service';
+
 //Modelos
 import type { walk_model } from "../../../models/walk_model";
 import type { walker_model } from "../../../models/walker_model";
@@ -83,25 +86,15 @@ export default function DashboardPaseadorScreen() {
   //Define las opciones del menú lateral (etiqueta, icono y acción al presionar)
   const menu_options = [
     {
-      label: "Menú Principal",
+      label: "Dashboard",
       icon: <Feather name="layout" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("dashboard_admin"),
+      on_press: () => navigation.navigate("dashboard_paseador"),
     },
+    { label: '__separator__', icon: null, on_press: () => { } },
     {
       label: "Buscar Paseos",
       icon: <Ionicons name="search" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("available_walks_screen"),
-    },
-    {
-      label: "Calendario",
-      icon: <MaterialIcons name="calendar-today" size={20} color="#000c14" />,
-      on_press: () => Alert.alert("Calendario"),
-    },
-    { label: "__separator__", icon: null, on_press: () => {} },
-    {
-      label: "Perfil",
-      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
-      on_press: () => navigation.navigate("walker_profile_screen"),
     },
     {
       label: "Calificaciones",
@@ -113,10 +106,24 @@ export default function DashboardPaseadorScreen() {
       icon: <Feather name="credit-card" size={20} color="#000c14" />,
       on_press: () => navigation.navigate("payments_walker_screen"),
     },
+    { label: "__separator__", icon: null, on_press: () => {} },
+    {
+      label: "Perfil",
+      icon: <Ionicons name="person-circle" size={20} color="#000c14" />,
+      on_press: () => navigation.navigate("walker_profile_screen"),
+    },
     {
       label: "Ajustes",
       icon: <Feather name="settings" size={20} color="#000c14" />,
       on_press: () => navigation.navigate('settings_screen', { role: 'walker' }),
+    },
+    {
+      label: 'Cerrar sesión',
+      icon: <MaterialIcons name="logout" size={20} color="#000c14" />,
+      on_press: async () => {
+        await clear_session();
+        navigation.reset({ index: 0, routes: [{ name: 'login' }] });
+      },
     },
   ];
 
