@@ -29,7 +29,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../../../context/auth/auth_context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
-
+import HomeGridCard from '../../../components/shared/home_grid_card';
 
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -292,8 +292,16 @@ export default function DashboardClienteScreen() {
           />
           <Text style={styles.card_title}>Historial</Text>
         </TouchableOpacity>
-
-
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("ratings_client_screen")}
+        >
+          <Image
+            source={require('../../../assets/admin/admin_photo1.png')}
+            style={styles.icon}
+          />
+          <Text style={styles.card_title}>Calificaciones</Text>
+        </TouchableOpacity>
       </View>
     </ScreenWithMenu>
   );
