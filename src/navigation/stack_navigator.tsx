@@ -49,6 +49,7 @@ import create_walk_screen from "../screens/main/client/walks/create_walk_screen"
 import select_walk_type_screen from "../screens/main/client/walks/select_walk_type_screen";
 import walk_confirmation_screen from "../screens/main/client/walks/walk_confirmation_screen";
 import walk_history_cliente_screen from "../screens/main/client/walks/walk_history_screen";
+import ratings_client_screen from "../screens/main/client/rating/ratings_client_screen";
 
 // Pagos Cliente
 import payments_screen_cliente from "../screens/main/client/payment/payments_screen";
@@ -114,6 +115,7 @@ export type RootStackParamList = {
   payments_screen_cliente: undefined;
   payment_detail_screen_cliente: { paymentId: number };
   payment_success_screen: undefined;
+  ratings_client_screen: undefined;
 
   settings_screen: { role: 'admin' | 'walker' | 'cliente' };
 };
@@ -180,6 +182,7 @@ export default function stack_navigator() {
       <Stack.Screen name="select_walk_type_screen" component={select_walk_type_screen} />
       <Stack.Screen name="walk_confirmation_screen" component={walk_confirmation_screen} />
       <Stack.Screen name="walk_history_cliente_screen" component={walk_history_cliente_screen} />
+      <Stack.Screen name="ratings_client_screen" component={ratings_client_screen} />
 
       {/* Pagos Cliente */}
       <Stack.Screen name="payments_screen_cliente" component={payments_screen_cliente} />
