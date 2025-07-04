@@ -294,7 +294,7 @@ export default function DashboardClienteScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("ratings_client_screen")}
+          onPress={() => navigation.navigate("walk_seen_screen")}
         >
           <Image
             source={require('../../../assets/admin/admin_photo1.png')}
@@ -353,11 +353,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   badge: {
-    backgroundColor: '#E6F4FF',
+    backgroundColor: '#fff',
     color: '#007BFF',
     paddingHorizontal: 8,
     borderRadius: 12,
     fontSize: 14,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   carousel_container: {
     marginBottom: 24,
