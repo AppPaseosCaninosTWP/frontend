@@ -120,7 +120,7 @@ export default function Dashboard_admin_screen() {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('user_screen')}
+          onPress={() => navigation.navigate('walks_screen')}
         >
           <Image
             source={require('../../../assets/admin/admin_photo2.png')}
